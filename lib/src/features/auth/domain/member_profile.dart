@@ -32,6 +32,8 @@ class MemberProfile {
   final double? latitude;
   final double? longitude;
   final int onboardingStep; // Track progress (0-5)
+  final List<String> likes;
+  final List<String> skips;
 
   MemberProfile({
     this.id,
@@ -181,4 +183,3 @@ class MemberProfile {
     );
   }
 }
-旋

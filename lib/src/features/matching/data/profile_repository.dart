@@ -51,8 +51,9 @@ class ProfileRepository {
         email: 'user$index@jodohku.my',
         photoUrl: assets[index],
         birthState: _states[index % _states.length],
-        age: (20 + (index % 10)).toString(),
-        solatFreq: 'Pasti (5 Waktu)',
+        age: 20 + (index % 10),
+        prayerFrequency: PrayerFrequency.always,
+        gender: index % 2 == 0 ? 'woman' : 'man',
       );
     });
   }
