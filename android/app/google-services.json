@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "982535553679",
+    "project_id": "jodohku-61096",
+    "storage_bucket": "jodohku-61096.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:982535553679:android:fc83b33a9233b4fee126fa",
+        "android_client_info": {
+          "package_name": "com.jodohku.malaysia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "982535553679-k423dugfs6jt4hftqlunes5b6g0jjmv7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbxvvAGSneMUUu06brek_zGudVlhSQSII"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "982535553679-k423dugfs6jt4hftqlunes5b6g0jjmv7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
