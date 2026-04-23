@@ -2,7 +2,7 @@ name: Flutter CI/CD
 
 on:
   push:
-    branches: [ main, client-ami ]
+    branches: [ main, master, client-ami ]
   pull_request:
     branches: [ main ]
 
