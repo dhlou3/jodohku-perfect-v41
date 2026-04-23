@@ -52,13 +52,6 @@ class AIMatcher {
     return max(5.0, min(99.0, score));
   }
 
-    // 4. RANDOM STABILITY HASH (AI "Vibe")
-    final seed = user1.id.hashCode ^ user2.id.hashCode;
-    score += (Random(seed).nextDouble() * 5);
-
-    return max(5.0, min(99.0, score));
-  }
-
   static String getCompatibilityLabel(double score) {
     if (score >= 90) return "Sangat Serasi (Sultan Match)";
     if (score >= 75) return "Serasi (Barakah)";
