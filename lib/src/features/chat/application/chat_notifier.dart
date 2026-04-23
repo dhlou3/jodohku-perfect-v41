@@ -41,10 +41,21 @@ class ChatNotifier extends StateNotifier<List<ChatSession>> {
   }
 
   // LOGIC: Unlocking the next Taaruf Question (CLOUD SYNCED)
-  void advanceQuestion(String sessionId, int currentIndex) async {
-    final nextIndex = currentIndex + 1;
+  void advanceQuestion(String sessionId) async {
+    final session = state.firstWhere((s) => s.id == sessionId);
+    final nextIndex = session.currentQuestionIndex + 1;
     await FirestoreService.advanceTaarufQuestion(sessionId, nextIndex);
   }
+
+  void attachWali(String sessionId, String waliId) {
+    // SECURITY: Connects the supervisor to the session
+  }
+
+  void requestMeeting(String sessionId, String senderId) {
+    // LOGIC: Proposals for physical meeting
+  }
+
+  void sendMessage(String sessionId, String senderId, String text) {
     final filteredText = _halalGuard(text);
     
     // In production, this would call DB.sendMessage/FirestoreService.sendMessage

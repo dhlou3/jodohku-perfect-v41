@@ -116,7 +116,7 @@ class _TaarufQuestionScreenState extends State<TaarufQuestionScreen> {
                   
                   ElevatedButton(
                     onPressed: () => setState(() => _currentIdx++),
-                    style: AppTheme.proButtonPrimary,
+                    style: AppTheme.vibrantButton,
                     child: const Text('SETERUSNYA \u2192'),
                   ),
                 ],
