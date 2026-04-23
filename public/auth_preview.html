@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joduhku Auth Flow - Premium Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --midnight: #020617;
+            --slate: #0F172A;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --gold: #FACC15;
+            --gold-glow: 0 0 20px rgba(250, 204, 21, 0.3);
+            --cyan: #22D3EE;
+            --emerald: #10B981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        
+        body { 
+            background: #000; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: white; 
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(250, 204, 21, 0.05) 0%, transparent 40%);
+        }
+
+        .phone { 
+            width: 375px; 
+            height: 750px; 
+            background: var(--midnight); 
+            border-radius: 44px; 
+            border: 8px solid #1E293B; 
+            position: relative; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.05); 
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #1E293B;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            z-index: 1000;
+        }
+
+        .view { 
+            position: absolute; 
+            inset: 0; 
+            display: none; 
+            flex-direction: column; 
+            padding: 60px 24px 40px; 
+            background: var(--midnight);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .view.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Elements */
+        .logo-area { text-align: left; margin-bottom: 40px; }
+        .logo { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
+        .logo span { color: var(--gold); }
+        .subtitle { color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 4px; }
+
+        .glass-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 32px 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        h2 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+        p.desc { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 32px; line-height: 1.5; }
+
+        .input-group { margin-bottom: 24px; }
+        label { display: block; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.4); letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
+        
+        .input-wrapper {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--gold);
+            background: rgba(250, 204, 21, 0.05);
+        }
+
+        input { background: transparent; border: none; color: white; font-size: 16px; width: 100%; outline: none; }
+        input::placeholder { color: rgba(255,255,255,0.2); }
+
+        .btn-primary {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: 0.3s;
+            box-shadow: var(--gold-glow);
+        }
+
+        .btn-primary:hover { transform: scale(1.02); }
+
+        .btn-secondary {
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        /* OTP Specific */
+        .otp-container { display: flex; justify-content: space-between; gap: 8px; margin: 32px 0; }
+        .otp-box { 
+            width: 48px; 
+            height: 60px; 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 24px; 
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        /* Registration Badge */
+        .auto-fill-badge {
+            background: rgba(34, 211, 238, 0.1);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            border-radius: 20px;
+            padding: 16px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 12px;
+        }
+
+        .info-item { text-align: left; }
+        .info-label { font-size: 8px; color: rgba(34, 211, 238, 0.6); font-weight: 800; }
+        .info-val { font-size: 12px; font-weight: 700; margin-top: 2px; }
+
+        .footer-text { margin-top: auto; text-align: center; font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.6; padding-top: 40px; }
+        .footer-text span { color: var(--gold); cursor: pointer; }
+
+        .back-btn { position: absolute; top: 55px; right: 24px; color: rgba(255,255,255,0.4); cursor: pointer; font-size: 12px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="notch"></div>
+        
+        <!-- LOGIN / ADD PHONE SCREEN -->
+        <div id="vLogin" class="view active">
+            <div class="logo-area">
+                <div class="logo">Joduh<span>ku</span></div>
+                <div class="subtitle">Malaysia's Premier Halal Connection</div>
+            </div>
+            
+            <div class="glass-card">
+                <h2>Tambah Nombor</h2>
+                <p class="desc">Kami akan menghantar kod pengesahan untuk mengaktifkan akaun anda.</p>
+                
+                <div class="input-group">
+                    <label>NOMBOR TELEFON</label>
+                    <div class="input-wrapper">
+                        <span style="font-weight: 600; color: var(--gold); font-size: 14px;">🇲🇾 +60</span>
+                        <input type="text" placeholder="12 345 6789" id="phoneInput">
+                    </div>
+                </div>
+                
+                <button class="btn-primary" onclick="showV('vOtp')">DAPATKAN KOD OTP</button>
+            </div>
+            
+            <div class="footer-text">
+                Dengan mendaftar, anda bersetuju dengan <span>Terma</span> & <span>Dasar Privasi</span> kami.
+            </div>
+        </div>
+
+        <!-- OTP SCREEN -->
+        <div id="vOtp" class="view">
+            <div class="back-btn" onclick="showV('vLogin')">KEMBALI</div>
+            <div class="logo-area">
+                <div class="logo">Kod<span>OTP</span></div>
+                <div class="subtitle">Sahkan identiti anda</div>
+            </div>
+            
+            <div class="glass-card">
+                <h2>Semak Mesej</h2>
+                <p class="desc">Kod 6-digit dihantar ke +60 12 ••• ••89</p>
+                
+                <div class="otp-container">
+                    <div class="otp-box">4</div>
+                    <div class="otp-box">8</div>
+                    <div class="otp-box">2</div>
+                    <div class="otp-box"></div>
+                    <div class="otp-box"></div>
+                    <div class="otp-box"></div>
+                </div>
+                
+                <button class="btn-primary" onclick="showV('vRegister')">SAHKAN KOD</button>
+                <div style="text-align: center; margin-top: 20px;">
+                    <span style="font-size: 12px; color: var(--gold); cursor: pointer; font-weight: 600;">Hantar Semula dalam 45s</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- REGISTRATION / SIGN UP SCREEN -->
+        <div id="vRegister" class="view">
+            <div class="logo-area">
+                <div class="logo">Daftar<span>Akaun</span></div>
+                <div class="subtitle">Lengkapkan biografi anda</div>
+            </div>
+            
+            <div style="overflow-y: auto; padding-bottom: 20px; scrollbar-width: none;">
+                <div class="input-group">
+                    <label>NAMA PENUH (SEPERTI IC)</label>
+                    <div class="input-wrapper">
+                        <input type="text" placeholder="Ahmad Bin Abdullah">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>NO. KAD PENGENALAN (12 DIGIT)</label>
+                    <div class="input-wrapper">
+                        <input type="text" placeholder="001225140123" value="001225140123" readonly>
+                    </div>
+                </div>
+
+                <!-- AUTO-FILLED INFO FROM IC -->
+                <div class="auto-fill-badge">
+                    <div class="info-item">
+                        <div class="info-label">UMUR</div>
+                        <div class="info-val">24 Tahun</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">NEGERI</div>
+                        <div class="info-val">Kuala Lumpur</div>
+                    </div>
+                    <div class="info-item" style="text-align: right;">
+                        <div class="info-label">JANTINA</div>
+                        <div class="info-val">Lelaki</div>
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-top: 32px;">
+                    <label>ID KEAHLIAN</label>
+                    <div style="color: var(--gold); font-weight: 800; font-size: 18px; letter-spacing: 1px;">JDK-2026-6842</div>
+                </div>
+
+                <button class="btn-primary" onclick="showV('vSuccess')" style="margin-top: 20px;">CIPTA AKAUN & CARI JODOH</button>
+            </div>
+        </div>
+
+        <!-- SUCCESS SCREEN -->
+        <div id="vSuccess" class="view" style="justify-content: center; align-items: center; text-align: center;">
+            <div style="width: 100px; height: 100px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--emerald); margin-bottom: 40px; box-shadow: 0 0 40px rgba(16, 185, 129, 0.2);">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h1 style="font-size: 32px; margin-bottom: 12px;">Tahniah!</h1>
+            <p style="color: rgba(255,255,255,0.6); max-width: 250px; margin-bottom: 48px;">Akaun anda telah diaktifkan secara eksklusif.</p>
+            
+            <button class="btn-primary" onclick="window.location.href='app_preview.html'">PENGALAMAN DIAMOND</button>
+        </div>
+    </div>
+
+    <script>
+        function showV(id) {
+            document.querySelectorAll('.view').forEach(v => {
+                v.classList.remove('active');
+            });
+            const target = document.getElementById(id);
+            target.classList.add('active');
+        }
+
+        // Auto-focus logic for demo if needed
+    </script>
+</body>
+</html>

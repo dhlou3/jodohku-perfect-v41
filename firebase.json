@@ -1,0 +1,21 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "lib/**",
+      "backend/**",
+      "pubspec.yaml",
+      "firestore.rules",
+      "storage.rules"
+    ],
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/landing_preview.html"
+      }
+    ]
+  }
+}

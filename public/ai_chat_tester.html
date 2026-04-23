@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku Sentinel AI - Chat & Context Tester</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --gold: #BD8B52; 
+            --gold-light: #D4AF37;
+            --bg-cream: #FCFAF7; 
+            --danger: #EF4444; 
+            --success: #10B981;
+            --glass: rgba(255, 255, 255, 0.8);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit', sans-serif; }
+        body { 
+            background: #111827; 
+            background-image: radial-gradient(circle at 20% 30%, #1e293b 0%, #111827 100%);
+            min-height:100vh; 
+            display:flex; 
+            justify-content:center; 
+            align-items:center; 
+            padding: 20px;
+            color: #f8fafc;
+        }
+
+        .tester-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            height: 850px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Phone Simulator */
+        .phone { 
+            width:375px; height:812px; background:white; border-radius:44px; border:8px solid #334155; 
+            position:relative; overflow:hidden; display:flex; flex-direction:column; 
+            box-shadow:0 50px 100px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+
+        .chat-header { 
+            padding: 55px 20px 15px; 
+            background:white; border-bottom:1px solid #F3F4F6; 
+            display:flex; align-items:center; gap:12px;
+        }
+        .chat-av { width:40px; height:40px; border-radius:12px; background:var(--gold); display:flex; align-items:center; justify-content:center; color:white; font-weight:900; }
+        .chat-name { flex:1; font-weight:800; color:#111827; font-size:16px; }
+        .meeting-btn { padding: 8px 12px; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; color:#166534; font-size:12px; font-weight:900; cursor:pointer; }
+
+        .chat-area { flex:1; padding:20px; background:var(--bg-cream); overflow-y:auto; display:flex; flex-direction:column; gap:10px; scroll-behavior: smooth; }
+        .msg { max-width:80%; padding:12px 16px; border-radius:18px; font-size:14px; font-weight:600; line-height:1.4; position:relative; }
+        .me { align-self:flex-end; background:var(--gold); color:white; border-bottom-right-radius:4px; }
+        .them { align-self:flex-start; background:white; color:#111827; border-bottom-left-radius:4px; border:1px solid #E5E7EB; }
+        .redacted { background: #fee2e2 !important; color: #991b1b !important; border-color: #fca5a5 !important; font-style: italic; }
+
+        .chat-input-bar { padding:20px; background:white; display:flex; gap:10px; align-items:center; }
+        .chat-input-bar input { flex:1; padding:12px 20px; border-radius:100px; border:1.5px solid #F3F4F6; outline:none; font-weight:600; }
+        .send-btn { width:44px; height:44px; background:var(--gold); color:white; border:none; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+
+        /* Dashboard */
+        .dashboard {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            overflow-y: auto;
+        }
+
+        .dash-header h2 { font-family:'Playfair Display', serif; font-size:32px; color:var(--gold); margin-bottom:10px; }
+        .dash-header p { color: #94a3b8; font-size: 14px; }
+
+        .setting-group { display: flex; flex-direction: column; gap:10px; }
+        .setting-label { font-size: 12px; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        .setting-input { background: rgba(15, 23, 42, 0.5); border: 1px solid #334155; padding: 12px 16px; border-radius: 12px; color: white; outline:none; font-size:14px; }
+        .setting-input:focus { border-color: var(--gold); }
+
+        .slider-container { display: flex; align-items: center; gap: 15px; }
+        input[type=range] { flex: 1; accent-color: var(--gold); }
+
+        .log-section { flex: 1; display:flex; flex-direction:column; gap:15px; }
+        .log-container { flex: 1; background: rgba(15, 23, 42, 0.4); border-radius: 20px; padding: 20px; font-family: 'Courier New', Courier, monospace; font-size: 13px; overflow-y: auto; border: 1px solid rgba(189,139,82,0.1); }
+        .log-entry { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .log-time { color: var(--gold); margin-right: 10px; }
+        .log-type { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 900; text-transform: uppercase; margin-right: 10px; }
+        .type-info { background: #3b82f633; color: #3b82f6; }
+        .type-warning { background: #f59e0b33; color: #f59e0b; }
+        .type-danger { background: #ef444433; color: #ef4444; }
+
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .stat-card { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-val { font-size: 24px; font-weight: 900; color: var(--gold); }
+        .stat-lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-top: 5px; }
+
+        /* Badge animations */
+        .sentinel-pulse { 
+            width: 12px; height: 12px; background: var(--success); border-radius: 50%; 
+            display: inline-block; animation: pulse 2s infinite; 
+        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+    </style>
+</head>
+<body>
+    <div class="tester-container">
+        <!-- SIMULATOR -->
+        <div class="phone">
+            <header class="chat-header">
+                <div class="chat-av">A</div>
+                <div class="chat-name">Aisyah (AI Calon)</div>
+                <div class="meeting-btn" onclick="alert('Ini adalah butang Pertemuan Rasmi. Sentinel akan memastikan anda menggunakannya!')">🤝 MEET</div>
+            </header>
+            <div class="chat-area" id="chatArea">
+                <div class="them msg">Assalamualaikum! Saya Aisyah. Apa khabar hari ini? ✨</div>
+            </div>
+            <div class="chat-input-bar">
+                <input type="text" id="userInput" placeholder="Tulis mesej anda..." onkeypress="if(event.key==='Enter') sendMsg()">
+                <button class="send-btn" onclick="sendMsg()">➔</button>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard">
+            <div class="dash-header">
+                <h2>Sentinel AI Console <span class="sentinel-pulse"></span></h2>
+                <p>Monitoring context, safety, and Sharia compliance in real-time.</p>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-val" id="privacyScore">100%</div>
+                    <div class="stat-lbl">Privacy Integrity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="violationCount">0</div>
+                    <div class="stat-lbl">Violations Blocked</div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">Sentinel Sensitivity</label>
+                <div class="slider-container">
+                    <span>Low</span>
+                    <input type="range" id="sensitivity" min="0" max="100" value="80">
+                    <span>Elite</span>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">Gemini API Key (Optional for Deep Context)</label>
+                <input type="password" id="apiKey" class="setting-input" placeholder="Enter API Key to enable Context-AI...">
+            </div>
+
+            <div class="log-section">
+                <label class="setting-label">Sentinel Live Logs</label>
+                <div class="log-container" id="logContainer">
+                    <div class="log-entry"><span class="log-time">18:28:50</span> <span class="log-type type-info">System</span> Sentinel Engine initialized.</div>
+                </div>
+            </div>
+
+            <div style="font-size:11px; color:#64748b; text-align:center;">
+                🛡️ Enforcing "Elite Taaruf" standards. Context keywords tracked: <b>Zus, Coffee, Park, Jumpa, Meeting, WhatsApp</b>.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const logContainer = document.getElementById('logContainer');
+        const privacyScoreEl = document.getElementById('privacyScore');
+        const violationCountEl = document.getElementById('violationCount');
+        
+        let score = 100;
+        let violations = 0;
+
+        const FORBIDDEN_WORDS = ['babi', 'sial', 'bodoh', 'pala hotak', 'fuck', 'shit']; // Safety Layer
+        const MEETING_KEYWORDS = ['zus', 'coffee', 'kopi', 'kafe', 'kfc', 'mcd', 'jumpa', 'meet', 'park', 'wayang', 'tealive'];
+
+        function addLog(type, msg) {
+            const time = new Date().toLocaleTimeString('ms-MY', { hour12: false });
+            const typeClass = type === 'Danger' ? 'type-danger' : (type === 'Warning' ? 'type-warning' : 'type-info');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">${time}</span> <span class="log-type ${typeClass}">${type}</span> ${msg}`;
+            logContainer.prepend(entry);
+        }
+
+        function createMsg(text, isMe, isRedacted = false) {
+            const div = document.createElement('div');
+            div.className = `msg ${isMe ? 'me' : 'them'} ${isRedacted ? 'redacted' : ''}`;
+            div.innerText = text;
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        async function evaluateMessage(text) {
+            const raw = text.toLowerCase();
+            const sensitivity = document.getElementById('sensitivity').value;
+            let result = { isSafe: true, reason: '', redacted: null };
+
+            // 1. Safety Check (Profanity)
+            const hasBadWord = FORBIDDEN_WORDS.some(w => raw.includes(w));
+            if (hasBadWord) {
+                result.isSafe = false;
+                result.reason = 'Unsafe language detected / Kesantunan Bahasa.';
+                result.redacted = '[MAKLUMAT DISELINDUNG OLEH AI SEKURITI]';
+                return result;
+            }
+
+            // 2. Leak Detection (Regex)
+            const hasNumbers = /[0-9]{7,}/.test(raw.replace(/[^0-9]/g, ''));
+            const isLeakageApp = /whatsapp|wasap|wasp|tele|insta|ig|wechat|line|muka buku|fb|nombor|fon/i.test(raw);
+            if (hasNumbers || isLeakageApp) {
+                result.isSafe = false;
+                result.reason = 'Privacy Leak detected (Phone/Handle).';
+                result.redacted = '[MAKLUMAT DISELINDUNG OLEH AI SEKURITI]';
+                return result;
+            }
+
+            // 3. Context Analysis (The "Zus Coffee" logic)
+            // Heuristic for "Let's meet at [X]"
+            const intentToMeet = /jumpa|meet|lepak|dating|date/i.test(raw);
+            const hasPlace = MEETING_KEYWORDS.some(w => raw.includes(w));
+            
+            if (intentToMeet && hasPlace) {
+                result.isSafe = false;
+                result.reason = `Bypass attempt: External meeting intent detected (${hasPlace ? 'Place mention' : 'Direct request'}). Use the "MEET" button instead.`;
+                result.redacted = '[MEET UP TANPA WALI DI HALANG]';
+                return result;
+            }
+
+            // Real Gemini hook if API key is present
+            const apiKey = document.getElementById('apiKey').value;
+            if (apiKey && sensitivity > 70) {
+                try {
+                    addLog('System', 'Consulting Deep Context AI...');
+                    // In a real scenario, we'd fetch Gemini API here.
+                    // For simulation, we'll assume the model is even stricter.
+                } catch (e) {}
+            }
+
+            return result;
+        }
+
+        async function sendMsg() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            addLog('Info', `Analyzing message: "${text}"`);
+
+            const evaluation = await evaluateMessage(text);
+
+            if (!evaluation.isSafe) {
+                violations++;
+                score = Math.max(0, score - 20);
+                addLog('Danger', evaluation.reason);
+                createMsg(evaluation.redacted, true, true);
+                
+                // Feedback
+                violationCountEl.innerText = violations;
+                privacyScoreEl.innerText = score + '%';
+                privacyScoreEl.style.color = score < 50 ? 'var(--danger)' : 'var(--gold)';
+            } else {
+                createMsg(text, true);
+                addLog('Info', 'Message cleared Sharia-Sentinel check.');
+                
+                // Mock Response
+                setTimeout(() => {
+                    simulateAIResponse(text);
+                }, 1000);
+            }
+        }
+
+        function simulateAIResponse(userText) {
+            const raw = userText.toLowerCase();
+            let response = "Saya setuju. Yang penting kita jaga adab taaruf ini. 🙂";
+            
+            if (raw.includes('minat') || raw.includes('hobi')) {
+                response = "Saya suka membaca novel sejarah. Awak pula bagaimana?";
+            } else if (raw.includes('kerja') || raw.includes('pangkat')) {
+                response = "Bagi saya, keberkatan rezeki lebih utama dari pangkat. Setuju?";
+            } else if (raw.includes('apa khabar')) {
+                response = "Alhamdulillah, sihat walafiat. Saya tengah siapkan laporan kerja sikit.";
+            }
+
+            createMsg(response, false);
+            addLog('Info', 'AI Response delivered.');
+        }
+    </script>
+</body>
+</html>

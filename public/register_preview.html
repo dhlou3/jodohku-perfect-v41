@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Daftar Akaun (Final Restore)</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap"
+        rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root {
+            --gold: #BD8B52;
+            --orange: #C67C22;
+            --bg-midnight: #0B0E14;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #000;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: var(--bg-midnight);
+            border-radius: 44px;
+            border: 8px solid #1E293B;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .bg-img {
+            position: absolute;
+            inset: 0;
+            background-image: url('assets/images/wedding_hero.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+            filter: saturate(0.6) brightness(0.4);
+        }
+
+        .gradient-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(11, 14, 20, 0.1) 0%, rgba(11, 14, 20, 0.6) 50%, rgba(11, 14, 20, 0.9) 100%);
+            z-index: 1;
+        }
+
+        .accent-glow {
+            position: absolute;
+            top: -100px;
+            right: -50px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(189, 139, 82, 0.15) 0%, transparent 70%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .page-content {
+            flex: 1;
+            padding: 50px 24px;
+            display: flex;
+            flex-direction: column;
+            z-index: 3;
+            position: relative;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.7;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .back-btn:hover { opacity: 1; transform: translateX(-3px); }
+
+        .hero-section {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        .hero-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+        .hero-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%; height: 80%;
+            background: radial-gradient(circle, rgba(189, 139, 82, 0.1) 0%, transparent 80%);
+            border-radius: 50%;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 38px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .tagline {
+            font-size: 15px;
+            color: #9CA3AF;
+            font-weight: 500;
+            line-height: 1.5;
+            padding: 0 10px;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 32px 20px;
+            margin-top: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 22px;
+            background: white;
+            color: #111827;
+            border-radius: 100px;
+            font-size: 17px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .btn-google:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+        .btn-google:active { transform: scale(0.97); }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #9CA3AF;
+        }
+        .footer-note a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 800;
+            margin-left: 6px;
+            transition: 0.3s;
+        }
+        .footer-note a:hover { opacity: 0.8; text-decoration: underline; }
+
+        .security-badge {
+            margin: 30px auto 0;
+            font-size: 11px;
+            font-weight: 800;
+            color: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <div class="bg-img"></div>
+        <div class="gradient-overlay"></div>
+        <div class="accent-glow"></div>
+        <div class="page-content">
+            <a href="landing_preview.html" class="back-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span data-t="back">Kembali</span>
+            </a>
+
+            <!-- HERO SECTION -->
+            <div class="hero-section">
+                <div class="hero-icon">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="48" stroke="url(#goldGradient)" stroke-width="2" stroke-dasharray="10 5"/>
+                        <path d="M50 25C36.1929 25 25 36.1929 25 50C25 63.8071 36.1929 75 50 75C63.8071 75 75 63.8071 75 50" stroke="var(--gold)" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M65 35L75 25M75 50L85 50M65 65L75 75" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/>
+                        <defs>
+                            <linearGradient id="goldGradient" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#BD8B52"/>
+                                <stop offset="100%" stop-color="#F3D1A5"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1 data-t="create_account_title">Daftar Akaun</h1>
+                <p class="tagline" data-t="register_tagline">Sertai komuniti untuk perjalanan yang diberkati.</p>
+            </div>
+
+            <!-- ACTION CARD -->
+            <div class="action-card">
+                <button class="btn-google" id="gRegB">
+                    <img src="https://img.icons8.com/color/48/000000/google-logo.png" width="22" height="22">
+                    <span style="letter-spacing: -0.5px;">Continue with Google</span>
+                </button>
+
+                <div class="footer-note">
+                    <span data-t="already_account">Sudah ada akaun?</span>
+                    <a href="login_preview.html" data-t="login">Log Masuk</a>
+                </div>
+            </div>
+            
+            <div class="security-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Identity Verified Registration
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import { DB } from './database.js';
+        
+        // 🚀 SMART GOOGLE ONE-TAP REGISTRATION
+        document.getElementById('gRegB').onclick = async () => {
+            try {
+                // ADDING A LOADING STATE VIBE
+                const btn = document.getElementById('gRegB');
+                const originalContent = btn.innerHTML;
+                btn.innerHTML = 'Signing in...';
+                btn.style.opacity = '0.7';
+                btn.style.pointerEvents = 'none';
+
+                const gUser = await DB.signInWithGoogle();
+                if (gUser) {
+                    console.log("💎 [One-Tap] Google identity secured:", gUser.email);
+                    
+                    const uid = gUser.uid;
+                    const finalUser = {
+                        email: gUser.email,
+                        photoUrl: gUser.photoUrl,
+                        authProvider: 'google',
+                        isIdentityVerified: false,
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    await window.fs_sdk.setDoc(window.fs_sdk.doc(window.firestore_db, "users", uid), finalUser);
+                    localStorage.setItem('current_user_id', uid);
+                    window.location.href = 'onboarding_name.html';
+                } else {
+                    btn.innerHTML = originalContent;
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                }
+            } catch (e) {
+                console.error("Auth Fail:", e);
+                alert("Gagal daftar dengan Google. Sila cuba lagi.");
+                location.reload();
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if(window.I18N) window.I18N.translatePage();
+        });
+    </script>
+</body>
+
+</html>

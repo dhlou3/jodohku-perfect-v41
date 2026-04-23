@@ -1,0 +1,59 @@
+name: jodohku_malaysia
+description: A production-ready, Sharia-compliant Halal dating app for Malaysia.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
+  firebase_core: ^2.24.2
+  cloud_firestore: ^4.14.0
+  firebase_auth: ^4.15.3
+  firebase_storage: ^11.5.6
+  cloud_functions: ^4.5.3
+  google_maps_flutter: ^2.5.3
+  image_picker: ^1.0.7
+  google_fonts: ^6.1.0
+  shimmer: ^3.0.0
+  flutter_animate: ^4.2.0
+  glassmorphism: ^3.0.0
+  intl: ^0.19.0
+  geolocator: ^10.1.0
+  font_awesome_flutter: ^10.6.0
+  cached_network_image: ^3.3.0
+  flutter_svg: ^2.0.9
+  vibration: ^1.8.4
+  local_auth: ^2.1.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  riverpod_generator: ^2.3.9
+  build_runner: ^2.4.7
+
+flutter:
+  uses-material-design: true
+  
+  fonts:
+    - family: Outfit
+      fonts:
+        - asset: assets/fonts/Outfit-Regular.ttf
+        - asset: assets/fonts/Outfit-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Outfit-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Outfit-Bold.ttf
+          weight: 700
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/translations/
+    - assets/legal/

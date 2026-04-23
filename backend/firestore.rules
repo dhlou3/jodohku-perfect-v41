@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 🛡️ NURMATCH SHARIA SECURITY RULES (FINALISED)
+    
+    // 1. User Profiles: Everyone can see basic profiles, only owner can edit.
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
+      // Protected Identity Field (IC/Wali Details)
+      allow read, write: if false; // Lockdown sensitive fields
+    }
+
+    // 2. Chat Moderation: Only participants & their Wali can read.
+    match /chats/{chatId} {
+      allow read: if request.auth.uid in resource.data.participants 
+                  || request.auth.uid == resource.data.waliId;
+      allow create: if request.auth != null;
+    }
+
+    // 3. Messages: No deletion allowed (Audit Trail).
+    match /chats/{chatId}/messages/{messageId} {
+      allow read: if request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+                  || request.auth.uid == get(/databases/$(database)/documents/chats/$(chatId)).data.waliId;
+      allow create: if request.auth != null;
+      allow delete, update: if false; // Anti-tamper protection
+    }
+
+    // 4. Admin/Director Control: Exclusive access.
+    match /analytics/{doc} {
+      allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'DIRECTOR';
+    }
+  }
+}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Profil Terperinci</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --orange-btn: #C67C22; --bg-cream: #FDF9F4; --text-dark: #1F2937; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .phone { width: 375px; height: 812px; background: white; border-radius: 44px; border: 8px solid #1E293B; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 40px 80px rgba(0,0,0,0.1); }
+        .content { flex: 1; overflow-y: auto; scrollbar-width: none; background: var(--bg-cream); padding-bottom: 150px; }
+        
+        .profile-header { height: 400px; background-size: cover; background-position: center; position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 30px 24px; color: white; background-color: #BD8B52; }
+        .header-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%); }
+        .header-back { position: absolute; top: 50px; left: 24px; font-size: 24px; cursor: pointer; text-decoration: none; color: white; z-index: 10; width: 40px; height: 40px; background: rgba(0,0,0,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .h-jdkid { position: relative; font-size: 26px; font-weight: 900; letter-spacing: 1px; z-index: 5; }
+        .h-meta { position: relative; font-size: 14px; font-weight: 500; opacity: 0.9; z-index: 5; margin-top: 4px; }
+
+        .section { padding: 30px 24px; background: white; margin-bottom: 12px; }
+        .sec-label { font-size: 10px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; display: block; }
+        .sec-content { font-size: 15px; font-weight: 500; color: #4B5563; line-height: 1.6; }
+
+        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { padding: 8px 16px; border-radius: 100px; border: 1px solid #E5E7EB; font-size: 12px; font-weight: 600; color: #6B7280; }
+        .tag-active { color: var(--gold); border-color: var(--gold); background: #FFF9F2; }
+
+        .info-list { margin-top: 10px; }
+        .info-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #F9FAFB; }
+        .info-icon { font-size: 20px; width: 40px; height: 40px; background: var(--bg-cream); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .info-txt-label { font-size: 11px; font-weight: 600; color: #9CA3AF; margin-bottom: 2px; }
+        .info-txt-val { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+
+        .actions-bar { position: absolute; bottom: 0; width: 100%; padding: 20px 24px 40px; background: linear-gradient(to top, white 80%, rgba(255,255,255,0)); display: flex; gap: 15px; }
+        .btn-skip { flex: 1; padding: 18px; border-radius: 100px; background: #FFF7ED; color: #4B5563; border: 1px solid #FFEDD5; font-size: 15px; font-weight: 800; cursor: pointer; }
+        .btn-like { flex: 2; padding: 18px; border-radius: 100px; background: var(--orange-btn); color: white; border: none; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(198,124,34,0.3); }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="content">
+            <div class="profile-header" id="headerBg">
+                <div class="header-overlay"></div>
+                <a href="explore_preview.html" class="header-back">‹</a>
+                <div class="h-jdkid" id="jdkId">...</div>
+                <div class="h-meta" id="headerMeta">...</div>
+            </div>
+
+            <div class="section">
+                <span class="sec-label" data-t="tentang_saya">TENTANG SAYA</span>
+                <p class="sec-content" id="bioText">Memuatkan maklumat...</p>
+            </div>
+
+            <div class="section">
+                <span class="sec-label" data-t="minat_hobi">MINAT & HOBI</span>
+                <div class="tag-container" id="hobbiesContainer">
+                    <div class="tag tag-active">Suka Memasak</div>
+                    <div class="tag">Introvert</div>
+                    <div class="tag">Anak Sulung</div>
+                    <div class="tag">Hafaz 1 Juzuk</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <span class="sec-label" data-t="maklumat_asas">MAKLUMAT ASAS</span>
+                <div class="info-list">
+                    <div class="info-item">
+                        <div class="info-icon">🎓</div>
+                        <div><div class="info-txt-label" data-t="pendidikan">Pendidikan</div><div class="info-txt-val" id="eduVal">Ijazah Sarjana Muda</div></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🕌</div>
+                        <div><div class="info-txt-label" data-t="pegangan_agama">Pegangan Agama</div><div class="info-txt-val">Sunni (Syafi'i)</div></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">💍</div>
+                        <div><div class="info-txt-label" data-t="marital_status">Status</div><div class="info-txt-val" id="statusVal">Belum Berkahwin</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-bar" id="actionArea">
+            <button class="btn-skip" onclick="handleAction('refuse')" data-t="langkau">✕ Langkau</button>
+            <button class="btn-like" onclick="handleAction('accept')" data-t="suka_profil">💖 Suka Profil</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import './database.js';
+        let targetPhone = ''; let currentUser = null;
+
+        function calculateAge(birthday) {
+            if(!birthday) return '24';
+            const b = new Date(birthday); const today = new Date();
+            let age = today.getFullYear() - b.getFullYear();
+            if (today.getMonth() < b.getMonth() || (today.getMonth() === b.getMonth() && today.getDate() < b.getDate())) age--;
+            return age || '24';
+        }
+
+        async function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            targetPhone = sessionStorage.getItem('jdk_target_phone') || urlParams.get('phone');
+            currentUser = await DB.getCurrentUser();
+            
+            if (!targetPhone) return;
+
+            const all = await DB.getAllUsers();
+            const p = all.find(u => u.phone === targetPhone);
+
+            if (p) {
+                document.getElementById('jdkId').innerText = p.jdkId || 'JDK-USER';
+                document.getElementById('headerMeta').innerText = `📍 ${p.location_name || 'Malaysia'} • ${p.job || 'Ahli'} • ${calculateAge(p.birthday)} ${window.I18N.t('years_old')}`;
+                document.getElementById('bioText').innerText = p.bio || 'Tiada bio disediakan.';
+                document.getElementById('statusVal').innerText = p.marital_status || 'Belum Berkahwin';
+                document.getElementById('eduVal').innerText = p.education || 'Ijazah Sarjana Muda';
+
+                if (p.photos && p.photos.length > 0) {
+                    document.getElementById('headerBg').style.backgroundImage = `url('${p.photos[0]}')`;
+                }
+
+                // Hobbies/Tags Rendering
+                const hContainer = document.getElementById('hobbiesContainer');
+                if (p.interests && p.interests.length > 0) {
+                    hContainer.innerHTML = p.interests.map(t => `<div class="tag">${t}</div>`).join('');
+                }
+            }
+        }
+
+        window.handleAction = async (type) => {
+            if (!currentUser || !targetPhone) return;
+            if (type === 'accept') {
+                await DB.acceptInterest(currentUser.phone, targetPhone);
+                alert(window.I18N.t('match_success'));
+                window.location.href = 'sembang.html';
+            } else {
+                await DB.refuseInterest(currentUser.phone, targetPhone);
+                window.location.href = 'explore_preview.html';
+            }
+        }
+        init();
+    </script>
+</body>
+</html>

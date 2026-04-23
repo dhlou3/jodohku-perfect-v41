@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Nombor Telefon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand-gold: #BD8B52; --text-dark: #1F2937; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .phone { width: 375px; height: 812px; background: white; border-radius: 44px; border: 8px solid #1E293B; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 40px 80px rgba(0,0,0,0.1); }
+        
+        .header { padding: 24px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid #F3F4F6; }
+        .back-btn { font-size: 24px; color: #9CA3AF; cursor: pointer; text-decoration: none; }
+        .header h1 { font-size: 20px; font-weight: 700; color: var(--text-dark); }
+        
+        .content { flex: 1; padding: 24px; }
+        .instruction { font-size: 14px; color: #9CA3AF; line-height: 1.5; margin-bottom: 30px; }
+        
+        .label { font-size: 11px; font-weight: 800; color: var(--brand-gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        
+        .input-box { 
+            display: flex; align-items: center; gap: 12px; border: 1.5px solid #F3F4F6; border-radius: 16px; 
+            padding: 14px 18px; background: #FDF9F4; margin-bottom: 24px;
+        }
+        .prefix { font-weight: 700; color: var(--text-dark); }
+        input { border: none; background: transparent; font-size: 16px; color: var(--text-dark); outline: none; width: 100%; }
+
+        .save-btn { 
+            width: 100%; padding: 18px; background: var(--brand-gold); color: white; border-radius: 100px; 
+            font-size: 16px; font-weight: 700; border: none; cursor: pointer;
+        }
+        #errorMsg { color: #F87171; font-size: 12px; font-weight: 600; margin-top: 10px; text-align: center; display: none; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header">
+            <a href="settings_preview.html" class="back-btn">←</a>
+            <h1>Nombor Telefon</h1>
+        </header>
+
+        <div class="content" id="step1">
+            <p class="instruction">Nombor telefon digunakan untuk log masuk dan menerima kod pengesahan penting.</p>
+
+            <span class="label">NOMBOR TELEFON BAHARU</span>
+            <div class="input-box">
+                <span class="prefix">+60</span>
+                <input type="text" id="phoneInput" placeholder="12-xxxxxxx" autocomplete="off" spellcheck="false">
+            </div>
+
+            <div id="errorMsg"></div>
+
+            <button class="save-btn" onclick="requestOtp()">Hantar Kod Pengesahan</button>
+        </div>
+
+        <div class="content" id="step2" style="display:none;">
+            <p class="instruction">Kod pengesahan telah dihantar ke nombor baharu anda. Sila masukkan kod di bawah.</p>
+
+            <span class="label">KOD OTP (6 DIGIT)</span>
+            <input type="text" id="otpInput" placeholder="123456" style="margin-bottom:24px; text-align:center; letter-spacing:8px; font-weight:700; font-size:24px;" maxlength="6" autocomplete="off">
+
+            <div id="errorMsgOtp" style="color: #F87171; font-size: 12px; font-weight: 600; margin-top: -10px; text-align: center; display: none; margin-bottom: 20px;"></div>
+
+            <button class="save-btn" onclick="verifyOtp()">Sahkan & Tukar</button>
+            <p style="text-align:center; margin-top:20px; font-size:13px; color:#9CA3AF;">Tidak terima kod? <span style="color:var(--brand-gold); font-weight:700; cursor:pointer;" onclick="requestOtp()">Hantar Semula</span></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import './database.js';
+
+        let targetPhoneNumber = '';
+
+        async function init() {
+            const user = await DB.getCurrentUser();
+            if (user && user.phone) {
+                const raw = user.phone.replace('+60', '');
+                document.getElementById('phoneInput').value = raw;
+            }
+        }
+
+        window.requestOtp = async function() {
+            const raw = document.getElementById('phoneInput').value.replace(/\D/g, '');
+            const fullPhone = '+60' + (raw.startsWith('0') ? raw.substring(1) : raw);
+            const err = document.getElementById('errorMsg');
+            err.style.display = 'none';
+
+            if (raw.length < 9) {
+                err.innerText = "Sila masukkan nombor telefon yang sah.";
+                err.style.display = 'block';
+                return;
+            }
+
+            // Check duplicate
+            const dup = await DB.checkDuplicate('', '', fullPhone);
+            if (dup.phone) {
+                err.innerText = "Nombor ini telah digunakan oleh akaun lain.";
+                err.style.display = 'block';
+                return;
+            }
+
+            targetPhoneNumber = fullPhone;
+            
+            // UI Transition
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+        }
+
+        window.verifyOtp = async function() {
+            const otp = document.getElementById('otpInput').value;
+            const err = document.getElementById('errorMsgOtp');
+            err.style.display = 'none';
+
+            if (otp !== '123456') { // Simulation
+                err.innerText = "Kod OTP salah. Sila cuba lagi.";
+                err.style.display = 'block';
+                return;
+            }
+
+            await DB.updateUser({ phone: targetPhoneNumber });
+            localStorage.setItem('jodohku_current_user_phone', targetPhoneNumber);
+            
+            alert("Nombor telefon berjaya ditukar!");
+            window.location.href = 'settings_preview.html';
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

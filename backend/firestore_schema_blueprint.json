@@ -1,0 +1,42 @@
+{
+  "users": {
+    "JDK_USER_8821": {
+      "name": "Nur Aisyah",
+      "age": 24,
+      "state": "Kuala Lumpur",
+      "ic_verified": true,
+      "wali_id": "WALI_FATHER_994",
+      "subscription_tier": "Sovereign",
+      "trust_score": 98,
+      "role": "USER",
+      "stats": {
+        "matches": 12,
+        "likes_received": 142
+      }
+    }
+  },
+  "chats": {
+    "CHAT_AF_NA_2026": {
+      "participants": ["Ahmad_Faiz_77", "JDK_USER_8821"],
+      "wali_id": "WALI_FATHER_994",
+      "is_moderated": true,
+      "last_flag_reason": "Phone number leakage attempt",
+      "messages": {
+        "MSG_001": {
+          "sender": "Ahmad_Faiz_77",
+          "content": "[INFO DISELINDUNG]",
+          "is_redacted": true,
+          "timestamp": "2026-04-08T00:30:00Z"
+        }
+      }
+    }
+  },
+  "analytics": {
+    "GLOBAL_STATS": {
+      "total_users": 128432,
+      "active_sovereign_members": 1240,
+      "daily_revenue_fpx": 45100.00,
+      "successful_marriages_confirmed": 42
+    }
+  }
+}

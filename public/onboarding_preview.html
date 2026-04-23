@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Onboarding</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --brand-pink: #FD297B;
+            --brand-orange: #FF5864;
+            --brand-gradient: linear-gradient(135deg, #FF5864 0%, #FD297B 100%);
+            --bg-light: #FFFFFF;
+            --text-dark: #1F2937;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #E5E7EB;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 44px;
+            border: 8px solid #1E293B;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.1);
+            padding-top: 40px;
+        }
+
+        .header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            font-size: 24px;
+            color: #9CA3AF;
+            cursor: pointer;
+        }
+
+        .progress-line {
+            flex: 1;
+            height: 4px;
+            background: #F3F4F6;
+            border-radius: 100px;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--brand-pink);
+            transition: 0.5s;
+            width: 20%;
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px 24px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+        }
+
+        /* PHOTO GRID */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .photo-slot {
+            aspect-ratio: 3/4;
+            background: #F3F4F6;
+            border: 2px dashed #D1D5DB;
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-photo-icon {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            width: 24px;
+            height: 24px;
+            background: black;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+
+        /* SHOW MORE LINK */
+        .show-more {
+            display: block;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #6B7280;
+            margin: 10px 0;
+            text-decoration: none;
+        }
+
+        /* BOTTOM BUTTON */
+        .footer {
+            padding: 30px 24px;
+        }
+
+        .next-btn {
+            width: 100%;
+            padding: 18px;
+            background: #E5E7EB;
+            color: #9CA3AF;
+            border-radius: 100px;
+            font-size: 16px;
+            font-weight: 700;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .next-btn.active {
+            background: var(--brand-pink);
+            color: white;
+            box-shadow: 0 10px 20px rgba(253, 41, 123, 0.2);
+            pointer-events: auto;
+        }
+
+        .next-btn.active-black {
+            background: black;
+            color: white;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <div class="header">
+            <span class="back-btn" onclick="prevStep()">←</span>
+            <div class="progress-line">
+                <div class="progress-fill" id="pFill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Step 1-5 already there ... keeping them for context during replace -->
+            <div class="step-content active" id="step1">
+                <h1>What's your first name?</h1>
+                <input type="text" placeholder="Enter first name" oninput="checkStepContents(1)">
+                <p class="hint">This is how it'll appear on your profile.<br><b>Can't change it later.</b></p>
+            </div>
+
+            <div class="step-content" id="step2">
+                <h1>Your b-day?</h1>
+                <input type="text" placeholder="MM / DD / YYYY" value="04 / 09 / 1998">
+                <p class="hint">Your profile shows your age, not your birth date.</p>
+            </div>
+
+            <div class="step-content" id="step3">
+                <h1>What's your gender?</h1>
+                <div class="gender-btn" onclick="selectGender(this)">Woman</div>
+                <div class="gender-btn" onclick="selectGender(this)">Man</div>
+            </div>
+
+            <div class="step-content" id="step4">
+                <h1>Your distance preference?</h1>
+                <div class="slider-container">
+                    <div class="slider-header"><span>Distance Preference</span><span id="distVal">50 Mi</span></div>
+                    <input type="range" min="1" max="100" value="50" oninput="updateDist(this)">
+                </div>
+            </div>
+
+            <div class="step-content" id="step5">
+                <h1>Let's talk lifestyle habits</h1>
+                <div class="chip-group">
+                    <div class="chip-label">🥤 How often do you drink?</div>
+                    <div class="chips">
+                        <div class="chip selected">Not for me</div>
+                        <div class="chip">Sober</div>
+                    </div>
+                </div>
+                <div class="chip-group">
+                    <div class="chip-label">🚬 How often do you smoke?</div>
+                    <div class="chips">
+                        <div class="chip selected">Non-smoker</div>
+                        <div class="chip">Smoker</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW SCREEN: Step 6: Traits -->
+            <div class="step-content" id="step6">
+                <h1>What else makes you—you?</h1>
+                <p class="hint">Don't hold back. Authenticity attracts authenticity.</p>
+                <div class="chip-group">
+                    <div class="chip-label">💬 Communication style?</div>
+                    <div class="chips">
+                        <div class="chip selected">Big time texter</div>
+                        <div class="chip">Phone caller</div>
+                        <div class="chip">Better in person</div>
+                    </div>
+                </div>
+                <div class="chip-group">
+                    <div class="chip-label">❤️ How do you receive love?</div>
+                    <div class="chips">
+                        <div class="chip">Presents</div>
+                        <div class="chip selected">Thoughtful gestures</div>
+                        <div class="chip">Time together</div>
+                    </div>
+                </div>
+                <div class="chip-group">
+                    <div class="chip-label">🎓 Education level?</div>
+                    <div class="chips">
+                        <div class="chip selected">Bachelors</div>
+                        <div class="chip">Masters</div>
+                        <div class="chip">PhD</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW SCREEN: Step 7: Interests -->
+            <div class="step-content" id="step7">
+                <h1>What are you into?</h1>
+                <p class="hint">Add up to 10 interests to your profile.</p>
+                <div class="chip-group">
+                    <div class="chip-label">🎨 Creativity</div>
+                    <div class="chips">
+                        <div class="chip selected">Photography</div>
+                        <div class="chip">Painting</div>
+                        <div class="chip">Entrepreneurship</div>
+                    </div>
+                    <a href="#" class="show-more">Show more ⌵</a>
+                </div>
+                <div class="chip-group">
+                    <div class="chip-label">🍕 Food and drink</div>
+                    <div class="chips">
+                        <div class="chip">Street Food</div>
+                        <div class="chip selected">Boba tea</div>
+                        <div class="chip">Sushi</div>
+                    </div>
+                    <a href="#" class="show-more">Show more ⌵</a>
+                </div>
+            </div>
+
+            <!-- NEW SCREEN: Step 8: Photos -->
+            <div class="step-content" id="step8">
+                <h1>Add your recent pics</h1>
+                <p class="hint">Upload 2 photos to start. Add 4 or more to make your profile stand out.</p>
+                <div class="photo-grid">
+                    <div class="photo-slot">
+                        <div class="add-photo-icon">+</div>
+                    </div>
+                    <div class="photo-slot">
+                        <div class="add-photo-icon">+</div>
+                    </div>
+                    <div class="photo-slot">
+                        <div class="add-photo-icon">+</div>
+                    </div>
+                    <div class="photo-slot">
+                        <div class="add-photo-icon">+</div>
+                    </div>
+                    <div class="photo-slot">
+                        <div class="add-photo-icon">+</div>
+                    </div>
+                    <div class="photo-slot">
+                        <div class="add-photo-icon">+</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW SCREEN: Step 9: Bio/Prompts -->
+            <div class="step-content" id="step9">
+                <h1>Share more about yourself</h1>
+                <p class="hint">Write a bio and a prompt to help your profile stand out and spark conversations.</p>
+
+                <div style="position:relative; margin-top:30px;">
+                    <div class="prompt-card" style="margin:0; background:#F3F4F6; border:none; padding:24px;">
+                        <div style="font-weight:700; font-size:16px; margin-bottom:4px;">About me</div>
+                        <div style="font-size:14px; color:#6B7280;">Introduce yourself to make a strong impression.
+                        </div>
+                    </div>
+                    <div class="add-photo-icon"
+                        style="top:-8px; bottom:auto; right:-8px; background:black; color:white;">+</div>
+                </div>
+
+                <div style="position:relative; margin-top:20px;">
+                    <div class="prompt-card" style="margin:0; border: 1.5px dashed #D1D5DB; padding:24px;">
+                        <div style="font-weight:700; font-size:16px; margin-bottom:4px; color:#D1D5DB;">Add a prompt
+                        </div>
+                        <div style="font-size:14px; color:#D1D5DB;">Selection a question and answer it.</div>
+                    </div>
+                    <div class="add-photo-icon"
+                        style="top:-8px; bottom:auto; right:-8px; background:black; color:white;">+</div>
+                </div>
+            </div>
+
+            <!-- NEW SCREEN: Step 10: Location Permission -->
+            <div class="step-content" id="step10">
+                <div
+                    style="background: rgba(0,0,0,0.6); position:absolute; top:0; left:0; right:0; bottom:0; padding:24px; display:flex; align-items:center; justify-content:center; z-index:100;">
+                    <div
+                        style="background:white; border-radius:8px; padding:24px; width:100%; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+                        <h2 style="font-size:18px; color: #5F6368; margin-bottom:12px; font-weight:500;">For a better
+                            experience, your device will need to use Location Accuracy</h2>
+                        <p style="font-size:13px; color:#5F6368; line-height:1.5; margin-bottom:20px;">The following
+                            settings should be on:</p>
+
+                        <div style="display:flex; gap:16px; margin-bottom:20px; align-items:start;">
+                            <span style="font-size:20px; color:#1A73E8;">📍</span>
+                            <div style="font-size:13px; color:#5F6368;">Device location</div>
+                        </div>
+
+                        <div style="display:flex; gap:16px; margin-bottom:20px; align-items:start;">
+                            <span style="font-size:20px; color:#1A73E8;">🎯</span>
+                            <div style="font-size:12px; color:#5F6368; line-height:1.4;">
+                                Location Accuracy, which provides more accurate location for apps and services. To do
+                                this, Google periodically processes information about device sensors and wireless
+                                signals...
+                            </div>
+                        </div>
+
+                        <p style="font-size:12px; color:#5F6368; margin-bottom:30px;">
+                            You can change this at any time in location settings. <a href="#"
+                                style="color:#1A73E8; text-decoration:none;">Manage settings</a> or <a href="#"
+                                style="color:#1A73E8; text-decoration:none;">learn more</a>
+                        </p>
+
+                        <div
+                            style="display:flex; justify-content:flex-end; gap:24px; font-weight:700; color:#1A73E8; font-size:14px;">
+                            <span style="cursor:pointer;" onclick="nextStep()">No thanks</span>
+                            <span style="cursor:pointer;" onclick="nextStep()">Turn on</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <button class="next-btn active" id="nextBtn" onclick="nextStep()"
+                style="pointer-events: auto !important;">Next</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+
+        let currentStep = 1;
+        const totalSteps = 10;
+        let userData = {
+            fullName: "",
+            birthday: "04/09/1998",
+            gender: "",
+            distancePref: 50,
+            lifestyle: {},
+            interests: [],
+            bio: ""
+        };
+
+        window.nextStep = async () => {
+            // Data collection before moving
+            if (currentStep === 1) {
+                userData.fullName = document.querySelector('#step1 input').value;
+            } else if (currentStep === 2) {
+                userData.birthday = document.querySelector('#step2 input').value;
+                const year = parseInt(userData.birthday.split('/').pop());
+                if (year) userData.age = new Date().getFullYear() - year;
+            } else if (currentStep === 9) {
+                userData.bio = "Cinta Halal Enthusiast"; // Placeholder for prototype bio
+            }
+
+            if (currentStep < totalSteps) {
+                document.getElementById('step' + currentStep).classList.remove('active');
+                currentStep++;
+                document.getElementById('step' + currentStep).classList.add('active');
+                updateProgress();
+            } else {
+                console.log("💾 [Onboarding] Compiling profile for final sync...");
+                const success = await DB.updateProfile(userData);
+                if (success) {
+                    window.location.href = 'home_preview.html';
+                } else {
+                    alert("Gagal menyimpan profil. Sila cuba lagi.");
+                }
+            }
+        }
+
+        window.prevStep = () => {
+            if (currentStep > 1) {
+                document.getElementById('step' + currentStep).classList.remove('active');
+                currentStep--;
+                document.getElementById('step' + currentStep).classList.add('active');
+                updateProgress();
+            } else {
+                window.location.href = 'otp_preview.html';
+            }
+        }
+
+        function updateProgress() {
+            const fill = (currentStep / totalSteps) * 100;
+            document.getElementById('pFill').style.width = fill + '%';
+
+            const btn = document.getElementById('nextBtn');
+            if (currentStep === 3 || currentStep === 4 || currentStep === 5) {
+                btn.classList.add('active-black');
+            } else {
+                btn.classList.remove('active-black');
+            }
+        }
+
+        window.selectGender = (el) => {
+            const gender = el.innerText.toLowerCase(); // "man" or "woman"
+            userData.gender = gender;
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            console.log(`🎯 [Onboarding] Gender selected: ${gender}`);
+            // Auto advance for better UX in mobile
+            setTimeout(window.nextStep, 300);
+        }
+
+        window.updateDist = (el) => {
+            userData.distancePref = parseInt(el.value);
+            document.getElementById('distVal').innerText = el.value + ' Mi';
+        }
+
+        window.checkStepContents = (step) => {
+            document.getElementById('nextBtn').classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

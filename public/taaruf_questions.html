@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Bank Soalan Taaruf</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --bg-cream: #FCFAF7; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit', sans-serif; }
+        body { background:#E5E7EB; min-height:100vh; display:flex; justify-content:center; align-items:center; overflow:hidden; }
+        .phone { 
+            width:375px; height:812px; background:white; border-radius:44px; border:8px solid #1E293B; 
+            position:relative; overflow:hidden; display:flex; flex-direction:column; 
+            box-shadow:0 40px 80px rgba(0,0,0,0.1); 
+        }
+        @media (max-width: 480px) {
+            body { background: white; }
+            .phone { width: 100vw; height: 100vh; border: none; border-radius: 0; }
+        }
+
+        .header { 
+            padding: 55px 24px 15px; 
+            padding-top: max(55px, env(safe-area-inset-top));
+            background:white; border-bottom:1px solid #F3F4F6; 
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .header h1 { font-family:'Playfair Display', serif; font-size:24px; font-weight:1000; color:#111827; }
+        .btn-back { width:40px; height:40px; border-radius:50%; background:#F9FAFB; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+        .content { flex:1; overflow-y:auto; padding:20px; background:var(--bg-cream); scrollbar-width:none; padding-bottom:40px; }
+        
+        /* Tabs */
+        .tabs { display:flex; gap:10px; overflow-x:auto; scrollbar-width:none; margin-bottom:25px; padding-bottom:5px; }
+        .tabs::-webkit-scrollbar { display:none; }
+        .tab-btn { 
+            padding:12px 20px; background:white; border-radius:100px; border:1px solid #F3F4F6;
+            font-size:13px; font-weight:800; color:#9CA3AF; white-space:nowrap; cursor:pointer; transition:0.2s;
+        }
+        .tab-btn.active { background:var(--gold); color:white; border-color:var(--gold); box-shadow:0 10px 20px rgba(189,139,82,0.2); }
+
+        /* Questions */
+        /* Questions */
+        .q-card {
+            background:white; border-radius:24px; padding:20px; margin-bottom:15px;
+            border:1px solid rgba(0,0,0,0.02); box-shadow:0 8px 25px rgba(0,0,0,0.03);
+            display:flex; gap:15px; align-items:center; transition:0.2s; cursor:pointer;
+            position:relative;
+        }
+        .q-card:active { transform:scale(0.98); }
+        .q-text { flex:1; font-size:15px; font-weight:600; color:#374151; line-height:1.5; }
+        .q-badge { position:absolute; top:-8px; right:20px; background:#10B981; color:white; font-size:9px; font-weight:900; padding:4px 10px; border-radius:100px; box-shadow:0 4px 10px rgba(16,185,129,0.2); }
+        .copy-btn { width:40px; height:40px; background:#F0FDF4; color:#10B981; border-radius:12px; display:flex; align-items:center; justify-content:center; }
+        
+        /* Modal */
+        #rModal { position:absolute; inset:0; background:rgba(0,0,0,0.4); z-index:2000; display:none; align-items:flex-end; }
+        .m-sheet { 
+            width:100%; min-height:50%; background:white; border-radius:32px 32px 0 0; 
+            padding:35px 25px; display:flex; flex-direction:column; gap:20px;
+            animation: slideUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+        @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+        .m-q { font-family:'Playfair Display', serif; font-size:22px; font-weight:900; color:#111827; line-height:1.3; }
+        .m-input { width:100%; height:120px; background:#F9FAFB; border:1px solid #F3F4F6; border-radius:20px; padding:20px; font-size:16px; font-weight:600; color:#374151; outline:none; resize:none; transition:0.2s; }
+        .m-input:focus { border-color:var(--gold); background:white; box-shadow:0 10px 20px rgba(0,0,0,0.02); }
+        .m-actions { display:flex; gap:12px; }
+        .m-btn { flex:1; padding:18px; border-radius:100px; font-size:14px; font-weight:900; border:none; cursor:pointer; transition:0.2s; }
+        .m-btn-save { background:var(--gold); color:white; box-shadow:0 12px 24px rgba(189,139,82,0.2); }
+        .m-btn-copy { background:#F9FAFB; color:#6B7280; }
+
+        /* Toast */
+        #toast { 
+            position:absolute; bottom:40px; left:50%; transform:translateX(-50%) translateY(100px);
+            background:#111827; color:white; padding:12px 24px; border-radius:100px;
+            font-size:13px; font-weight:700; transition:0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index:3000; display:block !important; width:auto;
+        }
+        #toast.show { transform:translateX(-50%) translateY(0); }
+
+        /* Choice Chips */
+        .chip-container { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+        .chip { 
+            padding:12px 20px; border-radius:100px; border:1.5px solid #F3F4F6; 
+            font-size:13px; font-weight:700; color:#4B5563; background:white; 
+            cursor:pointer; transition:0.2s; 
+        }
+        .chip.active { background:#FFFBEB; border-color:var(--gold); color:var(--gold); box-shadow:0 8px 15px rgba(189,139,82,0.1); }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header">
+            <div class="btn-back" onclick="location.href='onboarding_wali.html'">❮</div>
+            <h1 data-t="category_taaruf">Soalan Taaruf</h1>
+            <div style="width:40px;"></div>
+        </header>
+
+        <div class="content">
+            <div class="tabs">
+                <div class="tab-btn active" onclick="switchTab('basic', this)" data-t="tab_basic">Asas & Gaya Hidup</div>
+                <div class="tab-btn" onclick="switchTab('deen', this)" data-t="tab_deen">Karakter & Iman</div>
+                <div class="tab-btn" onclick="switchTab('fam', this)" data-t="tab_fam">Keluarga & Kerjaya</div>
+                <div class="tab-btn" onclick="switchTab('future', this)" data-t="tab_future">Masa Depan</div>
+            </div>
+
+            <div id="qList"></div>
+            
+            <div style="margin-top: 30px; padding: 0 10px;">
+                <button onclick="window.location.href='onboarding_location.html'" class="tab-btn" style="width:100%; justify-content:center; background:white; color:#9CA3AF; border-style:dashed;" data-t="mungkin_kemudian">Mungkin Kemudian (Langkau)</button>
+            </div>
+        </div>
+
+        <div id="toast" data-t="question_copied">Berjaya disalin!</div>
+
+        <!-- Response Modal -->
+        <div id="rModal" onclick="if(event.target === this) closeM()">
+            <div class="m-sheet">
+                <div style="width:40px; height:5px; background:#E5E7EB; border-radius:10px; align-self:center; margin-bottom:10px;"></div>
+                <div class="m-q" id="mQ">Question?</div>
+                <div id="choiceArea" class="chip-container" style="display:none;"></div>
+                <textarea class="m-input" id="mAns" data-t="tulis_jawapan" placeholder="Tulis jawapan anda di sini..."></textarea>
+                <div class="m-actions">
+                    <button class="m-btn m-btn-copy" onclick="copyInsideM()" data-t="salin_chat">SALIN UNTUK CHAT</button>
+                    <button class="m-btn m-btn-save" onclick="saveResponse()" data-t="simpan_profil">SIMPAN KE PROFIL</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+        
+        const QUESTIONS = {
+            basic: ["q_t_1", "q_t_2", "q_t_3", "q_t_4", "q_t_5", "q_t_6", "q_t_7", "q_t_8", "q_t_9", "q_t_10"],
+            deen: ["q_t_11", "q_t_12", "q_t_13", "q_t_14", "q_t_15"],
+            fam: ["q_t_16", "q_t_17", "q_t_18", "q_t_19", "q_t_20", "q_t_21", "q_t_22", "q_t_23"],
+            future: ["q_t_24", "q_t_25", "q_t_26", "q_t_27", "q_t_28", "q_t_29", "q_t_30"]
+        };
+
+        let activeKey = null;
+        let currentUser = null;
+
+        async function init() {
+            currentUser = await DB.getCurrentUser(true); // Force fresh fetch
+            window.switchTab('basic', document.querySelector('.tab-btn.active'));
+        }
+
+        window.switchTab = (cat, btn) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderQuestions(cat);
+        }
+
+        function renderQuestions(cat) {
+            const list = document.getElementById('qList');
+            list.innerHTML = '';
+            
+            QUESTIONS[cat].forEach(key => {
+                const card = document.createElement('div');
+                card.className = 'q-card';
+                const qText = window.I18N.t(key);
+                
+                // Index numbering
+                const index = key.split('_')[2];
+                
+                // Check if answered
+                const isAnswered = currentUser && currentUser.prompts && currentUser.prompts.some(p => p.key === key);
+                const badge = isAnswered ? `<div class="q-badge" data-t="anda_sudah_jawab">✓ Terjawab</div>` : '';
+
+                card.onclick = () => openM(key, qText);
+                card.innerHTML = `
+                    ${badge}
+                    <div style="font-size:12px; font-weight:900; color:var(--gold); margin-right:10px;">#${index}</div>
+                    <div class="q-text" data-t="${key}">${qText}</div>
+                    <div class="copy-btn">📋</div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function openM(key, text) {
+            activeKey = key;
+            document.getElementById('mQ').innerText = text;
+            const input = document.getElementById('mAns');
+            const choiceArea = document.getElementById('choiceArea');
+            input.value = '';
+            choiceArea.innerHTML = '';
+            
+            // Check for options
+            const optsKey = `${key}_opts`;
+            const optsRaw = window.I18N.t(optsKey);
+            const hasOptions = optsRaw && optsRaw !== optsKey;
+
+            if(hasOptions) {
+                input.style.display = 'none';
+                choiceArea.style.display = 'flex';
+                const opts = optsRaw.split(',').map(s => s.trim());
+                opts.forEach(opt => {
+                    const chip = document.createElement('div');
+                    chip.className = 'chip';
+                    chip.innerText = opt;
+                    chip.onclick = () => {
+                        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                        chip.classList.add('active');
+                        input.value = opt;
+                    }
+                    choiceArea.appendChild(chip);
+                });
+            } else {
+                input.style.display = 'block';
+                choiceArea.style.display = 'none';
+            }
+            
+            // pre-fill if exists
+            if(currentUser && currentUser.prompts) {
+                const existing = currentUser.prompts.find(p => p.key === key);
+                if(existing) {
+                    input.value = existing.a;
+                    if(hasOptions) {
+                        const chips = document.querySelectorAll('.chip');
+                        chips.forEach(c => {
+                            if(c.innerText === existing.a) c.classList.add('active');
+                        });
+                    }
+                }
+            }
+            
+            document.getElementById('rModal').style.display = 'flex';
+        }
+
+        window.closeM = () => { document.getElementById('rModal').style.display = 'none'; }
+
+        window.copyInsideM = () => {
+            const text = document.getElementById('mQ').innerText;
+            copyQ(text);
+        }
+
+        window.saveResponse = async () => {
+            const ans = document.getElementById('mAns').value.trim();
+            if(!ans) return;
+            
+            const btn = document.querySelector('.m-btn-save');
+            btn.disabled = true; btn.innerText = "...";
+            
+            const qText = document.getElementById('mQ').innerText;
+            const newPrompt = { key: activeKey, q: qText, a: ans };
+            
+            let currentPrompts = currentUser.prompts || [];
+            // Remove old version of this question if exists
+            currentPrompts = currentPrompts.filter(p => p.key !== activeKey && p.q !== qText);
+            currentPrompts.push(newPrompt);
+
+            const ok = await DB.updateUser({ prompts: currentPrompts });
+            if(ok) {
+                showToast(window.I18N.t('jawapan_disimpan'));
+                currentUser.prompts = currentPrompts; // local sync
+                closeM();
+                // re-render active tab to show badge
+                const activeTab = document.querySelector('.tab-btn.active');
+                const cat = Object.keys(QUESTIONS).find(k => activeTab.innerText.includes(window.I18N.t(k))); 
+                // Simple catch-all for tab sync
+                renderQuestions(document.querySelector('.tab-btn.active').getAttribute('onclick').match(/'([^']+)'/)[1]);
+            }
+            btn.disabled = false; btn.innerText = window.I18N.t('simpan_profil');
+        }
+
+        function copyQ(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(window.I18N.t('question_copied'));
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

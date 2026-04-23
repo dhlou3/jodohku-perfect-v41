@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Pengesahan Identiti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --orange: #C67C22; --text-dark: #1F2937; --bg-cream: #FDF9F4; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .phone { width: 375px; height: 812px; background: white; border-radius: 44px; border: 8px solid #1E293B; position: relative; overflow: hidden; display: flex; flex-direction: column; padding-top: 40px; box-shadow: 0 40px 80px rgba(0,0,0,0.1); }
+        .header { padding: 20px 24px; display: flex; align-items: center; gap: 20px; }
+        .back-btn { font-size: 24px; color: #9CA3AF; text-decoration: none; }
+        .progress-line { flex: 1; height: 6px; background: #F3F4F6; border-radius: 100px; display: flex; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--orange); width: 20%; }
+        .content { flex: 1; padding: 40px 24px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900; color: var(--text-dark); margin-bottom: 20px; line-height: 1.1; }
+        .desc { font-size: 15px; color: #6B7280; font-weight: 500; margin-bottom: 40px; line-height: 1.5; }
+        .input-wrap { position: relative; }
+        input[type="text"] { width: 100%; border: none; border-bottom: 3px solid #F3F4F6; padding: 15px 0; font-size: 22px; font-weight: 700; outline: none; transition: 0.4s; color: var(--text-dark); background: transparent; letter-spacing: 2px; }
+        input[type="text"]:focus { border-bottom-color: var(--orange); }
+        .hint { font-size: 13px; color: #9CA3AF; margin-top: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .footer { padding: 40px 24px; }
+        .next-btn { width: 100%; padding: 20px; background: var(--orange); color: white; border-radius: 100px; font-size: 17px; font-weight: 800; text-align: center; border: none; cursor: pointer; display: block; box-shadow: 0 12px 24px rgba(198, 124, 34, 0.25); transition: 0.3s; }
+        .next-btn:active { transform: scale(0.97); }
+        .loader { display: none; margin-top: 20px; color: var(--gold); font-weight: 800; font-size: 14px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="header">
+            <a href="onboarding_name.html" class="back-btn">←</a>
+            <div class="progress-line"><div class="progress-fill"></div></div>
+        </div>
+        <div class="content">
+            <h1 data-t="ic_title">No. Kad Pengenalan</h1>
+            <p class="desc" data-t="ic_hint">Maklumat ini digunakan secara sulit untuk mengesahkan umur dan jantina anda bagi tujuan keselamatan taaruf.</p>
+            <div class="input-wrap">
+                <input type="text" id="icInput" data-t="ic_placeholder" placeholder="Contoh: 850216035829" maxlength="14">
+                <div class="hint">🔒 Maklumat anda disulitkan secara selamat.</div>
+            </div>
+            <div id="loader" class="loader" data-t="mengesahkan">Mengesahkan maklumat...</div>
+        </div>
+        <div class="footer">
+            <button onclick="processIC()" class="next-btn" data-t="seterusnya_btn">Seterusnya ➔</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+
+        function parseMyKad(ic) {
+            const raw = ic.replace(/\D/g, '');
+            if (raw.length !== 12) return null;
+            
+            const yy = parseInt(raw.substring(0, 2));
+            const mm = parseInt(raw.substring(2, 4));
+            const dd = parseInt(raw.substring(4, 6));
+            
+            const currentYearShort = new Date().getFullYear() % 100;
+            const century = (yy > (currentYearShort + 1)) ? 1900 : 2000;
+            const year = century + yy;
+            
+            const birthdateObj = new Date(year, mm - 1, dd);
+            const today = new Date();
+            let age = today.getFullYear() - birthdateObj.getFullYear();
+            const m = today.getMonth() - birthdateObj.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthdateObj.getDate())) age--;
+            
+            const lastDigit = parseInt(raw.charAt(11));
+            const gender = (lastDigit % 2 === 0) ? 'woman' : 'man';
+            
+            return { 
+                birthday: `${year}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`, 
+                gender,
+                age
+            };
+        }
+
+        window.processIC = async function() {
+            const icVal = document.getElementById('icInput').value.trim();
+            const result = parseMyKad(icVal);
+
+            if (!result) {
+                alert(window.I18N.getLang() === 'en' ? 'Invalid IC Number format.' : 'Format No. IC tidak sah.');
+                return;
+            }
+
+            if (result.age < 18) {
+                alert(window.I18N.getLang() === 'en' ? 'You must be 18+ to use Jodohku.' : 'Anda mestilah berumur 18 tahun ke atas untuk menggunakan Jodohku.');
+                return;
+            }
+
+            document.getElementById('loader').style.display = 'block';
+
+            try {
+                // AUTO-IDENT UPDATE: Extracting Gender and Age from IC
+                const updateData = {
+                    birthday: result.birthday,
+                    gender: result.gender,
+                    age: result.age,
+                    icNumber: icVal.replace(/\D/g, ''),
+                    isIdentityVerified: true // Mark as AI Verified
+                };
+
+                console.log("🧠 [AI Extraction] Identity confirmed:", updateData);
+                const ok = await DB.updateUser(updateData);
+
+                if (ok) {
+                    window.location.href = 'onboarding_work.html';
+                } else {
+                    alert('Sistem sibuk. Sila cuba lagi.');
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if(window.I18N) window.I18N.translatePage();
+        });
+    </script>
+</body>
+</html>

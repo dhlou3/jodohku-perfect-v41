@@ -1,0 +1,32 @@
+{
+  "login": "Log Masuk",
+  "welcome_back": "Selamat Datang Ke Jodohku",
+  "login_subtitle": "Akses akaun tulus anda di sini",
+  "phone_no": "No. Telefon Bimbit",
+  "password": "Kata Laluan Selamat",
+  "register_new": "Daftar Keahlian Jodohku",
+  "full_name": "Nama Penuh (Seperti Dalam MyKad)",
+  "ic_no": "No. Kad Pengenalan (12 Digit)",
+  
+  "empire_sultan": "Mod Sultan Eksklusif",
+  "empire_sovereign": "Pangkat Sovereign",
+  "ai_sentinel": "Penjaga AI Sentinel",
+  "security_audit": "Audit Keselamatan Real-time",
+  
+  "wali_hub": "Hab Mahram & Wali",
+  "wali_dashboard": "Papan Pemuka Penjaga",
+  "wali_approval": "Kebenaran Bertulis Wali",
+  
+  "taaruf_engine": "Protokol Taaruf",
+  "taaruf_questions": "30 Soalan Taaruf Mendalam",
+  "nikah_roadmap": "Laluan Barakah Menuju Nikah",
+  
+  "safe_venue": "Lokasi Selamat Patuh Syariah",
+  "vendor_marketplace": "Direktori Vendor Nikah Halal",
+  "search_halal": "Cari Premis Halal JAKIM...",
+  
+  "match_score": "{score}% Keserasian Rohani",
+  "trust_score": "{score}% Skor Amanah",
+  "is_verified": "Ahli Disahkan",
+  "is_sovereign": "Profil Sultan"
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Temui Cinta Halal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;900&family=Amiri&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --orange: #C67C22; --bg-midnight: #0B0E14; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #000; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .phone { width: 375px; height: 812px; background: black; border-radius: 44px; border: 8px solid #1e293b; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 40px 80px rgba(0,0,0,0.8); }
+        .bg-img { position: absolute; inset: 0; background-image: url('assets/images/wedding_hero.png'); background-size: cover; background-position: center; z-index: 1; filter: saturate(0.8) brightness(0.7); }
+        .gradient-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(11, 14, 20, 0.2) 0%, rgba(11, 14, 20, 0.8) 60%, rgba(11, 14, 20, 1) 100%); z-index: 2; }
+        .content { position: relative; z-index: 3; height: 100%; padding: 0 30px; display: flex; flex-direction: column; color: white; justify-content: space-between; padding-bottom: 50px; }
+        .top-notch { align-self: center; background: rgba(255,255,255,0.05); padding: 8px 24px; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--gold); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 72px; font-weight: 950; letter-spacing: -3px; line-height: 1; margin-bottom: 20px; margin-top: 100px; }
+        .logo span { color: var(--gold); }
+        .description { font-size: 17px; font-weight: 500; line-height: 1.5; color: rgba(255, 255, 255, 0.8); max-width: 250px; }
+        .button-stack { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+        .btn { width: 100%; padding: 22px; border-radius: 100px; font-size: 16px; font-weight: 800; text-align: center; text-transform: uppercase; cursor: pointer; border: none; }
+        .btn-create { background: var(--gold); color: white; box-shadow: 0 10px 30px rgba(189, 139, 82, 0.3); }
+        .btn-login { background: rgba(255, 255, 255, 0.05); color: #fff; border: 1.5px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); }
+        .bismillah-footer { text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 30px; }
+        .arabic { font-family: 'Amiri', serif; font-size: 30px; color: var(--gold); opacity: 0.9; margin-bottom: 10px; }
+        .premium-tag { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="bg-img"></div>
+        <div class="gradient-overlay"></div>
+        <div class="content">
+            <button class="top-notch" id="langSwitcher" onclick="toggleLang()" data-t="lang_display">EN | MS</button>
+            <div class="brand-section">
+                <h1 class="logo">Jodoh<span>ku</span></h1>
+                <p class="description" data-t="tagline">Temui cinta yang diberkati di bawah panduan Syariah.</p>
+            </div>
+            <div class="footer-group">
+                <div class="button-stack">
+                    <button class="btn btn-create" data-t="create_acc" onclick="window.location.href='register_preview.html'">Cipta Akaun Baru</button>
+                    <button class="btn btn-login" data-t="login" onclick="window.location.href='login_preview.html'">Log Masuk</button>
+                </div>
+                <div class="bismillah-footer">
+                    <div class="arabic">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
+                    <div class="premium-tag" data-t="platform_tag">PLATFORM TAARUF NO. 1 MALAYSIA</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function toggleLang() {
+            const current = window.I18N.getLang();
+            const next = current === 'ms' ? 'en' : 'ms';
+            window.I18N.setLang(next);
+        }
+    </script>
+</body>
+</html>

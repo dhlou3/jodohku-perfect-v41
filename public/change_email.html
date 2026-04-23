@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - E-mel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand-gold: #BD8B52; --text-dark: #1F2937; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .phone { width: 375px; height: 812px; background: white; border-radius: 44px; border: 8px solid #1E293B; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 40px 80px rgba(0,0,0,0.1); }
+        
+        .header { padding: 24px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid #F3F4F6; }
+        .back-btn { font-size: 24px; color: #9CA3AF; cursor: pointer; text-decoration: none; }
+        .header h1 { font-size: 20px; font-weight: 700; color: var(--text-dark); }
+        
+        .content { flex: 1; padding: 24px; }
+        .instruction { font-size: 14px; color: #9CA3AF; line-height: 1.5; margin-bottom: 30px; }
+        
+        .label { font-size: 11px; font-weight: 800; color: var(--brand-gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        
+        input { 
+            width: 100%; border: 1.5px solid #F3F4F6; border-radius: 16px; padding: 14px 18px; 
+            font-size: 16px; color: var(--text-dark); background: #FDF9F4; outline: none; transition: 0.3s;
+            margin-bottom: 24px;
+        }
+        input:focus { border-color: var(--brand-gold); background: white; }
+
+        .save-btn { 
+            width: 100%; padding: 18px; background: var(--brand-gold); color: white; border-radius: 100px; 
+            font-size: 16px; font-weight: 700; border: none; cursor: pointer;
+        }
+        #errorMsg { color: #F87171; font-size: 12px; font-weight: 600; margin-top: 10px; text-align: center; display: none; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header">
+            <a href="settings_preview.html" class="back-btn">←</a>
+            <h1>E-mel</h1>
+        </header>
+
+        <div class="content">
+            <p class="instruction">Alamat e-mel digunakan untuk pemulihan akaun dan notifikasi penting.</p>
+
+            <span class="label">ALAMAT E-MEL BAHARU</span>
+            <input type="text" id="emailInput" placeholder="name@email.com" autocomplete="off" spellcheck="false">
+
+            <div id="errorMsg"></div>
+
+            <button class="save-btn" onclick="updateEmail()">Kemas Kini E-mel</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import './database.js';
+
+        async function init() {
+            const user = await DB.getCurrentUser();
+            if (user && user.email) {
+                document.getElementById('emailInput').value = user.email;
+            }
+        }
+
+        window.updateEmail = async function() {
+            const email = document.getElementById('emailInput').value;
+            const err = document.getElementById('errorMsg');
+            err.style.display = 'none';
+
+            if (!email.includes('@') || !email.includes('.')) {
+                err.innerText = "Sila masukkan alamat e-mel yang sah.";
+                err.style.display = 'block';
+                return;
+            }
+
+            // Check duplicate
+            const dup = await DB.checkDuplicate('', email, '');
+            if (dup.email) {
+                err.innerText = "E-mel ini telah digunakan oleh akaun lain.";
+                err.style.display = 'block';
+                return;
+            }
+
+            await DB.updateUser({ email: email });
+            alert("E-mel berjaya dikemas kini!");
+            window.location.href = 'settings_preview.html';
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

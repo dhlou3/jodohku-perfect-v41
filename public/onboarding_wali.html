@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Maklumat Wali</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap"
+        rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root {
+            --gold: #BD8B52;
+            --orange: #C67C22;
+            --text-dark: #1F2937;
+            --bg-cream: #FDF9F4;
+            --emerald: #059669;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #E5E7EB;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 44px;
+            border: 8px solid #1E293B;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 40px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            font-size: 24px;
+            color: #9CA3AF;
+            text-decoration: none;
+        }
+
+        .progress-line {
+            flex: 1;
+            height: 6px;
+            background: #F3F4F6;
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--emerald);
+            width: 95%;
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px 24px;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .badge {
+            background: #ECFDF5;
+            color: var(--emerald);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 950;
+            display: inline-block;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 35px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .label {
+            font-size: 11px;
+            font-weight: 900;
+            color: #9CA3AF;
+            margin-bottom: 8px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 18px 22px;
+            border-radius: 18px;
+            border: 2px solid #F3F4F6;
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+            transition: 0.3s;
+            background: #FAFBFC;
+        }
+
+        input:focus {
+            border-color: var(--emerald);
+            background: white;
+            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.05);
+        }
+
+        .disclaimer {
+            background: #F9FAFB;
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #6B7280;
+            line-height: 1.5;
+            margin-top: 10px;
+            border: 1px dashed #E5E7EB;
+        }
+
+        .footer {
+            padding: 30px 24px;
+            background: white;
+            border-top: 1px solid #F3F4F6;
+        }
+
+        .finish-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--emerald);
+            color: white;
+            border-radius: 100px;
+            font-size: 17px;
+            font-weight: 800;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 12px 24px rgba(5, 150, 105, 0.25);
+            display: block;
+            text-decoration: none;
+        }
+
+        .skip-top-btn {
+            font-size: 13px;
+            font-weight: 800;
+            color: #9CA3AF;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 12px;
+            transition: 0.2s;
+        }
+
+        .skip-top-btn:hover {
+            color: var(--orange);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <div class="header">
+            <a href="onboarding_photos.html" class="back-btn">←</a>
+            <div class="progress-line">
+                <div class="progress-fill"></div>
+            </div>
+            <a href="home_preview.html" class="skip-top-btn" data-t="langkau">Langkau</a>
+        </div>
+        <div class="content">
+            <div class="badge">SECURE HANDSHAKE</div>
+            <h1 data-t="wali_title">Butiran Wali</h1>
+            <p class="subtitle" data-t="wali_desc">Sila nyatakan maklumat Wali atau Penjaga anda untuk pengesahan Taaruf Rasmi di masa
+                hadapan.</p>
+
+            <div class="input-group">
+                <span class="label" data-t="wali_name_label">Nama Penuh Wali</span>
+                <input type="text" id="wName" data-t="wali_name_placeholder" placeholder="Nama mengikut IC">
+            </div>
+
+            <div class="input-group">
+                <span class="label" data-t="wali_ic_label">No. Kad Pengenalan Wali</span>
+                <input type="text" id="wIC" data-t="wali_ic_example" placeholder="Contoh: 801212015566">
+            </div>
+
+            <div class="input-group">
+                <span class="label" data-t="wali_email_label">Alamat Emel Wali</span>
+                <input type="email" id="wEmail" placeholder="wali@email.com">
+            </div>
+
+            <div class="input-group">
+                <span class="label" data-t="wali_phone_label">No. Telefon Wali</span>
+                <input type="tel" id="wPhone" data-t="wali_phone_example" placeholder="Contoh: 0123456789">
+            </div>
+
+            <div class="disclaimer" data-t="wali_privacy">
+                🛡️ Privasi Terjamin: Maklumat ini hanya akan digunakan apabila anda dan calon bersetuju untuk melakukan
+                "Taaruf Rasmi".
+            </div>
+        </div>
+        <div class="footer">
+            <button onclick="complete()" class="finish-btn" data-t="lengkapkan_btn">Lengkapkan Profil ➔</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+
+        window.complete = async function () {
+            const name = document.getElementById('wName').value.trim();
+            const ic = document.getElementById('wIC').value.trim();
+            const email = document.getElementById('wEmail').value.trim();
+            const phone = document.getElementById('wPhone').value.trim();
+
+            if (!name || !ic || !email || !phone) {
+                alert(window.I18N.t('complete_all_wali_info') || 'Please complete all Guardian info.');
+                return;
+            }
+
+            try {
+                const ok = await DB.updateUser({
+                    waliName: name,
+                    waliIC: ic,
+                    waliEmail: email,
+                    waliPhone: phone
+                });
+                if (ok) window.location.href = 'home_preview.html';
+                else alert(window.I18N.t('tech_error'));
+            } catch (e) { console.error(e); }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            if(window.I18N) window.I18N.translatePage();
+            const user = await DB.getCurrentUser();
+            if (user) {
+                if (user.waliName) document.getElementById('wName').value = user.waliName;
+                if (user.waliIC) document.getElementById('wIC').value = user.waliIC;
+                if (user.waliEmail) document.getElementById('wEmail').value = user.waliEmail;
+                if (user.waliPhone) document.getElementById('wPhone').value = user.waliPhone;
+            }
+        });
+    </script>
+</body>
+
+</html>

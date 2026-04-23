@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Waktu Solat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Playfair+Display:wght@700;950&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --dark: #0B0E14; --glass: rgba(255,255,255,0.05); }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit', sans-serif; }
+        body { background: var(--dark); color:white; min-height:100vh; display:flex; justify-content:center; align-items:center; }
+        .phone { 
+            width:375px; height:812px; background:linear-gradient(180deg, #111827 0%, #000 100%); 
+            border-radius:44px; border:8px solid #1E293B; position:relative; overflow:hidden; display:flex; flex-direction:column;
+        }
+        .header { padding: 55px 24px 15px; display:flex; align-items:center; gap:15px; }
+        .back { font-size:24px; color:var(--gold); text-decoration:none; cursor:pointer; }
+        h1 { font-family:'Playfair Display', serif; font-size:24px; font-weight:900; }
+        
+        .hero { padding:20px; text-align:center; position:relative; margin-bottom:10px; }
+        .hero-bg { position:absolute; top:0; left:50%; transform:translateX(-50%); width:100%; height:200px; background:radial-gradient(circle, rgba(189,139,82,0.15) 0%, transparent 70%); z-index:0; }
+        .current-time { font-size:48px; font-weight:900; margin-bottom:5px; position:relative; }
+        .current-prayer { color:var(--gold); font-size:18px; font-weight:900; letter-spacing:2px; text-transform:uppercase; margin-bottom:20px; position:relative; }
+        .next-box { 
+            background:var(--glass); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.1); 
+            border-radius:24px; padding:20px; position:relative; display:inline-block; width:80%;
+        }
+        .next-label { font-size:11px; font-weight:800; color:#9CA3AF; margin-bottom:4px; }
+        .next-countdown { font-size:20px; font-weight:950; color:white; }
+
+        .list { flex:1; overflow-y:auto; padding:20px; scrollbar-width:none; padding-bottom:40px; }
+        .prayer-item { 
+            display:flex; justify-content:space-between; align-items:center; padding:18px 24px; 
+            background:var(--glass); border-radius:20px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.03);
+            transition:0.3s;
+        }
+        .prayer-item.active { background:rgba(189,139,82,0.15); border-color:var(--gold); }
+        .prayer-name { font-size:16px; font-weight:800; }
+        .prayer-time { font-size:16px; font-weight:900; color:var(--gold); }
+        .prayer-item.past { opacity:0.4; }
+
+        .location-bar { padding:15px 24px; display:flex; align-items:center; gap:10px; font-size:13px; font-weight:700; color:#9CA3AF; border-top:1px solid rgba(255,255,255,0.05); }
+
+        /* RTL Specifics */
+        [dir="rtl"] .back { transform: scaleX(-1); display:inline-block; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header">
+            <a href="islam_preview.html" class="back">‹</a>
+            <h1 data-t="prayer_times">Waktu Solat</h1>
+        </header>
+
+        <div class="hero">
+            <div class="hero-bg"></div>
+            <div class="current-time" id="clock">--:--</div>
+            <div class="current-prayer" id="activeN">Memuatkan...</div>
+            <div class="next-box">
+                <div class="next-label"><span data-t="prayer_next">Seterusnya:</span> <span id="nextN">--</span></div>
+                <div class="next-countdown" id="countdown">--:--:--</div>
+            </div>
+        </div>
+
+        <div class="list" id="pList">
+            <!-- Prayer items injected here -->
+        </div>
+
+        <div class="location-bar">
+            <span>📍</span>
+            <span id="loc" data-t="prayer_loc">Kuala Lumpur & Putrajaya (WLY01)</span>
+        </div>
+    </div>
+
+    <script>
+        const PRAYERS = [
+            { id: 'imsak', time: '05:46' },
+            { id: 'subuh', time: '05:56' },
+            { id: 'syuruk', time: '07:05' },
+            { id: 'zohor', time: '13:08' },
+            { id: 'asar', time: '16:15' },
+            { id: 'maghrib', time: '19:12' },
+            { id: 'isyak', time: '20:25' }
+        ];
+
+        function update() {
+            if (!window.I18N) return;
+            const now = new Date();
+            const clockEl = document.getElementById('clock');
+            clockEl.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            
+            const currentTotalMin = now.getHours() * 60 + now.getMinutes();
+            let nextIndex = 0;
+            let activeIndex = -1;
+
+            const list = document.getElementById('pList');
+            list.innerHTML = '';
+
+            PRAYERS.forEach((p, i) => {
+                const [h, m] = p.time.split(':').map(Number);
+                const pMin = h * 60 + m;
+                
+                let stateClass = '';
+                if (currentTotalMin >= pMin) {
+                    stateClass = 'past';
+                    activeIndex = i;
+                }
+                
+                const item = document.createElement('div');
+                item.className = `prayer-item ${stateClass}`;
+                const pName = window.I18N.t(p.id);
+                item.innerHTML = `<span class="prayer-name">${pName}</span><span class="prayer-time">${p.time}</span>`;
+                list.appendChild(item);
+            });
+
+            // Highlight active/next
+            if (activeIndex >= 0) {
+                list.children[activeIndex].className = 'prayer-item active';
+                document.getElementById('activeN').innerText = window.I18N.t(PRAYERS[activeIndex].id);
+            }
+
+            nextIndex = (activeIndex + 1) % PRAYERS.length;
+            const nextP = PRAYERS[nextIndex];
+            document.getElementById('nextN').innerText = window.I18N.t(nextP.id);
+
+            // Countdown logic
+            const [nH, nM] = nextP.time.split(':').map(Number);
+            let nextDate = new Date();
+            nextDate.setHours(nH, nM, 0);
+            if (nextDate < now) nextDate.setDate(nextDate.getDate() + 1);
+
+            const diff = nextDate - now;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            document.getElementById('countdown').innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        setInterval(update, 1000);
+        setTimeout(update, 500); // Small delay to let i18n load
+    </script>
+</body>
+</html>

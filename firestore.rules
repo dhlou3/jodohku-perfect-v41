@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 🛡️ USER PROFILE PROTECTION
+    match /users/{userId} {
+      allow read: if request.auth != null; 
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && (request.auth.uid == userId || request.auth.token.admin == true);
+    }
+    
+    // 💬 SHARIA-COMPLIANT CHAT (Strict Isolation)
+    match /chats/{chatId} {
+      // Allow read/write if user is memberA or memberB
+      allow read, write: if request.auth != null && (
+        request.auth.uid == resource.data.memberA || 
+        request.auth.uid == resource.data.memberB
+      );
+      
+      // Allow messages sub-collection access
+      match /messages/{msgId} {
+        allow read, write: if request.auth != null && (
+          get(/databases/$(database)/documents/chats/$(chatId)).data.memberA == request.auth.uid ||
+          get(/databases/$(database)/documents/chats/$(chatId)).data.memberB == request.auth.uid
+        );
+      }
+    }
+    
+    // 📜 JAKIM VERIFICATION (Private Documents)
+    match /verifications/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // 🛡️ WALI ASSIGNMENTS
+    match /wali_assignments/{assignmentId} {
+      allow read: if request.auth != null && (
+        request.auth.uid == resource.data.wardId || 
+        request.auth.uid == resource.data.waliId
+      );
+      allow create: if request.auth != null; // Ward requests a Wali
+    }
+    
+    // 🕍 JAKIM VENUE DATA (Publicly Readable)
+    match /venues/{venueId} {
+      allow read: if true;
+      allow write: if request.auth.token.admin == true; // Verified admin only
+    }
+  }
+}

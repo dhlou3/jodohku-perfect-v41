@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Notifikasi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #BD8B52; --orange: #C67C22; --bg-cream: #FDF9F4; --text-dark: #1F2937; --nav-gray: #9CA3AF; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .phone { width: 375px; height: 812px; background: white; border-radius: 44px; border: 8px solid #1E293B; position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 40px 80px rgba(0,0,0,0.1); }
+        
+        /* HEADER */
+        .notif-header { padding: 50px 24px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #F3F4F6; }
+        .back-btn { font-size: 20px; cursor: pointer; color: #9CA3AF; }
+        .notif-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: var(--text-dark); }
+        .read-all { color: var(--gold); font-size: 13px; font-weight: 800; cursor: pointer; }
+
+        .summary-bar { background: #FFF9F2; padding: 10px 24px; text-align: center; font-size: 11px; font-weight: 700; color: #BD8B52; letter-spacing: 0.5px; }
+
+        .content { flex: 1; overflow-y: auto; scrollbar-width: none; background: white; }
+        
+        .notif-item { display: flex; align-items: center; gap: 15px; padding: 20px 24px; border-bottom: 1px solid #F9FAFB; transition: 0.2s; cursor: pointer; text-decoration: none; }
+        .notif-item:active { background: #F9FAFB; }
+        
+        .n-icon-box { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .bg-red { background: #FFF1F2; color: #F43F5E; }
+        .bg-green { background: #ECFDF5; color: #10B981; }
+        .bg-purp { background: #F5F3FF; color: #8B5CF6; }
+        .bg-blue { background: #EFF6FF; color: #3B82F6; }
+        .bg-gold { background: #FFFBEB; color: var(--gold); }
+
+        .n-info { flex: 1; }
+        .n-text { font-size: 14px; font-weight: 800; color: var(--text-dark); margin-bottom: 2px; }
+        .n-sub { font-size: 12px; color: #6B7280; font-weight: 500; line-height: 1.4; }
+        .n-meta { font-size: 10px; color: #9CA3AF; margin-top: 6px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .dot { width: 4px; height: 4px; background: #D1D5DB; border-radius: 50%; }
+
+        .empty-state { padding: 100px 40px; text-align: center; color: #9CA3AF; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="notif-header">
+            <div class="back-btn" onclick="history.back()">‹</div>
+            <div class="notif-title">Notifikasi</div>
+            <div class="read-all">Baca Semua</div>
+        </header>
+
+        <div class="summary-bar" id="notifSummary">Memuatkan notifikasi...</div>
+
+        <div class="content" id="notifList">
+            <!-- Notifications will appear here -->
+        </div>
+    </div>
+
+    <script type="module">
+        import './database.js';
+
+        async function init() {
+            try {
+                const user = await DB.getCurrentUser(true);
+                if (!user) return;
+
+                const list = document.getElementById('notifList');
+                const summary = document.getElementById('notifSummary');
+
+                // 1. Fetch real logic data
+                const fans = await DB.getLikesForUser(user.phone);
+                
+                let allNotifs = [];
+
+                // ADD FANS (Padan)
+                fans.forEach(f => {
+                    allNotifs.push({
+                        type: 'padan',
+                        icon: '❤️',
+                        bg: 'bg-red',
+                        title: `${f.name} menyukai profil anda!`,
+                        sub: 'Klik untuk lihat profil beliau dan mulakan perbualan.',
+                        time: 'Baru saja',
+                        href: 'explore_preview.html'
+                    });
+                });
+
+                // ADD STATIC (Institutional Notifications)
+                allNotifs.push({
+                    type: 'jakim', icon: '🌿', bg: 'bg-green',
+                    title: 'Lencana Identiti Disahkan',
+                    sub: 'Profil anda kini mempunyai tanda verified JAKIM.',
+                    time: '1 jam lalu',
+                    href: 'profile_preview.html'
+                });
+
+                allNotifs.push({
+                    type: 'wali', icon: '🛡️', bg: 'bg-blue',
+                    title: 'Mod Wali: Status Selamat',
+                    sub: 'Garis panduan syariah dipatuhi dalam semua perbualan aktif.',
+                    time: 'Semalam',
+                    href: 'sembang.html'
+                });
+
+                allNotifs.push({
+                    type: 'artikel', icon: '📖', bg: 'bg-gold',
+                    title: 'Panduan Taaruf Beradab',
+                    sub: 'Lihat panduan terbaru tentang cara memulakan perbualan di Jodohku.',
+                    time: '2 hari lalu',
+                    href: 'islam_preview.html'
+                });
+
+                summary.innerText = `${allNotifs.length} Notifikasi Baharu`;
+
+                if (allNotifs.length === 0) {
+                    list.innerHTML = '<div class="empty-state">Tiada notifikasi baharu.</div>';
+                } else {
+                    list.innerHTML = '';
+                    allNotifs.forEach(n => {
+                        list.innerHTML += `
+                        <a href="${n.href}" class="notif-item">
+                            <div class="n-icon-box ${n.bg}">${n.icon}</div>
+                            <div class="n-info">
+                                <div class="n-text">${n.title}</div>
+                                <div class="n-sub">${n.sub}</div>
+                                <div class="n-meta">${n.time} <span class="dot"></span> ${n.type.toUpperCase()}</div>
+                            </div>
+                        </a>`;
+                    });
+                }
+
+            } catch (e) { console.error(e); }
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

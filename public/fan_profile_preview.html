@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Profil Calon (Elite)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;950&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --orange: #C67C22; --bg-cream: #FCFAF7; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit', sans-serif; }
+        body { background:#E5E7EB; height:100vh; display:flex; justify-content:center; align-items:center; overflow:hidden; }
+        .phone { width:375px; height:812px; background:white; border-radius:44px; border:8px solid #1E293B; position:relative; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 40px 80px rgba(0,0,0,0.1); }
+        
+        .hero { height:55%; background:#F3F4F6; position:relative; overflow:hidden; }
+        .hero-img { width:100%; height:100%; object-fit:cover; }
+        .back-btn { position:absolute; top:50px; left:20px; width:45px; height:45px; background:white; border-radius:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:900; box-shadow:0 10px 20px rgba(0,0,0,0.1); z-index:10; }
+
+        .details { flex:1; padding:30px 24px; background:white; margin-top:-40px; border-radius:40px 40px 0 0; position:relative; overflow-y:auto; padding-bottom:120px; scrollbar-width: none; }
+        .name { font-family:'Playfair Display', serif; font-size:34px; font-weight:950; color:#111827; }
+        .meta { color:#BD8B52; font-size:15px; font-weight:800; margin-top:5px; letter-spacing:0.5px; }
+        
+        .info-section { margin-top:30px; }
+        .info-title { font-size:12px; font-weight:900; color:#9CA3AF; letter-spacing:1px; margin-bottom:15px; text-transform:uppercase; }
+        .info-grid { display:flex; flex-wrap:wrap; gap:10px; }
+        .info-chip { background:#F9FAFB; border:1.5px solid #F3F4F6; padding:10px 18px; border-radius:100px; font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px; color: #374151; }
+        
+        .actions { position:absolute; bottom:30px; width:calc(100% - 48px); display:flex; gap:15px; left:24px; z-index:100; }
+        .btn { height:65px; border-radius:100px; font-weight:900; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; transition:0.3s; }
+        .btn-refuse { width:65px; background:#F3F4F6; color:#9CA3AF; border:1.5px solid #E5E7EB; }
+        .btn-like { flex:1; background:var(--gold); color:white; box-shadow: 0 15px 30px rgba(189,139,82,0.3); }
+        .btn:active { transform:scale(0.95); }
+
+        /* MATCH OVERLAY */
+        #matchOverlay { position:absolute; inset:0; background:rgba(11, 14, 20, 0.95); z-index:1000; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:white; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        .match-title { font-family:'Playfair Display', serif; font-size:42px; font-weight:950; color:var(--gold); }
+        .match-v { margin:30px 0; font-size:60px; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <!-- MATCH OVERLAY -->
+        <div id="matchOverlay">
+            <div class="match-title" data-t="alhamdulillah">Alhamdulillah!</div>
+            <p style="font-size:18px; font-weight:700; margin-top:10px;" data-t="matched_msg">Anda telah dipadankan.</p>
+            <div class="match-v">🤝</div>
+            <button class="btn btn-like" style="width:220px; margin-top:20px;" onclick="location.href='sembang.html'" data-t="start_chat_btn">MULA SEMBANG</button>
+        </div>
+
+        <div class="hero">
+            <div class="back-btn" onclick="history.back()">✕</div>
+            <img src="" id="photo" class="hero-img">
+        </div>
+        
+        <div class="details">
+            <h1 class="name" id="name">...</h1>
+            <p class="meta" id="meta">📍 <span id="uSt">...</span> • <span id="uAg">...</span> <span data-t="years_old">Tahun</span></p>
+            
+            <div class="info-section">
+                <div class="info-title" data-t="maklumat_peribadi">Maklumat Peribadi</div>
+                <div id="infoGrid" class="info-grid">
+                    <!-- Chips will be rendered here -->
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-title" data-t="tentang_saya">Tentang Saya</div>
+                <p id="bio" style="font-size:14px; color:#4B5563; line-height:1.7; font-weight:500;">
+                    ...
+                </p>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-refuse" onclick="history.back()">✕</button>
+                <button class="btn btn-like" onclick="match()" data-t="like_back_btn">❤️ SUKAI BALIK</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+
+        const params = new URLSearchParams(window.location.search);
+        const targetId = params.get('uid');
+        let targetUser = null;
+
+        async function init() {
+            if (window.I18N) window.I18N.translatePage();
+            if(!targetId) return;
+            
+            try {
+                targetUser = await DB.getUserDoc(targetId);
+                if(!targetUser) return;
+
+                const name = targetUser.fullName || targetUser.name || window.I18N.t('participant');
+                document.getElementById('name').innerText = name;
+                document.getElementById('uSt').innerText = targetUser.birthState || targetUser.cityName || "Malaysia";
+                document.getElementById('uAg').innerText = targetUser.age || "--";
+                document.getElementById('photo').src = targetUser.photoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=BD8B52&color=fff&size=512`;
+                document.getElementById('bio').innerText = targetUser.bio || (window.I18N.getLang() === 'en' ? "No bio provided." : "Tiada bio disediakan.");
+
+                const grid = document.getElementById('infoGrid');
+                const traits = [...(targetUser.interests || []), ...(targetUser.traits || [])];
+                
+                if (targetUser.profession || targetUser.jobTitle) {
+                    addChip(grid, '💼', targetUser.profession || targetUser.jobTitle);
+                }
+
+                traits.forEach(t => {
+                    addChip(grid, '👤', window.I18N.t(t) || t);
+                });
+
+            } catch(e) { console.error("Fan profile init error:", e); }
+        }
+
+        function addChip(container, icon, text) {
+            const chip = document.createElement('div');
+            chip.className = 'info-chip';
+            chip.innerHTML = `<span>${icon}</span> <span>${text}</span>`;
+            container.appendChild(chip);
+        }
+
+        window.match = async () => {
+            if(!targetId) return;
+            const btn = document.querySelector('.btn-like');
+            btn.disabled = true;
+            btn.innerHTML = `<span data-t="loading">...</span>`;
+            
+            try {
+                const ok = await DB.likeUser(targetId);
+                if (ok) {
+                    // Check if it's a match happens in likeUser logic usually, 
+                    // but for this UI we show the overlay
+                    document.getElementById('matchOverlay').style.display = 'flex';
+                }
+            } catch(e) { console.error(e); }
+            finally { btn.disabled = false; btn.innerText = window.I18N.t('like_back_btn'); }
+        }
+
+        init();
+    </script>
+</body>
+</html>
