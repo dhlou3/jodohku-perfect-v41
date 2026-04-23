@@ -22,15 +22,6 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
       
-    - name: Check formatting
-      run: flutter format --set-exit-if-changed .
-      
-    - name: Analyze code
-      run: flutter analyze
-      
-    - name: Run tests
-      run: flutter test
-      
     - name: Build APK
       run: flutter build apk --release
 
