@@ -51,6 +51,20 @@ class AuthNotifier extends StateNotifier<JodohkuAuthState> {
     }
   }
 
+  Future<void> sendMagicLink(String email) async {
+    state = state.copyWith(status: AuthStatus.authenticating);
+    // LOGIC: Simulation
+    await Future.delayed(const Duration(seconds: 2));
+    state = state.copyWith(status: AuthStatus.awaitingOtp, email: email);
+  }
+
+  Future<void> verifyOtp(String code) async {
+    state = state.copyWith(status: AuthStatus.authenticating);
+    // LOGIC: Simulation
+    await Future.delayed(const Duration(seconds: 2));
+    state = state.copyWith(status: AuthStatus.authenticated);
+  }
+
   Future<void> upgradeToSultan() async {
     state = state.copyWith(status: AuthStatus.authenticating);
     
