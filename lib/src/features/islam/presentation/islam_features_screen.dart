@@ -123,6 +123,8 @@ class IslamFeaturesScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
   void _showMarriageGuide(BuildContext context) {
     showModalBottomSheet(
       context: context,
