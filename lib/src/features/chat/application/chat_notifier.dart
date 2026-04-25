@@ -108,7 +108,7 @@ class ChatNotifier extends StateNotifier<List<ChatSession>> {
     ];
     
     final session = state.firstWhere((s) => s.id == sessionId);
-    WaliReportService.generateAndSendReport(session, partner ?? MemberProfile(id: session.memberA == senderId ? session.memberB : session.memberA, fullName: 'Calon Pasangan', gender: 'woman', birthState: 'Kuala Lumpur', isWaliVerified: true));
+    WaliReportService.generateAndSendReport(session, partner ?? MemberProfile(id: session.memberAId == senderId ? session.memberBId : session.memberAId, fullName: 'Calon Pasangan', gender: 'woman', birthState: 'Kuala Lumpur', isWaliVerified: true));
   }
 
   // INTERNAL LOGIC: Halal Guard (AGGRESSIVE SENTINEL v3.0)

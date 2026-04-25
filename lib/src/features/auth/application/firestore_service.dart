@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../domain/member_profile.dart';
+import '../../chat/domain/chat_models.dart';
 
 class FirestoreService {
   static final _db = FirebaseFirestore.instance;
@@ -62,7 +63,7 @@ class FirestoreService {
     });
   }
 
-  static Stream<List<Map<String, dynamic>>> watchChats() {
+  static Stream<List<ChatSession>> watchChats() {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return Stream.value([]);
 
@@ -72,7 +73,7 @@ class FirestoreService {
         Filter('memberB', isEqualTo: uid),
       ))
       .snapshots()
-      .map((snap) => snap.docs.map((d) => d.data()).toList());
+      .map((snap) => snap.docs.map((d) => ChatSession.fromMap(d.data(), d.id)).toList());
   }
 
   static Future<void> advanceTaarufQuestion(String sessionId, int nextIndex) async {

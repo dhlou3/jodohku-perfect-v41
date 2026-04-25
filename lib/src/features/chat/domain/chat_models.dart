@@ -55,5 +55,16 @@ class ChatSession {
       isFrozen: isFrozen ?? this.isFrozen,
       meetStatus: meetStatus ?? this.meetStatus,
     );
+  factory ChatSession.fromMap(Map<String, dynamic> map, String docId) {
+    return ChatSession(
+      id: docId,
+      memberAId: map['memberA'] ?? '',
+      memberBId: map['memberB'] ?? '',
+      waliId: map['waliId'],
+      currentQuestionIndex: map['currentQuestionIndex'] ?? 0,
+      isFrozen: map['isFrozen'] ?? false,
+      meetStatus: MeetStatus.values[map['meetStatus'] ?? 0],
+      messages: [], // Messages are fetched as subcollection in production
+    );
   }
 }
