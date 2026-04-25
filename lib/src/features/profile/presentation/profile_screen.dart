@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:jodohku_malaysia/src/theme/app_theme.dart';
 import 'package:jodohku_malaysia/src/features/auth/application/auth_notifier.dart';
 import 'package:jodohku_malaysia/src/features/auth/domain/auth_models.dart';
+import 'package:jodohku_malaysia/src/features/auth/domain/member_profile.dart';
+import 'package:jodohku_malaysia/src/features/notifications/application/notification_notifier.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});

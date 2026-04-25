@@ -51,6 +51,21 @@ class AuthNotifier extends StateNotifier<JodohkuAuthState> {
     }
   }
 
+  Future<void> upgradeToSultan() async {
+    state = state.copyWith(status: AuthStatus.authenticating);
+    
+    // LOGIC: Verify payment or trigger cloud script
+    await Future.delayed(const Duration(seconds: 2));
+    
+    final profile = await FirestoreService.getProfile();
+    if (profile != null) {
+      await FirestoreService.saveProfile(profile.copyWith(isSultan: true));
+    }
+    
+    state = state.copyWith(status: AuthStatus.authenticated);
+    ref.read(notificationProvider.notifier).show('STATUS SULTAN AKTIF! 💎', 'Selamat datang ke Elit Jodohku. Akses anda telah dibuka.');
+  }
+
   void logout() async {
     await FirebaseAuth.instance.signOut();
     state = JodohkuAuthState();
