@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jodohku_malaysia/src/features/auth/application/auth_notifier.dart';
 import 'package:jodohku_malaysia/src/features/chat/domain/chat_models.dart';
 import 'package:jodohku_malaysia/src/features/chat/application/chat_observer_service.dart';
 import 'package:jodohku_malaysia/src/features/chat/application/wali_report_service.dart';
@@ -15,7 +16,7 @@ class ChatNotifier extends StateNotifier<List<ChatSession>> {
     });
 
     // WALI HEARTBEAT - Ensure safety remains active during live sessions
-    ref.listen(profileProvider, (previous, next) {
+    ref.listen<AsyncValue<MemberProfile?>>(profileProvider, (previous, next) {
       final profile = next.value;
       if (profile != null && (profile.waliName == null || profile.waliName!.isEmpty)) {
         // If Wali disappears, we can broadcast a global alert or freeze UI
@@ -85,7 +86,7 @@ class ChatNotifier extends StateNotifier<List<ChatSession>> {
   }
 
   // LOGIC: Accept Meeting & Trigger Wali Report
-  void acceptMeeting(String sessionId, String senderId, MemberProfile partner) {
+  void acceptMeeting(String sessionId, String senderId, [MemberProfile? partner]) {
     state = [
       for (final session in state)
         if (session.id == sessionId)
@@ -107,7 +108,7 @@ class ChatNotifier extends StateNotifier<List<ChatSession>> {
     ];
     
     final session = state.firstWhere((s) => s.id == sessionId);
-    WaliReportService.generateAndSendReport(session, partner);
+    WaliReportService.generateAndSendReport(session, partner ?? MemberProfile(id: session.memberA == senderId ? session.memberB : session.memberA, fullName: 'Calon Pasangan', isWaliVerified: true));
   }
 
   // INTERNAL LOGIC: Halal Guard (AGGRESSIVE SENTINEL v3.0)

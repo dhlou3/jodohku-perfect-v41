@@ -33,7 +33,7 @@ class FirestoreService {
     });
   }
 
-  static Future<void> createChatRoom(String roomId, String p1, String p2) async {
+  static Future<void> createChatSession(String roomId, String p1, String p2) async {
     await _db.collection('chats').doc(roomId).set({
       'id': roomId,
       'memberA': p1,
