@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jodohku_malaysia/src/theme/app_theme.dart';
+import 'package:jodohku_malaysia/src/features/auth/application/auth_notifier.dart';
+import 'package:jodohku_malaysia/src/features/auth/domain/auth_models.dart';
 import 'package:jodohku_malaysia/src/features/navigation/main_navigation_screen.dart';
 
 class OtpVerificationScreen extends ConsumerWidget {

@@ -66,6 +66,20 @@ class AuthNotifier extends StateNotifier<JodohkuAuthState> {
     ref.read(notificationProvider.notifier).show('STATUS SULTAN AKTIF! 💎', 'Selamat datang ke Elit Jodohku. Akses anda telah dibuka.');
   }
 
+  Future<void> updateWali({required String name, required String email, required String relation}) async {
+    final profile = await FirestoreService.getProfile();
+    if (profile != null) {
+      final updated = profile.copyWith(
+        waliName: name,
+        waliEmail: email,
+        waliRelation: relation,
+        isWaliVerified: true,
+      );
+      await FirestoreService.saveProfile(updated);
+      ref.read(notificationProvider.notifier).show('WALI DIKEMASKINI 🛡️', 'Maklumat penjaga anda telah selamat disimpan.');
+    }
+  }
+
   void logout() async {
     await FirebaseAuth.instance.signOut();
     state = JodohkuAuthState();
