@@ -55,6 +55,8 @@ class ChatSession {
       isFrozen: isFrozen ?? this.isFrozen,
       meetStatus: meetStatus ?? this.meetStatus,
     );
+  }
+
   factory ChatSession.fromMap(Map<String, dynamic> map, String docId) {
     return ChatSession(
       id: docId,
