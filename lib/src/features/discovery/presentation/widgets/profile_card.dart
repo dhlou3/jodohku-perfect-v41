@@ -59,7 +59,7 @@ class ProfileCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${match.score.toStringAsFixed(0)}% MATCH',
+                            '${match.score.toStringAsFixed(0)}% KESERASIAN',
                             style: GoogleFonts.outfit(
                               fontSize: 11,
                               fontWeight: FontWeight.w900,
@@ -192,9 +192,9 @@ class ProfileCard extends StatelessWidget {
   }
 
   String _getMatchLabel(double score) {
-    if (score >= 90) return 'Perfect Taaruf';
-    if (score >= 80) return 'High Compatibility';
-    if (score >= 70) return 'Blessed Match';
-    return 'Good Potential';
+    if (score >= 90) return 'Sangat Serasi (Elite Match)';
+    if (score >= 80) return 'Serasi (Barakah)';
+    if (score >= 70) return 'Sesuai (Berpotensi)';
+    return 'Mencari Keserasian';
   }
 }
