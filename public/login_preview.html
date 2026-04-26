@@ -190,13 +190,19 @@
                 gLoginBtn.style.opacity = '0.7';
                 gLoginBtn.style.pointerEvents = 'none';
 
-                // VERIFICATION PROOF FOR USER
-                if (!window.AppBridge) {
-                    alert("✅ Verification: Button Logic is ACTIVE! On your phone, this will now open the Native Google Selector.");
+                // UNIVERSAL BRIDGE DETECTION (v8.0)
+                const bridge = window.AppBridge || (typeof AppBridge !== 'undefined' ? AppBridge : null);
+                
+                if (bridge) {
+                    bridge.postMessage('googleLogin');
+                    return;
                 }
 
-                if (window.AppBridge) {
-                    window.AppBridge.postMessage('googleLogin');
+                if (!bridge && window.location.protocol === 'file:') {
+                    alert("❌ Connection Error: Phone Bridge not ready. Try again in 2 seconds.");
+                    gLoginBtn.innerHTML = originalContent;
+                    gLoginBtn.style.opacity = '1';
+                    gLoginBtn.style.pointerEvents = 'auto';
                     return;
                 }
 

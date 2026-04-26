@@ -257,13 +257,19 @@
                 btn.style.opacity = '0.7';
                 btn.style.pointerEvents = 'none';
 
-                // VERIFICATION PROOF FOR USER
-                if (!window.AppBridge) {
-                    alert("✅ Verification: Register Logic is ACTIVE! On your phone, this will now open the Native Google Selector.");
+                // UNIVERSAL BRIDGE DETECTION (v8.0)
+                const bridge = window.AppBridge || (typeof AppBridge !== 'undefined' ? AppBridge : null);
+                
+                if (bridge) {
+                    bridge.postMessage('googleLogin');
+                    return;
                 }
 
-                if (window.AppBridge) {
-                    window.AppBridge.postMessage('googleLogin');
+                if (!bridge && window.location.protocol === 'file:') {
+                    alert("❌ Connection Error: Phone Bridge not ready. Try again in 2 seconds.");
+                    btn.innerHTML = originalContent;
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
                     return;
                 }
 
