@@ -29,35 +29,9 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
     final discoveryState = ref.watch(discoveryProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F5F0),
+      backgroundColor: AppColors.premiumTan,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            backgroundColor: Colors.white,
-            floating: true,
-            pinned: true,
-            elevation: 0,
-            leadingWidth: 150,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 20, top: 12),
-              child: Text(
-                'Jodohku Discovery',
-                style: GoogleFonts.outfit(
-                  fontWeight: FontWeight.w900,
-                  color: const Color(0xFFBD8B52),
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            actions: [
-              IconButton(onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tiada notifikasi baru.')));
-              }, icon: const Icon(Icons.notifications_none, color: Color(0xFFBD8B52))),
-              IconButton(onPressed: () => _showFilters(context), icon: const Icon(Icons.tune_rounded, color: Color(0xFFBD8B52))),
-              const SizedBox(width: 12),
-            ],
-          ),
-          
           discoveryState.when(
             data: (matches) => SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),

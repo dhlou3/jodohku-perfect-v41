@@ -51,8 +51,8 @@ flutter:
 #        - asset: assets/fonts/Outfit-Bold.ttf
 #          weight: 700
 
-#  assets:
-#    - assets/images/
+  assets:
+    - assets/images/
 #    - assets/icons/
 #    - assets/translations/
 #    - assets/legal/

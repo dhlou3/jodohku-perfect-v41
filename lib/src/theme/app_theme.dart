@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  // Luxury Theme Palette
-  static const Color background = Color(0xFF020617);
-  static const Color surface = Color(0xFF0F172A);
-  static const Color midnight = Color(0xFF1E293B);
-  static const Color primaryGold = Color(0xFFFFD700); // REVERTED TO VIBRANT YELLOW
-  static const Color accentCyan = Color(0xFF22D3EE);
-  static const Color shariaGreen = Color(0xFF406343);
-  static const Color premiumTan = Color(0xFFE6D5C3);
+  // Elite Premium Theme Palette
+  static const Color background = Color(0xFF0B0E14); // Web --bg-midnight
+  static const Color surface = Color(0xFF131720);
+  static const Color midnight = Color(0xFF0B0E14);
+  static const Color primaryGold = Color(0xFFBD8B52); // Web --gold
+  static const Color accentGold = Color(0xFFF3D1A5);
+  static const Color shariaGreen = Color(0xFF10B981);
+  static const Color premiumTan = Color(0xFFFCFAF7); // Web --bg-cream
   
   static const Color textMain = Colors.white;
   static const Color textSubtle = Color(0x99FFFFFF); // Transparent white

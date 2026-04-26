@@ -1,156 +1,188 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jodohku_malaysia/src/features/matching/domain/discovery_match.dart';
 import 'package:jodohku_malaysia/src/theme/app_theme.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jodohku_malaysia/src/features/auth/domain/member_profile.dart';
-import 'package:jodohku_malaysia/src/features/matching/application/discovery_notifier.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
-class ProfileCard extends ConsumerWidget {
+class ProfileCard extends StatelessWidget {
   final DiscoveryMatch match;
-
   const ProfileCard({super.key, required this.match});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: Colors.white.withOpacity(0.05), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
-          ),
-        ],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(35),
+        border: Border.all(color: Colors.black.withOpacity(0.05)),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // PROFILE IMAGE AREA
+          // IMAGE SECTION (MATCHING WEB 420px FEEL)
           Stack(
             children: [
-              Container(
-                height: 400,
+              SizedBox(
+                height: 420,
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-                  image: DecorationImage(
-                    image: NetworkImage(match.profile.photoUrl ?? 'https://images.unsplash.com/photo-1512484776495-a09d92e87c3b?auto=format&fit=crop&q=80&w=800'),
+                child: CachedNetworkImage(
+                  imageUrl: match.candidate.photoUrl ?? '',
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(color: AppColors.primaryGold.withOpacity(0.1)),
+                  errorWidget: (context, url, error) => Image.network(
+                    'https://ui-avatars.com/api/?name=${Uri.encodeComponent(match.candidate.fullName ?? 'User')}&background=BD8B52&color=fff&size=512',
                     fit: BoxFit.cover,
                   ),
                 ),
+              ),
+              // Match Score Badge (Premium Web Style)
+              Positioned(
+                top: 20,
+                right: 20,
                 child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        AppColors.background.withOpacity(0.8),
-                      ],
-                    ),
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(color: AppColors.primaryGold, width: 1.5),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('✨', style: TextStyle(fontSize: 16)),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${match.score.toStringAsFixed(0)}% MATCH',
+                            style: GoogleFonts.outfit(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.primaryGold,
+                              height: 1,
+                            ),
+                          ),
+                          Text(
+                            _getMatchLabel(match.score),
+                            style: GoogleFonts.outfit(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF374151),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-              
-              // MATCH SCORE (GOLD TAG)
-              Positioned(
-                top: 20, 
-                right: 20,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGold,
-                    borderRadius: BorderRadius.circular(100),
-                    boxShadow: [BoxShadow(color: AppColors.primaryGold.withOpacity(0.3), blurRadius: 15)],
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.bolt, size: 16, color: Colors.white),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${match.score.toStringAsFixed(0)}% MATCH',
-                        style: GoogleFonts.outfit(
-                          fontSize: 12,
+            ],
+          ),
+          
+          // CARD BODY
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        match.candidate.fullName ?? 'Calon Jodohku',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 28,
                           fontWeight: FontWeight.w900,
-                          color: Colors.white,
+                          color: AppColors.primaryGold,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'JDK-ELITE',
+                      style: GoogleFonts.outfit(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: const Color(0xFF9CA3AF),
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${match.candidate.profession ?? 'Professional'} • ${match.candidate.birthState ?? 'Malaysia'} • ${match.candidate.age ?? 25} thn',
+                  style: GoogleFonts.outfit(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF374151),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // BIO BOX
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFF3F4F6)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '📝 STATUS HARI INI',
+                        style: GoogleFonts.outfit(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.primaryGold,
                           letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        match.candidate.bio ?? "As-salam, saya mencari teman syurga.",
+                        style: GoogleFonts.outfit(
+                          fontSize: 15,
+                          color: const Color(0xFF1F2937),
+                          fontWeight: FontWeight.w500,
+                          height: 1.5,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ).animate().shimmer(duration: 2.seconds),
-
-              // IDENTITY OVERLAY
-              Positioned(
-                bottom: 24,
-                left: 24,
-                right: 24,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          match.profile.fullName,
-                          style: GoogleFonts.outfit(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: -1,
-                          ),
-                        ),
-                        if (match.profile.isWaliVerified) ...[
-                          const SizedBox(width: 10),
-                          const Icon(Icons.verified, color: AppColors.accentCyan, size: 24),
-                        ]
-                      ],
+                
+                const SizedBox(height: 16),
+                
+                // INTEREST CHIPS
+                Wrap(
+                  spacing: 8,
+                  children: (match.candidate.interests ?? []).take(3).map((interest) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(100),
+                      border: Border.all(color: const Color(0xFFE5E7EB)),
                     ),
-                    Text(
-                      '${match.profile.birthState} • ${match.profile.age} YEARS OLD',
+                    child: Text(
+                      interest,
                       style: GoogleFonts.outfit(
-                        fontSize: 13,
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.5,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF374151),
                       ),
                     ),
-                  ],
+                  )).toList(),
                 ),
-              ),
-            ],
-          ),
-
-          // DETAILS
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildPromptItem('PRAYER FREQUENCY', _getReligiousLabel(match.profile.prayerFrequency)),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Divider(color: Colors.white.withOpacity(0.05)),
-                ),
-                _buildPromptItem('MARITAL INTENT', _getIntentLabel(match.profile.maritalIntent)),
-              ],
-            ),
-          ),
-
-          // ACTION BUTTONS
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _circleBtn(Icons.close, Colors.white, onTap: () {}),
-                _circleBtn(Icons.star, AppColors.primaryGold, isLarge: true, onTap: () {}),
-                _circleBtn(Icons.favorite, AppColors.primaryGold, onTap: () {}),
               ],
             ),
           ),
@@ -159,62 +191,10 @@ class ProfileCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildPromptItem(String q, String a) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          q,
-          style: GoogleFonts.outfit(
-            fontSize: 10,
-            fontWeight: FontWeight.w900,
-            color: AppColors.primaryGold,
-            letterSpacing: 2,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          a,
-          style: GoogleFonts.outfit(
-            fontSize: 16,
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-            height: 1.4,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _circleBtn(IconData icon, Color color, {bool isLarge = false, required VoidCallback onTap}) {
-    return Container(
-      width: isLarge ? 84 : 64,
-      height: isLarge ? 84 : 64,
-      decoration: BoxDecoration(
-        color: isLarge ? AppColors.primaryGold : Colors.white.withOpacity(0.05),
-        shape: BoxShape.circle,
-        border: Border.all(color: isLarge ? Colors.transparent : Colors.white.withOpacity(0.1)),
-        boxShadow: isLarge ? [BoxShadow(color: AppColors.primaryGold.withOpacity(0.3), blurRadius: 20)] : [],
-      ),
-      child: Icon(icon, color: isLarge ? Colors.white : color, size: isLarge ? 36 : 28),
-    );
-  }
-
-  String _getReligiousLabel(PrayerFrequency freq) {
-    switch (freq) {
-      case PrayerFrequency.never: return 'Tidak Pernah';
-      case PrayerFrequency.usually: return 'Kadang-kadang';
-      case PrayerFrequency.often: return 'Biasanya (5 Waktu)';
-      case PrayerFrequency.always: return 'Sentiasa (Istiqamah)';
-    }
-  }
-
-  String _getIntentLabel(MaritalIntent intent) {
-    switch (intent) {
-      case MaritalIntent.exploring: return 'Mengenali Hati';
-      case MaritalIntent.nearFuture: return 'Tahun Depan';
-      case MaritalIntent.serious: return 'Serius (Sedia)';
-      case MaritalIntent.immediate: return 'Segera (Akad)';
-    }
+  String _getMatchLabel(double score) {
+    if (score >= 90) return 'Perfect Taaruf';
+    if (score >= 80) return 'High Compatibility';
+    if (score >= 70) return 'Blessed Match';
+    return 'Good Potential';
   }
 }

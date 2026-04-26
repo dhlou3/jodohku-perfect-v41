@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:jodohku_malaysia/src/theme/app_theme.dart';
 import 'package:jodohku_malaysia/src/features/auth/application/auth_notifier.dart';
 import 'package:jodohku_malaysia/src/features/onboarding/presentation/registration_screen.dart';
-import 'package:jodohku_malaysia/src/features/auth/presentation/login_screen.dart';
 
 class AuthLandingScreen extends ConsumerWidget {
   final bool isAuthenticating;
@@ -15,24 +14,25 @@ class AuthLandingScreen extends ConsumerWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // THE LUXURY HERO (FROM SCREENSHOT)
+          // THE ELITE HERO (MATCHING WEB)
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage('https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=1000'),
+                image: AssetImage('assets/images/wedding_hero.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          // Deep Navy Overlay
+          // Midnight Gradient Overlay
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  const Color(0xFF070D1E).withOpacity(0.4),
-                  const Color(0xFF070D1E).withOpacity(0.95),
+                  const Color(0xFF0B0E14).withOpacity(0.2),
+                  const Color(0xFF0B0E14).withOpacity(0.6),
+                  const Color(0xFF0B0E14).withOpacity(0.95),
                 ],
               ),
             ),
@@ -42,94 +42,141 @@ class AuthLandingScreen extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // LANGUAGE TOGGLE
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(100),
-                        border: Border.all(color: Colors.white.withOpacity(0.1)),
-                      ),
-                      child: Text(
-                        'EN | MS',
-                        style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                  // BACK BUTTON (TOP LEFT)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.arrow_back_rounded, color: Colors.white70, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Kembali',
+                            style: GoogleFonts.outfit(color: Colors.white70, fontWeight: FontWeight.w600),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  
+
                   const Spacer(),
+
+                  // HERO ICON (MATCHING WEB SVG)
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.primaryGold.withOpacity(0.3), width: 2),
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.fingerprint_rounded, color: AppColors.primaryGold, size: 60),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
                   
-                  // BRAND LOGO
-                  RichText(
-                    text: TextSpan(
-                      style: GoogleFonts.outfit(
-                        fontSize: 64,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: -2,
-                      ),
-                      children: const [
-                        TextSpan(text: 'Jodoh'),
-                        TextSpan(
-                          text: 'ku',
-                          style: TextStyle(color: AppColors.primaryGold),
+                  Text(
+                    'Selamat Pulang',
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 38,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  Text(
+                    'Log masuk dengan identiti digital anda.',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.outfit(
+                      fontSize: 15,
+                      color: const Color(0xFF9CA3AF),
+                      fontWeight: FontWeight.w500,
+                      height: 1.5,
+                    ),
+                  ),
+
+                  const SizedBox(height: 60),
+
+                  // PRIMARY ACTION: GOOGLE LOGIN (MATCHING WEB)
+                  ElevatedButton(
+                    onPressed: isAuthenticating ? null : () {
+                      ref.read(authProvider.notifier).authenticateWithBiometrics();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF111827),
+                      minimumSize: const Size(double.infinity, 64),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                      elevation: 8,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.network('https://img.icons8.com/color/48/000000/google-logo.png', width: 22, height: 22),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Continue with Google',
+                          style: GoogleFonts.outfit(fontWeight: FontWeight.w800, fontSize: 17),
                         ),
                       ],
                     ),
                   ),
-                  
-                  const SizedBox(height: 8),
-                  
-                  Text(
-                    'Find a love blessed under the guidance of Sharia.',
-                    style: GoogleFonts.outfit(
-                      fontSize: 20,
-                      color: Colors.white.withOpacity(0.9),
-                      fontWeight: FontWeight.w400,
-                      height: 1.3,
-                    ),
-                  ),
-
-                  const SizedBox(height: 48),
-
-                  // PRIMARY ACTION (LOGIC CONNECTED)
-                  ElevatedButton(
-                    onPressed: isAuthenticating ? null : () {
-                      // PHASE 1 LOGIC: Triggering registration state
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const RegistrationScreen()));
-                    },
-                    style: AppTheme.vibrantButton,
-                    child: isAuthenticating 
-                      ? const CircularProgressIndicator(color: Colors.black)
-                      : const Text('CREATE NEW ACCOUNT'),
-                  ),
 
                   const SizedBox(height: 16),
 
-                  // SECONDARY ACTION (LOGIC CONNECTED)
+                  // SECONDARY ACTION: BIOMETRIC (MATCHING WEB)
                   OutlinedButton(
                     onPressed: isAuthenticating ? null : () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+                      ref.read(authProvider.notifier).authenticateWithBiometrics();
                     },
-                    style: AppTheme.outlineButton,
-                    child: const Text('LOG IN'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primaryGold,
+                      minimumSize: const Size(double.infinity, 60),
+                      side: BorderSide(color: AppColors.primaryGold.withOpacity(0.3), width: 2),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                      backgroundColor: AppColors.primaryGold.withOpacity(0.05),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.lock_outline_rounded, size: 24),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Log Masuk Fingerprint',
+                          style: GoogleFonts.outfit(fontWeight: FontWeight.w800, fontSize: 16),
+                        ),
+                      ],
+                    ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 24),
 
-                  // BISMILLAH FOOTER
-                  Center(
-                    child: Text(
-                      'بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ',
-                      style: GoogleFonts.amiri(
-                        fontSize: 24,
-                        color: AppColors.primaryGold.withOpacity(0.8),
-                        height: 1.2,
+                  // FOOTER NOTE
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Belum ada akaun?',
+                        style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
                       ),
-                    ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const RegistrationScreen()));
+                        },
+                        child: const Text(
+                          'Daftar Sekarang',
+                          style: TextStyle(color: AppColors.primaryGold, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -140,7 +187,3 @@ class AuthLandingScreen extends ConsumerWidget {
     );
   }
 }
-
-
-
-
