@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:jodohku_malaysia/src/features/matching/domain/discovery_match.dart';
+import 'package:jodohku_malaysia/src/features/matching/application/discovery_notifier.dart';
 import 'package:jodohku_malaysia/src/theme/app_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -27,11 +27,11 @@ class ProfileCard extends StatelessWidget {
                 height: 420,
                 width: double.infinity,
                 child: CachedNetworkImage(
-                  imageUrl: match.candidate.photoUrl ?? '',
+                  imageUrl: match.profile.photoUrl ?? '',
                   fit: BoxFit.cover,
                   placeholder: (context, url) => Container(color: AppColors.primaryGold.withOpacity(0.1)),
                   errorWidget: (context, url, error) => Image.network(
-                    'https://ui-avatars.com/api/?name=${Uri.encodeComponent(match.candidate.fullName ?? 'User')}&background=BD8B52&color=fff&size=512',
+                    'https://ui-avatars.com/api/?name=${Uri.encodeComponent(match.profile.fullName ?? 'User')}&background=BD8B52&color=fff&size=512',
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -97,7 +97,7 @@ class ProfileCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        match.candidate.fullName ?? 'Calon Jodohku',
+                        match.profile.fullName ?? 'Calon Jodohku',
                         style: GoogleFonts.playfairDisplay(
                           fontSize: 28,
                           fontWeight: FontWeight.w900,
@@ -118,7 +118,7 @@ class ProfileCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${match.candidate.profession ?? 'Professional'} • ${match.candidate.birthState ?? 'Malaysia'} • ${match.candidate.age ?? 25} thn',
+                  '${match.profile.profession ?? 'Professional'} • ${match.profile.birthState ?? 'Malaysia'} • ${match.profile.age ?? 25} thn',
                   style: GoogleFonts.outfit(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
@@ -149,7 +149,7 @@ class ProfileCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        match.candidate.bio ?? "As-salam, saya mencari teman syurga.",
+                        match.profile.bio ?? "As-salam, saya mencari teman syurga.",
                         style: GoogleFonts.outfit(
                           fontSize: 15,
                           color: const Color(0xFF1F2937),
@@ -166,7 +166,7 @@ class ProfileCard extends StatelessWidget {
                 // INTEREST CHIPS
                 Wrap(
                   spacing: 8,
-                  children: (match.candidate.interests ?? []).take(3).map((interest) => Container(
+                  children: (match.profile.interests ?? []).take(3).map((interest) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.white,

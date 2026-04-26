@@ -53,7 +53,7 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(color: Color(0xFFBD8B52)),
+                    CircularProgressIndicator(color: AppColors.primaryGold),
                     SizedBox(height: 16),
                     Text('AI Calculating Barakah Match...', style: TextStyle(color: Colors.grey)),
                   ],
