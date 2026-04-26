@@ -14,7 +14,7 @@ dependencies:
   riverpod_annotation: ^2.3.3
   firebase_core: ^2.24.2
   cloud_firestore: ^4.14.0
-  firebase_auth: ^4.15.3
+  firebase_auth: ^4.16.0
   firebase_storage: ^11.5.6
   cloud_functions: ^4.5.3
   google_maps_flutter: ^2.5.3
@@ -29,7 +29,7 @@ dependencies:
   cached_network_image: ^3.3.0
   flutter_svg: ^2.0.9
   webview_flutter: ^4.4.2
-  google_sign_in: ^6.1.6
+  google_sign_in: ^6.2.1
   local_auth: ^2.1.8
 
 dev_dependencies:
