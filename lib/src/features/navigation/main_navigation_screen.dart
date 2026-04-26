@@ -53,38 +53,41 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
     ];
 
     return Scaffold(
+    return Scaffold(
       appBar: _currentIndex == 0 ? AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: false,
+        toolbarHeight: 80,
         title: Text(
-          'Jodohku',
+          'JODOHKU',
           style: GoogleFonts.playfairDisplay(
             color: AppColors.primaryGold,
-            fontSize: 28,
+            fontSize: 26,
             fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
           ),
         ),
         actions: [
           IconButton(
             onPressed: () {}, 
             icon: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: const Color(0xFFF3F4F6)),
               ),
               child: const Icon(Icons.tune_rounded, color: Colors.black87, size: 20),
             ),
           ),
-          const SizedBox(width: 8),
           IconButton(
             onPressed: () {}, 
             icon: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: const Color(0xFFF3F4F6)),
               ),
               child: const Icon(Icons.settings_outlined, color: Colors.black87, size: 20),
