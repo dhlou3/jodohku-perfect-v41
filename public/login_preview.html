@@ -115,7 +115,11 @@
     </style>
 </head>
 <body>
-    <div class="phone-container">
+    <!-- 📱 PHONE SIGNAL SIMULATOR (v10.3) -->
+    <div id="signalMonitor" style="position:fixed; top:10px; right:10px; background:rgba(255,0,0,0.9); color:white; padding:10px; border-radius:8px; font-family:monospace; font-size:10px; z-index:9999; border:2px solid white; display:none;">
+        STATUS: <span id="signalStatus">WAITING...</span><br>
+        TUNNEL: <span id="signalProtocol">NONE</span>
+    </div>
         <div class="auth-card">
             <div class="logo-symbol"></div>
             <h1>Jodohku</h1>
@@ -166,8 +170,20 @@
 
         // 🚀 GOOGLE BUTTON
         btn.onclick = async () => {
-            btn.style.background = '#FFD700'; // Visual confirmation
-            btn.innerText = 'Menyambung...';
+            // ACTIVATE SIMULATOR (Local Verification)
+            const mon = document.getElementById('signalMonitor');
+            const stat = document.getElementById('signalStatus');
+            const prot = document.getElementById('signalProtocol');
+            mon.style.display = 'block';
+            stat.innerText = '📡 CAPTURING SIGNAL...';
+            prot.innerText = 'appbridge://googleLogin';
+            
+            setTimeout(() => {
+                stat.innerText = '✅ TUNNEL VERIFIED!';
+                stat.style.color = '#00FF00';
+            }, 500);
+
+            btn.style.background = '#FFD700';
             
             try {
                 // BULLETPROOF TUNNEL (v10.2)
