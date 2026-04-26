@@ -110,13 +110,31 @@ export const DB = {
             };
 
             const all = await Promise.race([queryFetch(), timeout]);
-            console.log(`✅ [DB] Found ${all.length} gender-matched candidates.`);
+            
+            // SELF-HEALING: If no candidates found for your gender, show everyone for testing
+            if (all.length === 0) {
+                console.log("⚠️ [DB] No gender-matched candidates. Widening search to all users...");
+                const fallbackSnap = await getDocs(query(collection(db, "users"), limit(100)));
+                const fallbackList = fallbackSnap.docs.map(d => ({uid: d.id, ...d.data()}));
+                return fallbackList.filter(u => u.uid !== me.uid);
+            }
+
+            console.log(`✅ [DB] Found ${all.length} candidates.`);
 
             const myMatches = await DB.getMatches(me.uid);
             const matchedUids = myMatches.map(m => m.memberA === me.uid ? m.memberB : m.memberA);
             const excluded = [...(me.likes || []), ...(me.skips || []), me.uid, ...matchedUids];
             
-            return all.filter(u => !excluded.includes(u.uid));
+            let filtered = all.filter(u => !excluded.includes(u.uid));
+            
+            // EMERGENCY TEST RESET: If you've liked/skipped everyone, reset for demo purposes
+            if (filtered.length === 0 && excluded.length > 1) {
+                console.log("♻️ [DB] Resetting Likes/Skips to refill test discovery feed...");
+                await updateDoc(doc(db, "users", me.uid), { likes: [], skips: [] });
+                return all.filter(u => u.uid !== me.uid);
+            }
+
+            return filtered;
         } catch (e) { 
             console.error("🚨 [DB] Watchdog caught failure:", e.message); 
             if(e.message === "WATCHDOG_TIMEOUT") {

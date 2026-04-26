@@ -1,22 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:jodohku_malaysia/src/theme/app_theme.dart';
-import 'package:jodohku_malaysia/src/features/navigation/app_router.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  
-  runApp(
-    const ProviderScope(
-      child: JodohkuApp(),
-    ),
-  );
+  runApp(const JodohkuHybridApp());
 }
 
-class JodohkuApp extends StatelessWidget {
-  const JodohkuApp({super.key});
+class JodohkuHybridApp extends StatelessWidget {
+  const JodohkuHybridApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +16,47 @@ class JodohkuApp extends StatelessWidget {
       title: 'Jodohku Malaysia',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.proTheme,
-      home: const AppRouter(),
+      home: const HybridMainScreen(),
     );
   }
 }
 
+class HybridMainScreen extends StatefulWidget {
+  const HybridMainScreen({super.key});
+
+  @override
+  State<HybridMainScreen> createState() => _HybridMainScreenState();
+}
+
+class _HybridMainScreenState extends State<HybridMainScreen> {
+  late final WebViewController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(AppColors.background)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (int progress) {
+            // Update loading bar
+          },
+          onPageStarted: (String url) {},
+          onPageFinished: (String url) {},
+          onWebResourceError: (WebResourceError error) {},
+        ),
+      )
+      ..loadRequest(Uri.parse('https://jodohku-61096.web.app/landing_preview.html'));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: WebViewWidget(controller: _controller),
+      ),
+    );
+  }
+}
