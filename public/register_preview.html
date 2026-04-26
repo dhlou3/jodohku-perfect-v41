@@ -110,18 +110,9 @@
             btn.innerText = 'Connecting...';
             
             try {
-                const bridge = window.AppBridge || (typeof AppBridge !== 'undefined' ? AppBridge : null);
-                if (bridge) {
-                    bridge.postMessage('googleLogin');
-                    return;
-                }
-
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const result = await firebase.auth().signInWithPopup(provider);
-                if (result.user) {
-                    localStorage.setItem('current_user_id', result.user.uid);
-                    window.location.href = 'onboarding_name.html';
-                }
+                // 🛡️ THE BULLETPROOF TUNNEL (v10.6)
+                window.location.href = "appbridge://googleLogin";
+                return;
             } catch (e) {
                 console.error(e);
                 btn.style.background = '#FFFFFF';
