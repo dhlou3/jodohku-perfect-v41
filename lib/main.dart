@@ -36,6 +36,7 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setUserAgent("Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36")
       ..setBackgroundColor(AppColors.background)
       ..setNavigationDelegate(
         NavigationDelegate(
