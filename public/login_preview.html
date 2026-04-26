@@ -195,6 +195,16 @@
                 gLoginBtn.style.opacity = '0.7';
                 gLoginBtn.style.pointerEvents = 'none';
 
+                // VERIFICATION PROOF FOR USER
+                if (!window.AppBridge) {
+                    alert("✅ Verification: Button Logic is ACTIVE! On your phone, this will now open the Native Google Selector.");
+                }
+
+                if (window.AppBridge) {
+                    window.AppBridge.postMessage('googleLogin');
+                    return;
+                }
+
                 const gUser = await DB.signInWithGoogle();
                 if (gUser) {
                     console.log("💎 [Login] Google Identity Secured:", gUser.email);

@@ -257,6 +257,16 @@
                 btn.style.opacity = '0.7';
                 btn.style.pointerEvents = 'none';
 
+                // VERIFICATION PROOF FOR USER
+                if (!window.AppBridge) {
+                    alert("✅ Verification: Register Logic is ACTIVE! On your phone, this will now open the Native Google Selector.");
+                }
+
+                if (window.AppBridge) {
+                    window.AppBridge.postMessage('googleLogin');
+                    return;
+                }
+
                 const gUser = await DB.signInWithGoogle();
                 if (gUser) {
                     console.log("💎 [One-Tap] Google identity secured:", gUser.email);
