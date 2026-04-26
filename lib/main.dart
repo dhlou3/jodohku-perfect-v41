@@ -63,8 +63,13 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
       }
     } catch (e) {
       if (mounted) {
+        // 🕵️‍♂️ TRUE ERROR DETECTOR
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login Error: Please check your Google Play Services."), backgroundColor: Color(0xFFBD8B52)),
+          SnackBar(
+            content: Text("DEBUG ERROR: $e"), 
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 10),
+          ),
         );
       }
     }

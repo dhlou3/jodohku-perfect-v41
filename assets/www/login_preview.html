@@ -26,7 +26,7 @@
             width: 100%;
             height: 100vh;
             position: relative;
-            background: linear-gradient(180deg, rgba(11, 14, 20, 0) 0%, #0B0E14 100%),
+            background: linear-gradient(180deg, rgba(11, 14, 20, 0.4) 0%, #0B0E14 100%),
                         url('https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80') center/cover;
             display: flex;
             flex-direction: column;
@@ -34,15 +34,13 @@
             padding: 40px 24px;
         }
 
-        .auth-card {
+        .hero-section {
+            position: absolute;
+            top: 15%;
+            left: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-radius: 32px;
-            padding: 40px 24px;
-            border: 1px solid rgba(189, 139, 82, 0.2);
             text-align: center;
+            padding: 0 40px;
         }
 
         .logo-symbol {
@@ -54,6 +52,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background: rgba(189,139,82,0.1);
         }
         .logo-symbol::after {
             content: 'G';
@@ -62,12 +61,24 @@
             color: var(--gold);
         }
 
-        h1 { font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 8px; }
-        .tagline { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 36px; margin-bottom: 8px; }
+        .tagline { color: var(--text-dim); font-size: 16px; font-weight: 300; }
+
+        .auth-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 32px;
+            padding: 32px 24px;
+            border: 1px solid rgba(189, 139, 82, 0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
         .btn-google {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             background: #FFFFFF;
             color: #000000;
             border: none;
@@ -79,23 +90,43 @@
             justify-content: center;
             gap: 12px;
             cursor: pointer;
+            margin-bottom: 20px;
         }
 
-        .footer-note { margin-top: 32px; font-size: 14px; color: var(--text-dim); }
+        .biometric-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 1px solid rgba(189, 139, 82, 0.3);
+            background: rgba(189, 139, 82, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+
+        .footer-note { margin-top: 24px; font-size: 14px; color: var(--text-dim); }
         .footer-note a { color: var(--gold); text-decoration: none; font-weight: 600; }
     </style>
 </head>
 <body>
     <div class="phone-container">
-        <div class="auth-card">
+        <div class="hero-section">
             <div class="logo-symbol" id="masterTrigger"></div>
-            <h1 id="masterTitle">Welcome Back</h1>
+            <h1>Welcome Back</h1>
             <p class="tagline">Explore matches and chat securely.</p>
+        </div>
 
+        <div class="auth-card">
             <button class="btn-google" id="gBtn">
                 <img src="https://img.icons8.com/color/48/000000/google-logo.png" width="22" height="22">
                 <span>Continue with Google</span>
             </button>
+
+            <div class="biometric-btn" id="bioBtn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2s-2-.9-2-2v-2c0-1.1.9-2 2-2z"/><path d="M18 11c0-3.3-2.7-6-6-6s-6 2.7-6 6v10"/><path d="M22 11c0-5.5-4.5-10-10-10S2 5.5 2 11v10"/></svg>
+            </div>
 
             <div class="footer-note">
                 Don't have an account? <a href="register_preview.html">Register Now</a>
@@ -103,25 +134,10 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBZegwZmiUsddDY1-EcB27NYwuvxobkgx8",
-            authDomain: "jodohku-61096.firebaseapp.com",
-            projectId: "jodohku-61096",
-            storageBucket: "jodohku-61096.firebasestorage.app",
-            messagingSenderId: "982535553679",
-            appId: "1:982535553679:web:b7146ace7d99475ce126fa",
-        };
-
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-
         const btn = document.getElementById('gBtn');
         const trigger = document.getElementById('masterTrigger');
+        const bioBtn = document.getElementById('bioBtn');
         let taps = 0;
 
         trigger.onclick = () => {
@@ -132,22 +148,14 @@
             }
         };
 
+        bioBtn.onclick = () => {
+            alert("🔒 Biometrics: Please use Google Login for the first time to link your fingerprint.");
+        };
+
         btn.onclick = async () => {
             btn.innerText = 'Connecting...';
-            try {
-                // BULLETPROOF TUNNEL
-                window.location.href = "appbridge://googleLogin";
-                
-                // Web Fallback
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const result = await firebase.auth().signInWithPopup(provider);
-                if (result.user) {
-                    localStorage.setItem('current_user_id', result.user.uid);
-                    window.location.href = 'home_preview.html';
-                }
-            } catch (e) {
-                btn.innerText = 'Continue with Google';
-            }
+            // BULLETPROOF TUNNEL
+            window.location.href = "appbridge://googleLogin";
         };
     </script>
 </body>

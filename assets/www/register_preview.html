@@ -24,6 +24,7 @@
         .phone-container {
             width: 100%;
             height: 100vh;
+            position: relative;
             background: linear-gradient(180deg, rgba(11, 14, 20, 0.4) 0%, #0B0E14 100%),
                         url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80') center/cover;
             display: flex;
@@ -32,6 +33,46 @@
             padding: 40px 24px;
         }
 
+        .hero-section {
+            position: absolute;
+            top: 25%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 0 40px;
+        }
+
+        .logo-symbol {
+            width: 60px; height: 60px;
+            border: 2px solid var(--gold);
+            border-radius: 60%;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(189,139,82,0.1);
+            position: relative;
+        }
+        .logo-symbol::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px; height: 2px;
+            background: var(--gold);
+        }
+        .logo-symbol::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px; height: 24px;
+            background: var(--gold);
+        }
+
+        h1 { font-family: 'Playfair Display', serif; font-size: 36px; margin-bottom: 8px; }
+        .tagline { color: var(--text-dim); font-size: 16px; margin-bottom: 32px; font-weight: 300; }
+
         .auth-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(25px);
@@ -39,14 +80,12 @@
             padding: 32px 24px;
             text-align: center;
             border: 1px solid rgba(189, 139, 82, 0.1);
+            margin-bottom: 20px;
         }
-
-        h1 { font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 8px; }
-        .tagline { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; }
 
         .btn-google {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             background: #FFFFFF;
             color: #000000;
             border: none;
@@ -66,10 +105,13 @@
 </head>
 <body>
     <div class="phone-container">
-        <div class="auth-card">
+        <div class="hero-section">
+            <div class="logo-symbol"></div>
             <h1>Create Account</h1>
             <p class="tagline">Join the community for a blessed journey.</p>
+        </div>
 
+        <div class="auth-card">
             <button class="btn-google" id="regBtn">
                 <img src="https://img.icons8.com/color/48/000000/google-logo.png" width="20" height="20">
                 <span>Continue with Google</span>
@@ -81,21 +123,12 @@
         </div>
     </div>
 
-    <!-- FIREBASE LEGACY -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
     <script>
         const btn = document.getElementById('regBtn');
-
         btn.onclick = async () => {
             btn.innerText = 'Connecting...';
-            try {
-                // BULLETPROOF TUNNEL
-                window.location.href = "appbridge://googleLogin";
-            } catch (e) {
-                btn.innerText = 'Continue with Google';
-            }
+            // BULLETPROOF TUNNEL
+            window.location.href = "appbridge://googleLogin";
         };
     </script>
 </body>
