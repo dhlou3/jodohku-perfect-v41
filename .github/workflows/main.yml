@@ -30,8 +30,8 @@ jobs:
 
     - name: 🔎 INSPECT SECURITY KEY (SHA-1)
       run: |
-        echo "Firebase Security Check - Exporting SHA Fingerprints..."
-        keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android | grep SHA1 || true
+        echo "Deep Inspection: Reading Fingerprint from APK..."
+        keytool -printcert -jarfile build/app/outputs/flutter-apk/app-release.apk | grep SHA1 || true
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
