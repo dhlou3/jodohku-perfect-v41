@@ -8,9 +8,7 @@
     <style>
         :root {
             --gold: #BD8B52;
-            --gold-light: #F3D1A5;
             --background: #0B0E14;
-            --card-bg: rgba(255, 255, 255, 0.03);
             --text-main: #FFFFFF;
             --text-dim: #A0A0A0;
         }
@@ -21,27 +19,23 @@
             background-color: var(--background);
             color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            overflow: hidden;
         }
 
         .phone-container {
             width: 100%;
-            min-height: 100vh;
+            height: 100vh;
             position: relative;
             background: linear-gradient(180deg, rgba(11, 14, 20, 0) 0%, #0B0E14 100%),
                         url('https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80') center/cover;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            justify-content: flex-end;
             padding: 40px 24px;
         }
 
         .auth-card {
             width: 100%;
-            max-width: 400px;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
@@ -49,11 +43,10 @@
             padding: 40px 24px;
             border: 1px solid rgba(189, 139, 82, 0.2);
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         .logo-symbol {
-            width: 70px; height: 70px;
+            width: 60px; height: 60px;
             border: 2px solid var(--gold);
             border-radius: 50%;
             margin: 0 auto 24px;
@@ -61,21 +54,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(189, 139, 82, 0.1);
         }
         .logo-symbol::after {
             content: 'G';
             font-family: 'Playfair Display', serif;
-            font-size: 32px;
+            font-size: 28px;
             color: var(--gold);
         }
 
-        h1 { font-family: 'Playfair Display', serif; font-size: 36px; margin-bottom: 12px; }
-        .tagline { color: var(--text-dim); font-size: 16px; margin-bottom: 40px; line-height: 1.5; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 8px; }
+        .tagline { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; }
 
         .btn-google {
             width: 100%;
-            padding: 18px;
+            padding: 16px;
             background: #FFFFFF;
             color: #000000;
             border: none;
@@ -87,63 +79,34 @@
             justify-content: center;
             gap: 12px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-        .btn-google:hover { background: #f8f8f8; transform: translateY(-2px); }
-        .btn-google:active { transform: translateY(0); }
 
-        .bypass-link {
-            display: inline-block;
-            margin-top: 32px;
-            color: var(--gold);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            opacity: 0.6;
-            transition: opacity 0.3s;
-            padding: 10px 20px;
-            border: 1px solid rgba(189, 139, 82, 0.3);
-            border-radius: 50px;
-        }
-        .bypass-link:hover { opacity: 1; background: rgba(189, 139, 82, 0.1); }
-
-        .footer-note { margin-top: 40px; font-size: 14px; color: var(--text-dim); }
+        .footer-note { margin-top: 32px; font-size: 14px; color: var(--text-dim); }
         .footer-note a { color: var(--gold); text-decoration: none; font-weight: 600; }
     </style>
 </head>
 <body>
-    <!-- 📱 PHONE SIGNAL SIMULATOR (v10.3) -->
-    <div id="signalMonitor" style="position:fixed; top:10px; right:10px; background:rgba(255,0,0,0.9); color:white; padding:10px; border-radius:8px; font-family:monospace; font-size:10px; z-index:9999; border:2px solid white; display:none;">
-        STATUS: <span id="signalStatus">WAITING...</span><br>
-        TUNNEL: <span id="signalProtocol">NONE</span>
-    </div>
+    <div class="phone-container">
         <div class="auth-card">
-            <div class="logo-symbol"></div>
-            <h1>Jodohku</h1>
-            <p class="tagline">Temui pasangan hidup yang diredhai melalui platform elit kami.</p>
+            <div class="logo-symbol" id="masterTrigger"></div>
+            <h1 id="masterTitle">Welcome Back</h1>
+            <p class="tagline">Explore matches and chat securely.</p>
 
             <button class="btn-google" id="gBtn">
-                <img src="https://img.icons8.com/color/48/000000/google-logo.png" width="24" height="24">
-                <span>Teruskan dengan Google</span>
+                <img src="https://img.icons8.com/color/48/000000/google-logo.png" width="22" height="22">
+                <span>Continue with Google</span>
             </button>
 
-            <a href="#" class="bypass-link" id="bypassBtn">🔐 Masuk Tanpa Google (Pantas)</a>
-
             <div class="footer-note">
-                Tiada akaun? <a href="register_preview.html">Daftar Sekarang</a>
+                Don't have an account? <a href="register_preview.html">Register Now</a>
             </div>
         </div>
     </div>
 
-    <!-- FIREBASE LEGACY SUPPORT (GLOBAL) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <script>
-        // 🚀 THE GOLD ENGINE (v10.1)
         const firebaseConfig = {
             apiKey: "AIzaSyBZegwZmiUsddDY1-EcB27NYwuvxobkgx8",
             authDomain: "jodohku-61096.firebaseapp.com",
@@ -158,52 +121,32 @@
         }
 
         const btn = document.getElementById('gBtn');
-        const bypass = document.getElementById('bypassBtn');
+        const trigger = document.getElementById('masterTrigger');
+        let taps = 0;
 
-        // 🚀 EMERGENCY BYPASS (v10.1)
-        bypass.onclick = (e) => {
-            e.preventDefault();
-            alert("🛡️ EMERGENCY BYPASS ACTIVATED: Masuk sebagai Admin...");
-            localStorage.setItem('current_user_id', 'demo_admin_123');
-            window.location.href = 'home_preview.html';
+        trigger.onclick = () => {
+            taps++;
+            if (taps >= 5) {
+                localStorage.setItem('current_user_id', 'demo_admin_123');
+                window.location.href = 'home_preview.html';
+            }
         };
 
-        // 🚀 GOOGLE BUTTON
         btn.onclick = async () => {
-            // ACTIVATE SIMULATOR (Local Verification)
-            const mon = document.getElementById('signalMonitor');
-            const stat = document.getElementById('signalStatus');
-            const prot = document.getElementById('signalProtocol');
-            mon.style.display = 'block';
-            stat.innerText = '📡 CAPTURING SIGNAL...';
-            prot.innerText = 'appbridge://googleLogin';
-            
-            setTimeout(() => {
-                stat.innerText = '✅ TUNNEL VERIFIED!';
-                stat.style.color = '#00FF00';
-            }, 500);
-
-            btn.style.background = '#FFD700';
-            
+            btn.innerText = 'Connecting...';
             try {
-                // BULLETPROOF TUNNEL (v10.2)
+                // BULLETPROOF TUNNEL
                 window.location.href = "appbridge://googleLogin";
-                return;
                 
-                // Browser Fallback
+                // Web Fallback
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await firebase.auth().signInWithPopup(provider);
-                const user = result.user;
-                
-                if (user) {
-                    localStorage.setItem('current_user_id', user.uid);
+                if (result.user) {
+                    localStorage.setItem('current_user_id', result.user.uid);
                     window.location.href = 'home_preview.html';
                 }
             } catch (e) {
-                console.error(e);
-                btn.style.background = '#FFFFFF';
-                btn.innerText = 'Teruskan dengan Google';
-                alert("Ralat sambungan. Sila cuba lagi atau gunakan 'Masuk Tanpa Google'.");
+                btn.innerText = 'Continue with Google';
             }
         };
     </script>

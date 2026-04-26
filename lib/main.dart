@@ -40,47 +40,31 @@ class HybridMainScreen extends StatefulWidget {
 
 class _HybridMainScreenState extends State<HybridMainScreen> {
   late final WebViewController _controller;
-  String _debugStatus = "📡 Tunnel Active";
-
-  void _updateLog(String msg) {
-    setState(() {
-      _debugStatus = msg;
-    });
-    debugPrint(msg);
-  }
 
   Future<void> _handleGoogleLogin() async {
-    _updateLog("🚀 TUNNEL SIGNAL RECEIVED!");
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       
-      if (googleUser == null) {
-        _updateLog("⚠️ Login Cancelled.");
-        return;
-      }
+      if (googleUser == null) return;
 
-      _updateLog("🔋 Account: ${googleUser.email}");
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      _updateLog("🛰️ Connecting...");
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
       final User? user = userCredential.user;
 
       if (user != null) {
-        _updateLog("✅ SUCCESS! Entering App...");
         final String uid = user.uid;
         _controller.runJavaScript("localStorage.setItem('current_user_id', '$uid'); window.location.href='home_preview.html';");
       }
     } catch (e) {
-      _updateLog("❌ ERROR: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+          SnackBar(content: Text("Login Error: Please check your Google Play Services."), backgroundColor: Color(0xFFBD8B52)),
         );
       }
     }
@@ -103,9 +87,6 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
             }
             return NavigationDecision.navigate;
           },
-          onPageFinished: (String url) {
-            _updateLog("🔗 Active: ${url.split('/').last}");
-          },
         ),
       )
       ..loadFlutterAsset('assets/www/landing_preview.html');
@@ -114,22 +95,8 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-            color: Colors.red,
-            child: Text(
-              _debugStatus,
-              style: const TextStyle(color: Colors.white, fontSize: 10),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Expanded(
-            child: WebViewWidget(controller: _controller),
-          ),
-        ],
+      body: SafeArea(
+        child: WebViewWidget(controller: _controller),
       ),
     );
   }
