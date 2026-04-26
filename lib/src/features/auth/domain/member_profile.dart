@@ -11,6 +11,11 @@ class MemberProfile {
   final String birthState; // Birth state / Location
   final String? photoUrl;
   
+  // ELITE FIELDS (SYNCED WITH WEB V14)
+  final String? profession;
+  final String? bio;
+  final List<String> interests;
+  
   // Religious & Intent
   final PrayerFrequency prayerFrequency;
   final MaritalIntent maritalIntent;
@@ -48,6 +53,9 @@ class MemberProfile {
     required this.gender,
     required this.birthState,
     this.photoUrl,
+    this.profession,
+    this.bio,
+    this.interests = const [],
     this.prayerFrequency = PrayerFrequency.always,
     this.maritalIntent = MaritalIntent.serious,
     this.isWaliVerified = false,
@@ -80,6 +88,9 @@ class MemberProfile {
     String? gender,
     String? birthState,
     String? photoUrl,
+    String? profession,
+    String? bio,
+    List<String>? interests,
     PrayerFrequency? prayerFrequency,
     MaritalIntent? maritalIntent,
     bool? isWaliVerified,
@@ -107,6 +118,9 @@ class MemberProfile {
       gender: gender ?? this.gender,
       birthState: birthState ?? this.birthState,
       photoUrl: photoUrl ?? this.photoUrl,
+      profession: profession ?? this.profession,
+      bio: bio ?? this.bio,
+      interests: interests ?? this.interests,
       prayerFrequency: prayerFrequency ?? this.prayerFrequency,
       maritalIntent: maritalIntent ?? this.maritalIntent,
       isWaliVerified: isWaliVerified ?? this.isWaliVerified,
@@ -137,6 +151,9 @@ class MemberProfile {
       'gender': gender,
       'location_name': birthState,
       'photoUrl': photoUrl,
+      'profession': profession,
+      'bio': bio,
+      'interests': interests,
       'prayerFrequency': prayerFrequency.index,
       'maritalIntent': maritalIntent.index,
       'isWaliVerified': isWaliVerified,
@@ -167,6 +184,9 @@ class MemberProfile {
       gender: map['gender'] ?? 'man',
       birthState: map['location_name'] ?? 'Malaysia',
       photoUrl: map['photoUrl'],
+      profession: map['profession'] ?? map['jobTitle'],
+      bio: map['bio'],
+      interests: List<String>.from(map['interests'] ?? []),
       prayerFrequency: PrayerFrequency.values[map['prayerFrequency'] ?? 3],
       maritalIntent: MaritalIntent.values[map['maritalIntent'] ?? 2],
       isWaliVerified: map['isWaliVerified'] ?? false,
