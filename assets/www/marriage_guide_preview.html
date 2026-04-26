@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Panduan Nikah</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --emerald: #4A7C59;
+            --emerald-dark: #355E3B;
+            --emerald-soft: #ECF2ED;
+            --gold: #BD8B52;
+            --text-dark: #1F2937;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        
+        body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+
+        .phone { 
+            width: 375px; height: 812px; background: #FDF9F4; border-radius: 44px; border: 8px solid #1E293B; 
+            position: relative; overflow: hidden; display: flex; flex-direction: column; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.1); padding-top: 40px;
+        }
+
+        /* HEADER */
+        .header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: white;
+            z-index: 10;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 24px;
+            font-size: 20px;
+            color: var(--text-dark);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* CONTENT */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        /* HERO AREA */
+        .hero {
+            background: var(--emerald-dark);
+            padding: 40px 24px;
+            color: white;
+            text-align: center;
+        }
+
+        .hero-icon { font-size: 40px; margin-bottom: 20px; }
+        .hero-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+        .hero-sub { font-size: 13px; font-weight: 500; opacity: 0.9; }
+
+        /* LIST SECTION */
+        .guide-list { padding: 24px; }
+        
+        .guide-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            border: 1px solid #F3F4F6;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .guide-card:active { transform: scale(0.98); }
+
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            background: #FDF9F4;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .card-info { flex: 1; }
+        .card-title { font-size: 16px; font-weight: 800; color: var(--text-dark); margin-bottom: 2px; }
+        .card-sub { font-size: 12px; color: #9CA3AF; font-weight: 500; }
+        .chevron { color: #D1D5DB; font-size: 16px; }
+
+        /* VIDEO SECTION */
+        .video-section { padding: 0 24px 30px; }
+        .video-title { font-size: 16px; font-weight: 800; color: var(--text-dark); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        
+        .video-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .video-card {
+            min-width: 140px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .video-thumb {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .video-label {
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header">
+            <a href="islam_preview.html" class="back-btn">‹</a>
+            <h1 id="title">Panduan Nikah</h1>
+        </header>
+
+        <div class="content">
+            <div class="hero">
+                <div class="hero-icon">📖</div>
+                <div class="hero-title" id="hdTitle">Munakahat Islam</div>
+                <div class="hero-sub" id="hdSub">Panduan Perkahwinan Mengikut Al-Quran & Sunnah</div>
+            </div>
+
+            <div class="guide-list">
+                <div class="guide-card">
+                    <div class="icon-box">📋</div>
+                    <div class="card-info">
+                        <div class="card-title" id="t1">Rukun & Syarat Nikah</div>
+                        <div class="card-sub" id="s1">5 rukun, wali, saksi, ijab & kabul</div>
+                    </div>
+                    <div class="chevron">›</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="icon-box">💰</div>
+                    <div class="card-info">
+                        <div class="card-title" id="t2">Mas Kahwin & Hantaran</div>
+                        <div class="card-sub" id="s2">Kadar, cara bayar, hak isteri</div>
+                    </div>
+                    <div class="chevron">›</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="icon-box">📜</div>
+                    <div class="card-info">
+                        <div class="card-title" id="t3">Permohonan Lesen Perkahwinan</div>
+                        <div class="card-sub" id="s3">Proses pendaftaran di JPN/JAIS</div>
+                    </div>
+                    <div class="chevron">›</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="icon-box">🏠</div>
+                    <div class="card-info">
+                        <div class="card-title" id="t4">Hak & Tanggungjawab Suami Isteri</div>
+                        <div class="card-sub" id="s4">Nafkah, ta'at, mawaddah, rahmah</div>
+                    </div>
+                    <div class="chevron">›</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="icon-box">⚖️</div>
+                    <div class="card-info">
+                        <div class="card-title" id="t5">Poligami — Hukum & Syarat</div>
+                        <div class="card-sub" id="s5">Keadilan, syarat undang-undang</div>
+                    </div>
+                    <div class="chevron">›</div>
+                </div>
+            </div>
+
+            <div class="video-section">
+                <div class="video-title" id="vidTitle">🎬 Video Pembelajaran</div>
+                <div class="video-scroll">
+                    <div class="video-card">
+                        <div class="video-thumb" style="background:#4A7C59;">▶️</div>
+                        <div class="video-label" id="v1">Rukun Nikah</div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-thumb" style="background:#B08D57;">▶️</div>
+                        <div class="video-label" id="v2">Memilih Pasangan</div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-thumb" style="background:#4B6A9B;">▶️</div>
+                        <div class="video-label" id="v3">Hak Isteri</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            'EN | MS': {
+                title: 'Marriage Guide',
+                hdTitle: 'Islamic Munakahat',
+                hdSub: 'Marriage Guide According to Al-Quran & Sunnah',
+                t1: 'Pillars & Conditions',
+                s1: '5 pillars, wali, witness, contract',
+                t2: 'Mahr & Dowry',
+                s2: 'Rates, payment methods, wife rights',
+                t3: 'Marriage License Application',
+                s3: 'Registration process at JPN/JAIS',
+                t4: 'Husband & Wife Responsibilities',
+                s4: 'Maintenance, obedience, love, mercy',
+                t5: 'Polygamy — Law & Rules',
+                s5: 'Justice, legal requirements',
+                vidTitle: '🎬 Learning Videos',
+                v1: 'Pillars of Nikah',
+                v2: 'Choosing a Partner',
+                v3: 'Rights of the Wife'
+            },
+            'MS | EN': {
+                title: 'Panduan Nikah',
+                hdTitle: 'Munakahat Islam',
+                hdSub: 'Panduan Perkahwinan Mengikut Al-Quran & Sunnah',
+                t1: 'Rukun & Syarat Nikah',
+                s1: '5 rukun, wali, saksi, ijab & kabul',
+                t2: 'Mas Kahwin & Hantaran',
+                s2: 'Kadar, cara bayar, hak isteri',
+                t3: 'Permohonan Lesen Perkahwinan',
+                s3: 'Proses pendaftaran di JPN/JAIS',
+                t4: 'Hak & Tanggungjawab Suami Isteri',
+                s4: 'Nafkah, ta\'at, mawaddah, rahmah',
+                t5: 'Poligami — Hukum & Syarat',
+                s5: 'Keadilan, syarat undang-undang',
+                vidTitle: '🎬 Video Pembelajaran',
+                v1: 'Rukun Nikah',
+                v2: 'Memilih Pasangan',
+                v3: 'Hak Isteri'
+            }
+        };
+
+        function applyLang(lang) {
+            const content = translations[lang];
+            if(!content) return;
+
+            document.getElementById('title').innerText = content.title;
+            document.getElementById('hdTitle').innerText = content.hdTitle;
+            document.getElementById('hdSub').innerText = content.hdSub;
+            document.getElementById('t1').innerText = content.t1;
+            document.getElementById('s1').innerText = content.s1;
+            document.getElementById('t2').innerText = content.t2;
+            document.getElementById('s2').innerText = content.s2;
+            document.getElementById('t3').innerText = content.t3;
+            document.getElementById('s3').innerText = content.s3;
+            document.getElementById('t4').innerText = content.t4;
+            document.getElementById('s4').innerText = content.s4;
+            document.getElementById('t5').innerText = content.t5;
+            document.getElementById('s5').innerText = content.s5;
+            document.getElementById('vidTitle').innerText = content.vidTitle;
+            document.getElementById('v1').innerText = content.v1;
+            document.getElementById('v2').innerText = content.v2;
+            document.getElementById('v3').innerText = content.v3;
+            
+            localStorage.setItem('appLang', lang);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('appLang') || 'MS | EN';
+            applyLang(savedLang);
+        });
+    </script>
+</body>
+</html>

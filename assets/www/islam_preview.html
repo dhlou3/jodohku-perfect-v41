@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Islam Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --bg-cream: #FCFAF7; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit', sans-serif; }
+        body { background:#E5E7EB; min-height:100vh; display:flex; justify-content:center; align-items:center; overflow:hidden; }
+        .phone { 
+            width:375px; height:812px; background:white; border-radius:44px; border:8px solid #1E293B; 
+            position:relative; overflow:hidden; display:flex; flex-direction:column; 
+            box-shadow:0 40px 80px rgba(0,0,0,0.1); 
+        }
+        @media (max-width: 480px) {
+            body { background: white; }
+            .phone { width: 100vw; height: 100vh; border: none; border-radius: 0; }
+        }
+
+        .header { 
+            padding: 55px 24px 15px; 
+            padding-top: max(55px, env(safe-area-inset-top));
+            background:white; border-bottom:1px solid #F3F4F6; 
+        }
+        .header h1 { font-family:'Playfair Display', serif; font-size:26px; font-weight:1000; color:#111827; }
+
+        .content { flex:1; overflow-y:auto; padding:20px; background:var(--bg-cream); scrollbar-width:none; padding-bottom:120px; }
+        .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+        .islam-card {
+            background:white; border-radius:24px; padding:20px 16px;
+            display:flex; flex-direction:column; gap:10px;
+            border:1px solid rgba(0,0,0,0.02);
+            box-shadow:0 8px 25px rgba(0,0,0,0.03);
+            cursor:pointer; transition:all 0.3s ease;
+            position:relative; overflow:hidden;
+        }
+        .islam-card:active { transform:scale(0.96); background:#F9FAFB; }
+        
+        .card-icon { 
+            font-size:28px; width:44px; height:44px; 
+            display:flex; align-items:center; justify-content:center;
+            border-radius:14px; margin-bottom:4px;
+        }
+        .card-title { font-size:15px; font-weight:800; color:#111827; line-height:1.2; }
+        .card-subtitle { font-size:11px; font-weight:600; color:#9CA3AF; line-height:1.3; }
+
+        .c-jakim .card-icon { background:#FFF7ED; }
+        .c-wali .card-icon { background:#F0F9FF; }
+        .c-soalan .card-icon { background:#F5F3FF; }
+        .c-nikah .card-icon { background:#ECFDF5; }
+        .c-vendor .card-icon { background:#FFF1F2; }
+        .c-faq .card-icon { background:#FDF2F8; }
+        .c-kursus .card-icon { background:#FFFBEB; }
+        .c-solat .card-icon { background:#F0FDFA; }
+
+        .nav-bar { 
+            width:100%; height:95px; background:white; border-top:1px solid #F3F4F6; 
+            display:flex; justify-content:space-around; padding:12px; padding-bottom: max(12px, env(safe-area-inset-bottom));
+            position:absolute; bottom:0; z-index:100; 
+        }
+        .nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#9CA3AF; font-size:10px; font-weight:800; flex:1; }
+        .nav-item.active { color:var(--gold); } 
+        .nav-icon { font-size:24px; margin-bottom:5px; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header"><h1 data-t="nav_islam">Islam</h1></header>
+
+        <div class="content">
+            <div class="grid">
+                <div id="btnJAKIM" class="islam-card c-jakim" onclick="location.href='jakim_verification_preview.html'">
+                    <div class="card-icon">📜</div>
+                    <div class="card-title" data-t="sijil_jakim">Sijil JAKIM</div>
+                    <div class="card-subtitle" data-t="sijil_jakim_desc">Pengesahan halal anda</div>
+                </div>
+
+                <div id="btnWali" class="islam-card c-wali" onclick="location.href='wali_setup_preview.html'">
+                    <div class="card-icon">🛡️</div>
+                    <div id="waliBadge" style="position:absolute; top:12px; right:12px; font-size:10px; font-weight:900; color:#10B981; display:none;" data-t="wali_aktif">🛡️ AKTIF</div>
+                    <div class="card-title" data-t="mod_wali">Mod Wali</div>
+                    <div class="card-subtitle" data-t="mod_wali_desc">Pemantauan wali/mahram</div>
+                </div>
+
+                <div id="btnSoalan" class="islam-card c-soalan" onclick="location.href='taaruf_questions.html'">
+                    <div class="card-icon">💬</div>
+                    <div class="card-title" data-t="soalan_taaruf_card">Soalan Taaruf</div>
+                    <div class="card-subtitle" data-t="soalan_taaruf_desc">30 soalan penting</div>
+                </div>
+
+                <div id="btnNikah" class="islam-card c-nikah" onclick="location.href='panduan_nikah.html'">
+                    <div class="card-icon">📖</div>
+                    <div class="card-title" data-t="panduan_nikah">Panduan Nikah</div>
+                    <div class="card-subtitle" data-t="panduan_nikah_desc">Munakahat Islam</div>
+                </div>
+
+                <div id="btnVendor" class="islam-card c-vendor" onclick="location.href='halal_vendors_preview.html'">
+                    <div class="card-icon">💍</div>
+                    <div class="card-title" data-t="vendor_halal">Vendor Halal</div>
+                    <div class="card-subtitle" data-t="vendor_halal_desc">Perkhidmatan perkahwinan</div>
+                </div>
+
+                <div id="btnFAQ" class="islam-card c-faq" onclick="location.href='faq_preview.html'">
+                    <div class="card-icon">❓</div>
+                    <div class="card-title" data-t="faq_title">FAQ</div>
+                    <div class="card-subtitle" data-t="faq_desc">Soalan lazim</div>
+                </div>
+
+                <div id="btnKursus" class="islam-card c-kursus" onclick="location.href='kursus_nikah.html'">
+                    <div class="card-icon">🎓</div>
+                    <div class="card-title" data-t="kursus_nikah">Kursus Pra-Nikah</div>
+                    <div class="card-subtitle" data-t="kursus_nikah_desc">Sijil AADK & BERNAS</div>
+                </div>
+
+                <div id="btnSolat" class="islam-card c-solat" onclick="location.href='waktu_solat.html'">
+                    <div class="card-icon">🌙</div>
+                    <div class="card-title" data-t="waktu_solat_card">Waktu Solat</div>
+                    <div class="card-subtitle" data-t="waktu_solat_desc">Lokasi semasa</div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-bar">
+            <a href="home_preview.html" class="nav-item">
+                <div class="nav-icon">🏠</div><span data-t="nav_utama">Utama</span>
+            </a>
+            <a href="explore_preview.html" class="nav-item">
+                <div class="nav-icon">🔍</div><span data-t="nav_jelajah">Jelajah</span>
+            </a>
+            <a href="sembang.html" class="nav-item">
+                <div class="nav-icon">💬</div><span data-t="nav_sembang">Sembang</span>
+            </a>
+            <a href="islam_preview.html" class="nav-item active">
+                <div class="nav-icon">🕌</div><span data-t="nav_islam">Islam</span>
+            </a>
+            <a href="profile_preview.html" class="nav-item">
+                <div class="nav-icon">👤</div><span data-t="nav_saya">Saya</span>
+            </a>
+        </nav>
+    </div>
+    <script type="module">
+        import { DB } from './database.js';
+        async function checkStatus() {
+            if (window.I18N) window.I18N.translatePage();
+            const me = await DB.getCurrentUser();
+            if (me && me.wali && me.wali.fullName) {
+                document.getElementById('waliBadge').style.display = 'block';
+            }
+        }
+        checkStatus();
+    </script>
+</body>
+</html>

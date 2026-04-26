@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Video Taaruf</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #BD8B52; --orange: #C67C22; --text-dark: #111827; --bg-midnight: #0B0E14; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #000; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .phone { width: 375px; height: 812px; background: var(--bg-midnight); border-radius: 44px; border: 8px solid #1E293B; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 60px 24px 40px; color: white; box-shadow: 0 40px 80px rgba(0,0,0,0.4); }
+        
+        .header-section { text-align: center; margin-bottom: 40px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900; margin-bottom: 15px; }
+        h1 span { color: var(--gold); }
+        p { font-size: 15px; color: #94A3B8; line-height: 1.6; font-weight: 500; }
+
+        .upload-area { flex: 1; border: 2px dashed rgba(189, 139, 82, 0.3); border-radius: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; background: rgba(255, 255, 255, 0.02); margin-bottom: 40px; transition: 0.4s; cursor: pointer; }
+        .upload-area:active { transform: scale(0.98); background: rgba(189, 139, 82, 0.05); }
+        .icon-circle { width: 90px; height: 90px; background: rgba(189, 139, 82, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 36px; margin-bottom: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        
+        .upload-title { font-size: 20px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .upload-hint { font-size: 13px; color: #64748B; text-align: center; max-width: 200px; line-height: 1.5; }
+
+        .btn-gold { background: var(--gold); color: white; border: none; padding: 22px; border-radius: 100px; font-weight: 800; font-size: 17px; cursor: pointer; width: 100%; margin-bottom: 15px; box-shadow: 0 12px 24px rgba(189, 139, 82, 0.2); }
+        .btn-skip { background: transparent; color: #64748B; border: none; font-size: 14px; font-weight: 700; cursor: pointer; align-self: center; transition: 0.3s; }
+        .btn-skip:hover { color: white; }
+
+        .benefit-box { background: rgba(189, 139, 82, 0.05); border: 1px solid rgba(189, 139, 82, 0.1); border-radius: 24px; padding: 18px; display: flex; align-items: center; gap: 14px; margin-bottom: 30px; }
+        .b-icon { font-size: 24px; filter: drop-shadow(0 0 10px rgba(189, 139, 82, 0.3)); }
+        .b-text { font-size: 12px; font-weight: 700; color: var(--gold); line-height: 1.4; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="header-section">
+            <h1>Video <span>Taaruf</span></h1>
+            <p>Tingkatkan kepercayaan calon pasangan dengan video pengenalan 30 saat yang sopan.</p>
+        </div>
+
+        <div class="benefit-box">
+            <span class="b-icon">✨</span>
+            <span class="b-text">Profil dengan video mendapat 10x lebih banyak padanan yang berkualiti.</span>
+        </div>
+
+        <div class="upload-area" onclick="handleFileUpload()">
+            <div class="icon-circle">📹</div>
+            <div class="upload-title">Muat Naik Video</div>
+            <div class="upload-hint">Sila pastikan pemakaian yang menutup aurat dan bahasa yang sopan.</div>
+            <input type="file" id="videoInput" accept="video/*" style="display: none;">
+        </div>
+
+        <button class="btn-gold" id="saveBtn" onclick="finishStep()">SIMPAN & TERUSKAN ➔</button>
+        <button class="btn-skip" onclick="finishStep()">Mungkin Kemudian</button>
+
+        <p style="text-align: center; margin-top: 35px; font-size: 11px; color: #64748B; font-weight: 500;">Video anda hanya boleh dilihat oleh calon yang serasi.</p>
+    </div>
+
+    <script type="module">
+        import './database.js';
+
+        window.handleFileUpload = function() {
+            document.getElementById('videoInput').click();
+        }
+        
+        document.getElementById('videoInput').onchange = e => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('saveBtn').innerText = "Vdeo '" + file.name + "' terpilih! ➔";
+            }
+        };
+
+        window.finishStep = async function() {
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerText = "MENYIMPAN... ⏳";
+
+            try {
+                const user = await DB.getCurrentUser();
+                if (user) {
+                    // Simulation: Set a flag that they have a video
+                    await DB.updateProfile(user.uid, { hasVideo: true });
+                }
+                window.location.href = 'onboarding_birthday.html';
+            } catch (e) {
+                window.location.href = 'onboarding_birthday.html';
+            }
+        }
+    </script>
+</body>
+</html>

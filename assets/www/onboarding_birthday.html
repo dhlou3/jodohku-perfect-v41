@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Tarikh Lahir</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap"
+        rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root {
+            --gold: #BD8B52;
+            --orange: #C67C22;
+            --text-dark: #1F2937;
+            --bg-cream: #FDF9F4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #E5E7EB;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 44px;
+            border: 8px solid #1E293B;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 40px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            font-size: 24px;
+            color: #9CA3AF;
+            text-decoration: none;
+        }
+
+        .progress-line {
+            flex: 1;
+            height: 6px;
+            background: #F3F4F6;
+            border-radius: 100px;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--orange);
+            width: 25%;
+        }
+
+        .content {
+            flex: 1;
+            padding: 40px 24px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 34px;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #6B7280;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .picker-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .picker-box {
+            flex: 1;
+            background: var(--bg-cream);
+            border-radius: 20px;
+            padding: 15px;
+            border: 2px solid transparent;
+            transition: 0.4s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .picker-box:focus-within {
+            border-color: var(--orange);
+            background: white;
+            box-shadow: 0 10px 25px rgba(198, 124, 34, 0.1);
+        }
+
+        .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--orange);
+            text-align: center;
+            font-weight: 800;
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        select {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--text-dark);
+            appearance: none;
+            text-align: center;
+            cursor: pointer;
+            outline: none;
+            padding: 8px 0;
+        }
+
+        .hint {
+            font-size: 14px;
+            color: #6B7280;
+            margin-top: 40px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .footer {
+            padding: 40px 24px;
+        }
+
+        .next-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--orange);
+            color: white;
+            border-radius: 100px;
+            font-size: 17px;
+            font-weight: 800;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            box-shadow: 0 12px 24px rgba(198, 124, 34, 0.25);
+            transition: 0.3s;
+        }
+
+        .next-btn:active {
+            transform: scale(0.97);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <div class="header">
+            <a href="onboarding_name.html" class="back-btn">←</a>
+            <div class="progress-line">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        <div class="content">
+            <h1 data-t="bday_title">Bilakah tarikh lahir anda?</h1>
+            <p class="subtitle" data-t="bday_desc">Profil anda hanya akan memaparkan umur anda untuk menjaga privasi tarikh lahir yang
+                tepat.</p>
+
+            <div class="picker-container">
+                <div class="picker-box">
+                    <span class="label" data-t="label_day">Hari</span>
+                    <select id="day"></select>
+                </div>
+                <div class="picker-box">
+                    <span class="label" data-t="label_month">Bulan</span>
+                    <select id="month"></select>
+                </div>
+                <div class="picker-box">
+                    <span class="label" data-t="label_year">Tahun</span>
+                    <select id="year"></select>
+                </div>
+            </div>
+
+            <p class="hint" data-t="bday_hint">Adakah anda tahu? Umur purata perkahwinan di Malaysia kini semakin meningkat. Cari jodoh
+                anda sekarang!</p>
+        </div>
+        <div class="footer">
+            <button onclick="saveAndNext()" class="next-btn" data-t="seterusnya_btn">Seterusnya ➔</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+
+        const d = document.getElementById('day');
+        const m = document.getElementById('month');
+        const y = document.getElementById('year');
+
+        function populate() {
+            d.innerHTML = "";
+            m.innerHTML = "";
+            y.innerHTML = "";
+            
+            for (let i = 1; i <= 31; i++) d.innerHTML += `<option value="${i}">${i < 10 ? '0' + i : i}</option>`;
+            
+            for (let i = 1; i <= 12; i++) {
+                const monthName = window.I18N.t(`m${i}`);
+                m.innerHTML += `<option value="${i}">${monthName}</option>`;
+            }
+            
+            for (let i = 2008; i >= 1950; i--) y.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+
+        window.saveAndNext = async function () {
+            const bday = `${d.value} / ${m.value} / ${y.value}`;
+            try {
+                const ok = await DB.updateUser({ birthday: bday });
+                if (ok) window.location.href = 'onboarding_gender.html';
+                else alert('Sistem sibuk. Sila cuba lagi.');
+            } catch (e) { console.error(e); }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            if(window.I18N) window.I18N.translatePage();
+            populate();
+            
+            const user = await DB.getCurrentUser();
+            if (user && user.birthday) {
+                const p = user.birthday.split(' / ');
+                if (p.length === 3) {
+                    d.value = parseInt(p[0]);
+                    m.value = parseInt(p[1]);
+                    y.value = p[2];
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

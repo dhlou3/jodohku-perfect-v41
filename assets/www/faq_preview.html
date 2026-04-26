@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - FAQ & Privasi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --bg-cream: #FCFAF7; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit', sans-serif; }
+        body { background:#E5E7EB; min-height:100vh; display:flex; justify-content:center; align-items:center; overflow:hidden; }
+        .phone { 
+            width:375px; height:812px; background:white; border-radius:44px; border:8px solid #1E293B; 
+            position:relative; overflow:hidden; display:flex; flex-direction:column; 
+            box-shadow:0 40px 80px rgba(0,0,0,0.1); 
+        }
+        @media (max-width: 480px) {
+            body { background: white; }
+            .phone { width: 100vw; height: 100vh; border: none; border-radius: 0; }
+        }
+
+        /* HEADER */
+        .header { 
+            padding: 55px 24px 15px; 
+            padding-top: max(55px, env(safe-area-inset-top));
+            background:white; border-bottom:1px solid #F3F4F6; 
+            display:flex; align-items:center; gap:12px;
+        }
+        .header .back-btn { font-size:24px; cursor:pointer; color:#111827; }
+        .header h1 { font-family:'Playfair Display', serif; font-size:26px; font-weight:1000; color:#111827; }
+
+        /* CONTENT */
+        .content { 
+            flex:1; overflow-y:auto; padding:24px; background:var(--bg-cream); 
+            scrollbar-width:none; padding-bottom:120px;
+            scroll-behavior: smooth;
+        }
+        .last-updated { font-size:12px; font-weight:700; color:var(--gold); margin-bottom:20px; }
+        
+        /* POLICY TEXT STYLING */
+        .policy-section { margin-bottom:35px; }
+        .policy-title { font-family:'Playfair Display', serif; font-size:20px; font-weight:900; color:#111827; margin-bottom:12px; display:flex; gap:10px; }
+        .policy-title span { color:var(--gold); }
+        .policy-text { font-size:13.5px; color:#4B5563; line-height:1.7; font-weight:500; text-align:justify; }
+        .policy-text b { color:#111827; font-weight:800; }
+        .policy-sub { margin-top:15px; margin-bottom:8px; font-weight:800; color:#111827; font-size:14px; }
+        
+        .list { list-style:none; margin-top:10px; }
+        .list-item { margin-bottom:10px; padding-left:20px; position:relative; font-size:13px; color:#4B5563; line-height:1.6; }
+        .list-item::before { content:'•'; position:absolute; left:0; color:var(--gold); font-weight:900; }
+
+        .contact-box { background:white; border-radius:18px; padding:15px; border:1px solid rgba(0,0,0,0.05); margin-top:15px; }
+        .contact-line { font-size:12px; margin-bottom:4px; font-weight:600; color:#374151; }
+        .contact-line b { color:var(--gold); width:80px; display:inline-block; }
+
+        /* NAV BAR SYNC */
+        .nav-bar { 
+            position:absolute; bottom:0; left:0; width:100%; height:95px; 
+            background:white; border-top:1px solid #F3F4F6;
+            display:flex; justify-content:space-around; align-items:center;
+            padding:12px; padding-bottom:max(15px, env(safe-area-inset-bottom));
+            z-index:100;
+        }
+        .nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#9CA3AF; flex:1; gap:4px; }
+        .nav-item.active { color:var(--gold); }
+        .nav-icon { font-size:24px; }
+        .nav-item span { font-size:10px; font-weight:800; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header">
+            <div class="back-btn" onclick="history.back()">‹</div>
+            <h1>FAQ & Privasi</h1>
+        </header>
+
+        <div class="content">
+            <div class="last-updated">(Terakhir Dikemaskini pada 23 Disember 2025)</div>
+
+            <!-- SECTION 1 -->
+            <div class="policy-section">
+                <div class="policy-title"><span>1.</span> Pendahuluan</div>
+                
+                <div class="policy-sub">(a) Umum</div>
+                <div class="policy-text">
+                    <b>Jodohku</b> (Laman Web atau aplikasi mudah alih) dimiliki dan dikendalikan oleh Syarikat. Syarikat merupakan Pengawal Data bagi data peribadi anda. Maklumat mengenai Syarikat disediakan dalam bahagian 'Hubungan' dan 'Definisi' dalam Pernyataan Privasi ini.
+                </div>
+                <div class="policy-text" style="margin-top:10px;">
+                    Kami komited untuk melindungi privasi pengguna. Kami memahami bahawa pelawat dan pengguna Laman Web bimbang tentang privasi mereka, serta kerahsiaan dan keselamatan mana-mana Data Peribadi yang disediakan.
+                </div>
+                <div class="policy-text" style="margin-top:10px;">
+                    Kami hanya akan mengumpul, menggunakan, dan mendedahkan Data Peribadi mengikut Pernyataan Privasi ini dan undang-undang yang terpakai di bidang kuasa tempat kami mengumpul Data Peribadi. Kami telah melantik Pegawai Perlindungan Data ("DPO") yang bertanggungjawab menyelia soalan berkaitan Pernyataan Privasi ini. Sila hubungi DPO melalui <b>team@jodohku.com</b>.
+                </div>
+
+                <div class="policy-sub">(b) Hubungan</div>
+                <div class="policy-text">Butiran hubungan kami (termasuk isu privasi) adalah:</div>
+                <div class="contact-box">
+                    <div class="contact-line"><b>E-mel:</b> team@jodohku.com</div>
+                    <div class="contact-line"><b>Telefon:</b> +61 7 5571 1181</div>
+                    <div class="contact-line"><b>Alamat:</b> Cupid Media PTY LTD, 21 CROMBIE AVENUE, BUNDALL, QLD 4217, AUSTRALIA</div>
+                </div>
+            </div>
+
+            <!-- SECTION 2 -->
+            <div class="policy-section">
+                <div class="policy-title"><span>2.</span> Dasar Pemprosesan Data</div>
+                <div class="policy-text">
+                    Pernyataan Privasi ini menetapkan dasar kami berkaitan dengan pengumpulan dan penggunaan Data Peribadi anda semasa anda menggunakan Laman Web Jodohku dan Laman Web Berkaitan.
+                </div>
+
+                <div class="policy-sub">(a) Perkhidmatan Kontrak</div>
+                <div class="policy-text">
+                    Apabila anda mempunyai akaun di Laman Web kami, kami perlu mengumpul dan menggunakan Data Peribadi anda untuk:
+                </div>
+                <ul class="list">
+                    <li class="list-item">Memasuki perjanjian kami dengan anda.</li>
+                    <li class="list-item">Menyampaikan perkhidmatan kami yang tersedia melalui Laman Web kami kepada anda.</li>
+                </ul>
+
+                <div class="policy-sub">(b) Tujuan Perniagaan Sah</div>
+                <div class="policy-text">
+                    Kami juga boleh memproses Data Peribadi anda untuk meningkatkan Laman Web atau aplikasi Mudah Alih kami atau rangkaian perkhidmatan yang kami tawarkan kepada anda.
+                </div>
+            </div>
+
+            <!-- SECTION 3 -->
+            <div class="policy-section">
+                <div class="policy-title"><span>3.</span> Tanpa Nama</div>
+                <div class="policy-text">
+                    Disebabkan sifat perkhidmatan yang disediakan oleh Syarikat, adalah tidak praktikal bagi kami untuk berurusan dengan anda tanpa mengetahui nama penuh, foto, atau data peribadi lain yang anda pilih untuk tinggalkan dalam profil anda.
+                </div>
+            </div>
+
+            <!-- SECTION 4 -->
+            <div class="policy-section">
+                <div class="policy-title"><span>4.</span> Kategori Data yang Diproses</div>
+                <div class="policy-sub">(a) Semua Pengguna</div>
+                <div class="policy-text">
+                    Setiap kali anda melawat Laman Web <b>Jodohku</b>, pelayan kami merekodkan maklumat secara automatik seperti: jenis pelayar, URL rujukan, alamat IP, dan masa lawatan.
+                </div>
+
+                <div class="policy-sub">(b) Ahli</div>
+                <div class="policy-text">
+                    Selepas pendaftaran anda sebagai ahli, kami mengumpul maklumat seperti nama penuh, alamat e-mel, alamat kediaman, nombor telefon, gambar, umur, pekerjaan, dan maklumat pengebilan.
+                </div>
+                <div class="policy-text" style="margin-top:10px;">
+                    Anda juga boleh menyediakan kategori data khas seperti asal kaum, kepercayaan agama, kesihatan, atau <b>data biometrik</b> anda untuk pengesahan identiti.
+                </div>
+            </div>
+
+            <!-- SECTION 5 -->
+            <div class="policy-section">
+                <div class="policy-title"><span>5.</span> Tujuan Pengumpulan Data</div>
+                <div class="policy-text">
+                    Kami mengumpul Data Peribadi yang munasabah perlu untuk:
+                </div>
+                <ul class="list">
+                    <li class="list-item">Membolehkan kami memproses permohonan keahlian anda.</li>
+                    <li class="list-item">Membolehkan anda memindahkan profil anda dengan mudah ke perkhidmatan lain yang kami miliki.</li>
+                    <li class="list-item">Tujuan penyelidikan dalaman dan statistik kami.</li>
+                    <li class="list-item">Membolehkan pemproses pembayaran memproses pembayaran yang anda buat kepada kami.</li>
+                </ul>
+            </div>
+
+            <!-- SECTION 6 -->
+            <div class="policy-section" style="border-top: 1px solid #E5E7EB; padding-top:20px;">
+                <div class="policy-text" style="font-style: italic; font-size:12px; text-align:center;">
+                    Sila hubungi <b>team@jodohku.com</b> untuk baki terperinci mengenai terma dan syarat lengkap mengikut peraturan GDPR dan Privacy Acts yang terpakai.
+                </div>
+            </div>
+
+        </div>
+
+        <nav class="nav-bar">
+            <a href="home_preview.html" class="nav-item"><div class="nav-icon">🏠</div><span>Utama</span></a>
+            <a href="explore_preview.html" class="nav-item"><div class="nav-icon">🔍</div><span>Jelajah</span></a>
+            <a href="sembang.html" class="nav-item"><div class="nav-icon">💬</div><span>Sembang</span></a>
+            <a href="islam_preview.html" class="nav-item active"><div class="nav-icon">🕌</div><span>Islam</span></a>
+            <a href="profile_preview.html" class="nav-item"><div class="nav-icon">👤</div><span>Saya</span></a>
+        </nav>
+    </div>
+</body>
+</html>

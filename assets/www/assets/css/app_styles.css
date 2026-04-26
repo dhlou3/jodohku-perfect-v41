@@ -1,0 +1,150 @@
+:root {
+    --midnight: #020617; --slate: #0F172A; --gold: #FACC15; --cyan: #22D3EE;
+    --emerald: #10B981; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+body { background: #000; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; overflow: hidden; }
+
+.phone { 
+    width: 375px; height: 750px; background: var(--midnight); border-radius: 44px; border: 8px solid #1E293B; position: relative; 
+    overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+}
+.notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 30px; background: #1E293B; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; z-index: 1000; }
+
+.view { position: absolute; inset: 0; display: none; flex-direction: column; background: var(--midnight); animation: fadeIn 0.4s ease-out; overflow-y: auto; scrollbar-width: none; }
+.view.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* LANDING PAGE STYLES */
+.hero-view { 
+    height: 100%; width: 100%; position: relative;
+    background: linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 0.95)), url('../images/wedding_hero.png');
+    background-size: cover; background-position: center;
+    display: flex; flex-direction: column; padding: 80px 24px 40px;
+}
+.logo-large { font-size: 52px; font-weight: 700; letter-spacing: -3px; margin-bottom: 8px; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+.logo-large span { color: var(--gold); }
+.bismillah { font-family: 'Amiri', serif; font-size: 20px; color: var(--gold); margin-top: 24px; text-align: center; opacity: 0.8; width: 100%; }
+.tagline { color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 400; margin-bottom: 40px; line-height: 1.4; text-shadow: 0 2px 10px rgba(0,0,0,0.8); white-space: nowrap; }
+
+.btn { padding: 20px; border-radius: 24px; font-size: 16px; font-weight: 800; cursor: pointer; text-align: center; transition: 0.3s; width: 100%; border: none; }
+.btn-gold { background: var(--gold); color: black; box-shadow: 0 15px 35px rgba(250, 204, 21, 0.3); }
+.btn-outline { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(15px); margin-top: 16px; }
+.btn:hover { transform: translateY(-2px); }
+
+/* FORM STYLES */
+.page-content { padding: 80px 24px 40px; }
+.input-group { margin-bottom: 24px; }
+label { display: block; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.4); margin-bottom: 10px; letter-spacing: 1px; }
+.input-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 18px; display: flex; align-items: center; gap: 12px; }
+input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 16px; }
+
+/* RECENT SUCCESSES OVERLAY */
+.glass-badge { background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.2); font-size: 11px; font-weight: 700; width: fit-content; margin-bottom: 16px; backdrop-filter: blur(5px); }
+
+/* DISCOVERY LIGHT THEME */
+.light-view { background: #F8F5F0; color: #333; }
+.discovery-header { background: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EEE; position: sticky; top: 0; z-index: 100; }
+.badge-free { background: #BD8B52; color: white; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 100px; margin-left: 8px; }
+
+.main-card { background: white; margin: 16px; border-radius: 32px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+.card-image { height: 320px; background: linear-gradient(135deg, #FAF7F2, #E6D5C3); display: flex; justify-content: center; align-items: center; position: relative; border-bottom: 1px solid #F0E6D8; }
+.card-image h1 { font-size: 120px; color: #BD8B52; font-weight: 100; opacity: 0.2; }
+.card-meta { position: absolute; bottom: 20px; left: 20px; color: #333; }
+.card-meta h2 { font-size: 28px; font-weight: 700; color: #BD8B52; }
+.card-meta p { font-size: 14px; opacity: 0.8; font-weight: 600; }
+.match-label { position: absolute; top: 20px; right: 20px; background: white; padding: 6px 12px; border-radius: 100px; font-size: 12px; font-weight: 700; color: #BD8B52; display: flex; align-items: center; gap: 4px; border: 1px solid #F0ECE4; }
+
+.prompt-box { padding: 20px; border-top: 1px solid #F0F0F0; }
+.prompt-label { font-size: 10px; font-weight: 800; color: #BD8B52; letter-spacing: 1px; margin-bottom: 8px; }
+.prompt-text { font-size: 15px; color: #444; line-height: 1.5; margin-bottom: 12px; }
+.prompt-action { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #666; cursor: pointer; }
+
+.tag-container { display: flex; flex-wrap: wrap; gap: 8px; padding: 20px; }
+.tag { background: white; border: 1px solid #EEE; padding: 8px 16px; border-radius: 100px; font-size: 13px; color: #666; display: flex; align-items: center; gap: 6px; }
+.tag-match { border-color: #BD8B52; color: #BD8B52; background: #FDF9F4; }
+
+.action-btns { display: flex; justify-content: space-around; padding: 10px 20px 20px; align-items: center; }
+.round-btn { width: 64px; height: 64px; border-radius: 100px; display: flex; justify-content: center; align-items: center; border: 1px solid #EEE; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; font-size: 24px; }
+.round-btn-large { width: 80px; height: 80px; font-size: 32px; border-color: #BD8B52; color: #BD8B52; }
+
+.bottom-nav { background: white; border-top: 1px solid #EEE; display: flex; justify-content: space-around; padding: 12px 0 24px; margin-top: auto; }
+.nav-item { text-align: center; color: #999; font-size: 11px; font-weight: 600; cursor: pointer; }
+.nav-item.active { color: #BD8B52; }
+.nav-icon { font-size: 22px; margin-bottom: 4px; display: block; position: relative; }
+.nav-badge { position: absolute; top: -4px; right: -4px; background: #E11D48; color: white; width: 14px; height: 14px; border-radius: 100px; font-size: 8px; display: flex; justify-content: center; align-items: center; }
+
+/* GRID & LIST STYLES */
+.search-bar { background: #F3ECE2; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; margin: 20px; }
+.filter-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; }
+.chip { padding: 8px 16px; border-radius: 100px; background: white; border: 1px solid #EEE; font-size: 13px; font-weight: 600; white-space: nowrap; color: #666; }
+.chip.active { background: #BD8B52; color: white; border-color: #BD8B52; }
+
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px 40px; }
+.mini-card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #EEE; }
+.mini-thumb { height: 160px; background: #E6D5C3; display: flex; justify-content: center; align-items: center; font-size: 40px; color: white; position: relative; }
+.mini-info { padding: 12px; }
+.mini-id { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+.mini-status { font-size: 11px; color: #999; display: flex; align-items: center; gap: 4px; margin-bottom: 8px; }
+.badge-row { display: flex; gap: 4px; flex-wrap: wrap; }
+.badge-sm { font-size: 9px; padding: 3px 6px; border-radius: 4px; font-weight: 700; }
+.b-verified { background: #FEF3C7; color: #D97706; }
+.b-active { background: #DBEAFE; color: #2563EB; }
+
+.chat-tabs { display: flex; border-bottom: 1px solid #EEE; }
+.tab-item { flex: 1; text-align: center; padding: 16px; font-weight: 700; font-size: 14px; color: #999; }
+.tab-item.active { color: #BD8B52; border-bottom: 3px solid #BD8B52; }
+.chat-list { padding: 20px; }
+.chat-row { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.avatar-lg { width: 56px; height: 56px; border-radius: 100px; background: #E6D5C3; display: flex; justify-content: center; align-items: center; font-size: 20px; color: white; position: relative; }
+.chat-body { flex: 1; }
+.chat-name { font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+.chat-msg { font-size: 13px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+
+.islam-hero { background: #406343; color: white; padding: 30px 20px; margin: 20px; border-radius: 24px; position: relative; overflow: hidden; }
+.match-score-card { background: rgba(255,255,255,0.1); padding: 16px; border-radius: 16px; display: flex; gap: 16px; align-items: center; margin-top: 20px; }
+.islam-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px 40px; }
+.feature-card { background: white; padding: 20px; border-radius: 20px; border: 1px solid #EEE; text-align: left; }
+.feature-icon { font-size: 24px; margin-bottom: 12px; }
+.feature-card h3 { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+.feature-card p { font-size: 11px; color: #999; }
+
+.profile-hdr { padding: 40px 20px; text-align: left; display: flex; align-items: center; gap: 20px; background: linear-gradient(to bottom, #F8F5F0, white); }
+.avatar-main { width: 88px; height: 88px; border-radius: 100px; border: 4px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.1); background: #BD8B52; color: white; display: flex; justify-content: center; align-items: center; font-size: 32px; }
+.progress-sect { padding: 0 20px; }
+.pb-bg { height: 8px; background: #EEE; border-radius: 100px; margin-top: 12px; }
+.pb-fill { height: 100%; width: 72%; background: #BD8B52; border-radius: 100px; }
+
+/* SUB-PAGE & UI COMPONENTS */
+.sub-header { background: white; padding: 16px 20px; display: flex; align-items: center; border-bottom: 1px solid #EEE; position: sticky; top: 0; z-index: 101; }
+.back-btn { font-size: 20px; cursor: pointer; width: 40px; }
+.sub-title { flex: 1; text-align: center; font-family: 'Amiri'; font-size: 20px; font-weight: 700; margin-right: 40px; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding: 20px; }
+.stat-card { background: white; padding: 16px; border-radius: 16px; border: 1px solid #EEE; text-align: center; }
+.stat-val { font-size: 24px; font-weight: 800; color: #BD8B52; margin-bottom: 4px; }
+.stat-lab { font-size: 11px; color: #999; font-weight: 600; }
+
+.setting-row { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-bottom: 1px solid #F5F5F5; background: white; }
+.setting-icon { width: 40px; height: 40px; background: #F8F5F0; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 18px; }
+.setting-body { flex: 1; }
+.setting-label { font-weight: 700; font-size: 14px; }
+.setting-desc { font-size: 11px; color: #999; }
+
+/* SWITCH UI */
+.switch { width: 48px; height: 26px; background: #EEE; border-radius: 100px; position: relative; cursor: pointer; transition: 0.3s; }
+.switch.on { background: #BD8B52; }
+.switch-dot { width: 22px; height: 22px; background: white; border-radius: 100px; position: absolute; top: 2px; left: 2px; transition: 0.3s; }
+.switch.on .switch-dot { left: 24px; }
+
+.jakim-card { background: #406343; color: white; padding: 40px 20px; border-radius: 32px; margin: 20px; text-align: center; position: relative; }
+.jakim-badge { background: rgba(255,255,255,0.1); padding: 16px; border-radius: 20px; margin-top: 30px; border: 1px solid rgba(255,255,255,0.2); }
+
+.list-item { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: white; border-bottom: 1px solid #F5F5F5; }
+.check-circle { width: 24px; height: 24px; border-radius: 100px; background: #E6D5C3; display: flex; justify-content: center; align-items: center; color: white; font-size: 12px; }
+.check-circle.done { background: #406343; }
+
+.vendor-card { background: white; margin: 0 20px 20px; border-radius: 20px; border: 1px solid #EEE; overflow: hidden; }
+.vendor-img { height: 160px; background: #E6D5C3; display: flex; justify-content: center; align-items: center; font-size: 40px; position: relative; }
+.v-meta { padding: 16px; }
+.v-price { font-weight: 800; color: #BD8B52; margin: 8px 0; }

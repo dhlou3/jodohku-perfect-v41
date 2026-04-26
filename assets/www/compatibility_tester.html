@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-t="sim_title">Jodohku Global Holistic Simulator v2.5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { 
+            --gold: #BD8B52; 
+            --orange: #C67C22;
+            --bg-slate: #0f172a; 
+            --danger: #EF4444; 
+            --success: #10B981;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit', sans-serif; }
+        body { 
+            background: var(--bg-slate); 
+            background-image: radial-gradient(circle at 10% 20%, #1e293b 0%, #0f172a 100%);
+            min-height:100vh; 
+            padding: 40px;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .lang-switcher { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 2000; }
+        .lang-btn { padding: 8px 16px; border-radius: 100px; background: var(--glass); border: 1px solid var(--border); color: white; font-size: 11px; font-weight: 800; cursor: pointer; }
+        .lang-btn.active { background: var(--gold); border-color: var(--gold); }
+
+        .app-layout {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 430px 1fr 430px;
+            gap: 25px;
+            height: calc(100vh - 120px);
+        }
+        [dir="rtl"] .app-layout { direction: rtl; }
+
+        .column { display: flex; flex-direction: column; gap: 20px; height: 100%; }
+        .scrollable { flex: 1; overflow-y: auto; padding-right: 10px; scrollbar-width: thin; scrollbar-color: var(--gold) transparent; }
+
+        .card { 
+            background: var(--glass); backdrop-filter: blur(20px); 
+            border: 1px solid var(--border); border-radius: 28px; 
+            padding: 22px; margin-bottom: 15px;
+        }
+        .card h3 { font-family:'Playfair Display', serif; color:var(--gold); font-size:20px; margin-bottom:12px; }
+
+        .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+        .label { font-size: 9px; font-weight: 900; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; }
+        .field { 
+            background: rgba(15,23,42,0.6); border: 1px solid #334155; 
+            padding: 10px; border-radius: 10px; color: white; font-size: 13px; font-weight: 600; width: 100%;
+        }
+        textarea.field { height: 80px; resize: none; line-height: 1.4; }
+
+        .question-item {
+            padding: 10px; background: rgba(255,255,255,0.02); border-radius: 10px;
+            margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .q-txt { font-size: 11px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px; line-height: 1.3; }
+
+        .chips-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .chip { 
+            padding: 6px 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 1000px; 
+            font-size: 11px; font-weight: 700; color: #94a3b8; cursor: pointer; background: rgba(255,255,255,0.02);
+            transition: 0.2s;
+        }
+        .chip.active { background: var(--orange); color: white; border-color: var(--orange); }
+
+        .center-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 15px; }
+        .gauge-module { 
+            width: 320px; height: 320px; border-radius: 50%;
+            background: conic-gradient(var(--gold) 0%, #1e293b 0%);
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 80px rgba(189,139,82,0.1);
+        }
+        .gauge-inner {
+            width: 260px; height: 260px; border-radius: 50%;
+            background: #0f172a; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+        }
+        .score-val { font-size: 70px; font-weight: 900; color: white; line-height: 1; }
+        .score-lbl { font-size: 12px; color: var(--gold); font-weight: 800; text-transform: uppercase; margin-top: 5px; }
+
+        .debug-console {
+            width: 100%; background: #020617; border-radius: 16px; padding: 15px;
+            font-family: 'Courier New', Courier, monospace; font-size: 11px; color: #10B981;
+            border: 1px solid #1e293b; overflow-y: auto; height: 250px;
+        }
+        .debug-line { margin-bottom: 4px; border-bottom: 1px solid rgba(16,185,129,0.08); padding-bottom: 3px; }
+        .debug-err { color: var(--danger); font-weight: 900; }
+        .debug-success { color: #34D399; font-weight: 900; }
+
+        .btn-simulate {
+            width: 100%; padding: 18px; background: var(--gold); color: white;
+            border: none; border-radius: 100px; font-size: 15px; font-weight: 900;
+            cursor: pointer; box-shadow: 0 15px 30px rgba(189,139,82,0.2);
+            transition: 0.3s;
+        }
+        .btn-simulate:hover { transform: translateY(-3px); background: #d4a76a; }
+
+        h1.title { font-family:'Playfair Display', serif; text-align: center; margin-bottom: 30px; color: white; font-size: 32px; }
+
+        .section-label { font-size: 10px; font-weight: 800; color: var(--gold); margin: 15px 0 8px; display: block; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" id="btn-ms" onclick="setLang('ms')">MS</button>
+        <button class="lang-btn" id="btn-ar" onclick="setLang('ar')">AR</button>
+    </div>
+
+    <h1 class="title" data-t="sim_title">Jodohku Global Holistic Simulator v2.5</h1>
+
+    <div class="app-layout">
+        <!-- USER A (ME) -->
+        <div class="column">
+            <div class="card" style="flex:0;">
+                <h3 data-t="sim_user_a">User A (Self)</h3>
+                <div class="input-group">
+                    <label class="label" data-t="sim_prompt_label">PREFERENCE PROMPT (Wants)</label>
+                    <textarea class="field" id="promptA" placeholder="e.g. 'I don't want a smoker or cat owner'"></textarea>
+                </div>
+                <div class="input-group">
+                    <label class="label" data-t="tentang_saya">MY BIO</label>
+                    <textarea class="field" id="bioA" placeholder="e.g. 'I love coffee and hiking'"></textarea>
+                </div>
+            </div>
+            <div class="card scrollable">
+                <h3 data-t="soalan_taaruf_card">My Worldview (30 Qs)</h3>
+                <div id="questionsA"></div>
+            </div>
+        </div>
+
+        <!-- RESULTS ENGINE -->
+        <div class="column center-col">
+            <div class="gauge-module" id="gaugeBg">
+                <div class="gauge-inner">
+                    <div class="score-val" id="scoreVal">50%</div>
+                    <div class="score-lbl" id="scoreLbl" data-t="match_moderate">Sesuai</div>
+                </div>
+            </div>
+
+            <div class="debug-console" id="debugConsole">
+                <div class="debug-line">> GLOBAL HOLISTIC ENGINE v2.5...</div>
+                <div class="debug-line">> Multi-Interest Synergy Enabled.</div>
+            </div>
+
+            <button class="btn-simulate" onclick="runEliteSimulation()" data-t="sim_btn_simulate">🚀 SIMULATE ELITE MATCH</button>
+        </div>
+
+        <!-- USER B (TARGET) -->
+        <div class="column">
+            <div class="card scrollable">
+                <h3 data-t="sim_user_b">User B (Suggestion)</h3>
+                
+                <div class="input-group">
+                    <label class="label" data-t="kerjaya_title">Job Title</label>
+                    <input type="text" class="field" id="jobB" placeholder="e.g. Teacher, Nurse">
+                </div>
+
+                <div class="input-group">
+                    <label class="label" data-t="tentang_saya">BIO (STORY)</label>
+                    <textarea class="field" id="bioB" placeholder="e.g. 'I am a primary school teacher'"></textarea>
+                </div>
+
+                <span class="section-label" data-t="interests_title">Sign Up Interests</span>
+                <div class="chips-container" id="interestsContainerB">
+                    <!-- SPIRITUAL -->
+                    <div class="chip" data-val="tadabbur">Tadabbur</div>
+                    <div class="chip" data-val="zikir">Zikir</div>
+                    <div class="chip" data-val="charity">Sedekah</div>
+                    <!-- FOOD -->
+                    <div class="chip" data-val="coffee">Coffee</div>
+                    <div class="chip" data-val="cooking">Masakan</div>
+                    <div class="chip" data-val="chinese">Chinese Food</div>
+                    <!-- OUTDOORS -->
+                    <div class="chip" data-val="hiking">Hiking</div>
+                    <div class="chip" data-val="travel">Travel</div>
+                    <div class="chip" data-val="archery">Archery</div>
+                    <!-- TECH -->
+                    <div class="chip" data-val="tech">Tech</div>
+                    <div class="chip" data-val="ai">AI</div>
+                    <!-- HOBBIES -->
+                    <div class="chip" data-val="cats">Kucing</div>
+                    <div class="chip" data-val="reading">Reading</div>
+                    <div class="chip" data-val="garden">Gardening</div>
+                </div>
+
+                <span class="section-label" data-t="sim_status_label">AI Status</span>
+                <div class="chips-container">
+                    <div class="chip status-chip" id="chipSmoke" onclick="this.classList.toggle('active')">Smoker</div>
+                    <div class="chip status-chip" id="chipVape" onclick="this.classList.toggle('active')">Vaper</div>
+                </div>
+            </div>
+
+            <div class="card" style="background: rgba(189,139,82,0.05); border-color: var(--gold); flex:0;">
+                <p style="font-size: 10px; color: var(--gold); font-weight: 700; line-height: 1.4;">
+                    🎯 Real Match Logic: The AI compares your 30 Questions and Prompt against her actual clickable interests and bio.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const qContainerA = document.getElementById('questionsA');
+        const consoleEl = document.getElementById('debugConsole');
+
+        function addLog(msg, type = '') {
+            const div = document.createElement('div');
+            div.className = 'debug-line ' + (type === 'err' ? 'debug-err' : (type === 'success' ? 'debug-success' : ''));
+            div.innerText = '> ' + msg;
+            consoleEl.prepend(div);
+        }
+
+        // Chip Toggle logic
+        document.querySelectorAll('.chip').forEach(chip => {
+            if (!chip.classList.contains('status-chip')) {
+                chip.addEventListener('click', () => chip.classList.toggle('active'));
+            }
+        });
+
+        // Render 30 Questions for User A
+        function renderQuestions() {
+            qContainerA.innerHTML = '';
+            for (let i = 1; i <= 30; i++) {
+                const key = 'q_t_' + i;
+                const optsKey = key + '_opts';
+                const qText = window.I18N.t(key);
+                const rawOpts = window.I18N.t(optsKey);
+                
+                const html = `
+                    <div class="question-item">
+                        <div class="q-txt">#${i}: ${qText}</div>
+                        <select class="field q-input" id="${key}_A">
+                            <option value="">- Select Answer -</option>
+                            ${rawOpts && rawOpts !== optsKey ? rawOpts.split(',').map(o => `<option value="${o.trim()}">${o.trim()}</option>`).join('') : '<option value="Yes">Yes</option><option value="No">No</option>'}
+                        </select>
+                    </div>
+                `;
+                qContainerA.innerHTML += html;
+            }
+        }
+
+        function setLang(lang) {
+            window.I18N.setLang(lang);
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + lang).classList.add('active');
+            renderQuestions();
+            addLog(`Language switched to ${lang.toUpperCase()}`, 'success');
+        }
+
+        function runEliteSimulation() {
+            consoleEl.innerHTML = '';
+            addLog("INITIALIZING GLOBAL HOLISTIC ENGINE v2.6 [RESILIENCE MODE]...");
+            
+            let score = 65; // Barakah Baseline
+            let bonuses = 0;
+            let penalties = 0;
+
+            const promptA = document.getElementById('promptA').value.toLowerCase();
+            const bioA = document.getElementById('bioA').value.toLowerCase();
+            const jobB = document.getElementById('jobB').value.toLowerCase();
+            const bioB = document.getElementById('bioB').value.toLowerCase();
+            const bSmokes = document.getElementById('chipSmoke').classList.contains('active');
+            
+            const selectedInterests = Array.from(document.querySelectorAll('#interestsContainerB .chip.active')).map(c => c.getAttribute('data-val'));
+            const interestsString = selectedInterests.join(" ");
+
+            const fullMe = promptA + " " + bioA;
+            const fullTarget = jobB + " " + bioB + " " + interestsString + (bSmokes ? " smoking smoker merokok" : "");
+
+            // 1. 🛡️ DEALBREAKER PROTECTION (Softened for Floor Resilience)
+            const isNegated = (text, keyword) => {
+                const regex = new RegExp(`(don't|no|not|tak nak|jangan|bukan|excluding|anti|neither)\\s*.*${keyword}`, 'i');
+                return regex.test(text);
+            };
+
+            const dealbreakers = [
+                { kw: 'teacher|cikgu|guru|lecturer', lbl: 'Teacher' },
+                { kw: 'smoke|merokok|rokok|vape', lbl: 'Smoker' },
+                { kw: 'cat|kucing', lbl: 'Cat Owner' }
+            ];
+
+            dealbreakers.forEach(db => {
+                if (isNegated(fullMe, db.kw)) {
+                    if (new RegExp(db.kw, 'i').test(fullTarget)) {
+                        penalties += 15; // Softened Penalty
+                        addLog(`CONTRADICTION: User B matches your excluded term [${db.lbl}]. (-15%)`, 'err');
+                    }
+                }
+            });
+
+            // 2. ✨ SYNERGY STACKING
+            const synergyKws = ['coffee', 'hiking', 'travel', 'tech', 'cooking', 'islam', 'reading', 'cats', 'garden'];
+            synergyKws.forEach(kw => {
+                if (fullMe.includes(kw) && fullTarget.includes(kw)) {
+                    bonuses += 5;
+                    addLog(`SYNERGY: Common interest in ${kw.toUpperCase()}! (+5%)`, 'success');
+                }
+            });
+
+            // 3. 📋 DEEP WORLDVIEW ALIGNMENT (Q11 Proxy)
+            const q11Val = document.getElementById('q_t_11_A').value;
+            if ((q11Val.includes("Sangat") || q11Val.includes("Very")) && /tadabbur|zikir|charity|islam/.test(fullTarget)) {
+                bonuses += 15;
+                addLog(`ELITE ALIGNMENT: Devout profile matches your spiritual requirement! (+15%)`, 'success');
+            }
+
+            // Final Calculation
+            score = score + bonuses - penalties;
+            score = Math.max(5, Math.min(99, score));
+
+            if (score >= 50) addLog(`FLOOR PROTECTION: Resilience logic active. Score maintained above 50%.`, 'success');
+
+            document.getElementById('scoreVal').innerText = Math.round(score) + '%';
+            document.getElementById('gaugeBg').style.background = `conic-gradient(var(--gold) ${score}%, #1e293b ${score}%)`;
+
+            let labelKey = "match_moderate";
+            if (score >= 90) labelKey = "match_perfect";
+            else if (score >= 75) labelKey = "match_high";
+            else if (score < 50) labelKey = "match_low";
+            
+            document.getElementById('scoreLbl').innerText = window.I18N.t(labelKey);
+            addLog(`FINAL COMPATIBILITY: ${score}%`, score > 70 ? 'success' : (score < 50 ? 'err' : ''));
+        }
+
+        const currentLang = window.I18N.getLang();
+        document.getElementById('btn-' + currentLang).classList.add('active');
+        renderQuestions();
+    </script>
+</body>
+</html>

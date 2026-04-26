@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Sijil JAKIM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --emerald: #4A7C59;
+            --emerald-dark: #355E3B;
+            --emerald-soft: #ECF2ED;
+            --gold: #BD8B52;
+            --text-dark: #1F2937;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        
+        body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+
+        .phone { 
+            width: 375px; height: 812px; background: #FDF9F4; border-radius: 44px; border: 8px solid #1E293B; 
+            position: relative; overflow: hidden; display: flex; flex-direction: column; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.1); padding-top: 40px;
+        }
+
+        /* HEADER */
+        .header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: white;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 24px;
+            font-size: 20px;
+            color: var(--text-dark);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* CONTENT */
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        /* CERTIFICATE CARD */
+        .cert-card {
+            background: var(--emerald-dark);
+            border-radius: 32px;
+            padding: 40px 24px;
+            color: white;
+            text-align: center;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(53, 94, 59, 0.2);
+        }
+
+        .cert-logo { font-size: 40px; margin-bottom: 20px; color: #9FD6A3; }
+        
+        .cert-org { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; opacity: 0.9; margin-bottom: 12px; text-transform: uppercase; }
+        
+        .cert-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+        
+        .cert-subtitle { font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 30px; }
+
+        .cert-inner {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cert-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+        
+        .cert-meta { font-size: 12px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; }
+
+        .cert-footer { font-size: 12px; font-weight: 600; opacity: 0.9; }
+
+        /* VERIFICATION LIST */
+        .list-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid #F3F4F6;
+            margin-bottom: 24px;
+        }
+
+        .list-item {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid #F9FAFB;
+        }
+        .list-item:last-child { border-bottom: none; }
+
+        .icon-box {
+            width: 44px;
+            height: 44px;
+            background: #F3F4F6;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .item-label { flex: 1; font-size: 14px; font-weight: 700; color: var(--text-dark); }
+        
+        .status-text { font-size: 13px; font-weight: 700; }
+        .status-green { color: #10B981; }
+        .status-gold { color: var(--gold); }
+
+        /* ACTION BUTTON */
+        .action-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--emerald-dark);
+            color: white;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 800;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header">
+            <a href="islam_preview.html" class="back-btn">‹</a>
+            <h1 id="title">Sijil JAKIM</h1>
+        </header>
+
+        <div class="content">
+            <div class="cert-card">
+                <div class="cert-logo">🌿</div>
+                <div class="cert-org" id="orgName">Jabatan Kemajuan Islam Malaysia</div>
+                <div class="cert-title" id="certMainTitle">Sijil Pengesahan Ahli</div>
+                <div class="cert-subtitle" id="certSub">Platform Perkahwinan Islam Berdaftar</div>
+                
+                <div class="cert-inner">
+                    <div class="cert-name">Ahmad Faiz bin Abdullah</div>
+                    <div class="cert-meta" id="regNo">No. Pendaftaran: JKM-2024-087432</div>
+                    <div class="cert-meta" id="regDate">Tarikh: 1 Januari 2024</div>
+                </div>
+
+                <div class="cert-footer" id="certVerify">✓ Disahkan secara digital oleh JAKIM</div>
+            </div>
+
+            <div class="list-card">
+                <div class="list-item">
+                    <div class="icon-box" style="background:#ECF2ED; color:#10B981;">✓</div>
+                    <div class="item-label" id="liIC">Pengesahan IC</div>
+                    <div class="status-text status-green" id="stDisahkan1">Disahkan</div>
+                </div>
+                <div class="list-item">
+                    <div class="icon-box" style="background:#ECF2ED; color:#10B981;">✓</div>
+                    <div class="item-label" id="liPhone">Pengesahan No. Telefon</div>
+                    <div class="status-text status-green" id="stDisahkan2">Disahkan</div>
+                </div>
+                <div class="list-item">
+                    <div class="icon-box" style="background:#ECF2ED; color:#10B981;">✓</div>
+                    <div class="item-label" id="liSelfie">Selfie Pengesahan</div>
+                    <div class="status-text status-green" id="stDiluluskan">Diluluskan</div>
+                </div>
+                <div class="list-item">
+                    <div class="icon-box">⏳</div>
+                    <div class="item-label" id="liSijil">Sijil Pra-Nikah</div>
+                    <div class="status-text status-gold" id="stBelum">Belum Dikemukakan</div>
+                </div>
+            </div>
+
+            <a href="#" class="action-btn" id="btnSubmit">Kemukakan Sijil Kursus Pra-Nikah</a>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            'EN | MS': {
+                title: 'JAKIM Certificate',
+                orgName: 'Department of Islamic Development Malaysia',
+                certMainTitle: 'Member Verification Certificate',
+                certSub: 'Registered Islamic Marriage Platform',
+                regNo: 'Registration No: JKM-2024-087432',
+                regDate: 'Date: 1 January 2024',
+                certVerify: '✓ Digitally verified by JAKIM',
+                liIC: 'IC Verification',
+                liPhone: 'Phone Number Verification',
+                liSelfie: 'Verification Selfie',
+                liSijil: 'Pre-Marriage Cert',
+                stDisahkan1: 'Verified',
+                stDisahkan2: 'Verified',
+                stDiluluskan: 'Approved',
+                stBelum: 'Not Submitted',
+                btnSubmit: 'Submit Pre-Marriage Course Cert'
+            },
+            'MS | EN': {
+                title: 'Sijil JAKIM',
+                orgName: 'Jabatan Kemajuan Islam Malaysia',
+                certMainTitle: 'Sijil Pengesahan Ahli',
+                certSub: 'Platform Perkahwinan Islam Berdaftar',
+                regNo: 'No. Pendaftaran: JKM-2024-087432',
+                regDate: 'Tarikh: 1 Januari 2024',
+                certVerify: '✓ Disahkan secara digital oleh JAKIM',
+                liIC: 'Pengesahan IC',
+                liPhone: 'Pengesahan No. Telefon',
+                liSelfie: 'Selfie Pengesahan',
+                liSijil: 'Sijil Pra-Nikah',
+                stDisahkan1: 'Disahkan',
+                stDisahkan2: 'Disahkan',
+                stDiluluskan: 'Diluluskan',
+                stBelum: 'Belum Dikemukakan',
+                btnSubmit: 'Kemukakan Sijil Kursus Pra-Nikah'
+            }
+        };
+
+        function applyLang(lang) {
+            const content = translations[lang];
+            if(!content) return;
+
+            document.getElementById('title').innerText = content.title;
+            document.getElementById('orgName').innerText = content.orgName;
+            document.getElementById('certMainTitle').innerText = content.certMainTitle;
+            document.getElementById('certSub').innerText = content.certSub;
+            document.getElementById('regNo').innerText = content.regNo;
+            document.getElementById('regDate').innerText = content.regDate;
+            document.getElementById('certVerify').innerText = content.certVerify;
+            document.getElementById('liIC').innerText = content.liIC;
+            document.getElementById('liPhone').innerText = content.liPhone;
+            document.getElementById('liSelfie').innerText = content.liSelfie;
+            document.getElementById('liSijil').innerText = content.liSijil;
+            document.getElementById('stDisahkan1').innerText = content.stDisahkan1;
+            document.getElementById('stDisahkan2').innerText = content.stDisahkan2;
+            document.getElementById('stDiluluskan').innerText = content.stDiluluskan;
+            document.getElementById('stBelum').innerText = content.stBelum;
+            document.getElementById('btnSubmit').innerText = content.btnSubmit;
+            
+            localStorage.setItem('appLang', lang);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('appLang') || 'MS | EN';
+            applyLang(savedLang);
+        });
+    </script>
+</body>
+</html>

@@ -47,7 +47,7 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
           onWebResourceError: (WebResourceError error) {},
         ),
       )
-      ..loadRequest(Uri.parse('https://jodohku-61096.web.app/landing_preview.html'));
+      ..loadFlutterAsset('assets/www/landing_preview.html');
   }
 
   @override

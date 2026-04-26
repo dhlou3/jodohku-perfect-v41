@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Nama Anda</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap"
+        rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root {
+            --gold: #BD8B52;
+            --orange: #C67C22;
+            --text-dark: #1F2937;
+            --bg-cream: #FDF9F4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #E5E7EB;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 44px;
+            border: 8px solid #1E293B;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 40px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            font-size: 24px;
+            color: #9CA3AF;
+            text-decoration: none;
+        }
+
+        .progress-line {
+            flex: 1;
+            height: 6px;
+            background: #F3F4F6;
+            border-radius: 100px;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--orange);
+            width: 15%;
+        }
+
+        .content {
+            flex: 1;
+            padding: 40px 24px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 34px;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 50px;
+            line-height: 1.1;
+        }
+
+        .input-wrap {
+            position: relative;
+            padding-top: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            border: none;
+            border-bottom: 3px solid #F3F4F6;
+            padding: 15px 0;
+            font-size: 26px;
+            font-weight: 700;
+            outline: none;
+            transition: 0.4s;
+            color: var(--text-dark);
+            background: transparent;
+        }
+
+        input[type="text"]:focus {
+            border-bottom-color: var(--orange);
+        }
+
+        input[type="text"]::placeholder {
+            color: #D1D5DB;
+            font-weight: 400;
+        }
+
+        .hint {
+            font-size: 14px;
+            color: #6B7280;
+            margin-top: 25px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .footer {
+            padding: 40px 24px;
+        }
+
+        .next-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--orange);
+            color: white;
+            border-radius: 100px;
+            font-size: 17px;
+            font-weight: 800;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            box-shadow: 0 12px 24px rgba(198, 124, 34, 0.25);
+            transition: 0.3s;
+        }
+
+        .next-btn:active {
+            transform: scale(0.97);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <div class="header">
+            <a href="landing_preview.html" class="back-btn">←</a>
+            <div class="progress-line">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        <div class="content">
+            <h1 data-t="name_title">Siapakah nama panggilan anda?</h1>
+            <div class="input-wrap">
+                <input type="text" data-t="name_placeholder" placeholder="Masukkan nama..." id="nameInput" autocomplete="off" spellcheck="false">
+                <p class="hint" data-t="name_hint">Nama ini akan dipaparkan pada profil anda sebagai permulaan taaruf yang mesra.</p>
+            </div>
+        </div>
+        <div class="footer">
+            <button onclick="saveAndNext()" class="next-btn" data-t="seterusnya_btn">Seterusnya ➔</button>
+        </div>
+    </div>
+    <script type="module">
+        import { DB } from './database.js';
+
+        window.saveAndNext = async function () {
+            const name = document.getElementById('nameInput').value.trim();
+            if (!name) {
+                const msg = window.I18N.getLang() === 'en' ? 'Please enter your name.' : 'Sila masukkan nama anda untuk meneruskan.';
+                alert(msg);
+                return;
+            }
+            try {
+                const ok = await DB.updateUser({ name: name });
+                if (ok) window.location.href = 'onboarding_ic.html';
+                else alert('Sistem sibuk. Sila cuba lagi.');
+            } catch (e) { console.error(e); }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            if(window.I18N) window.I18N.translatePage();
+            const user = await DB.getCurrentUser();
+            if (user && user.name) {
+                document.getElementById('nameInput').value = user.name;
+            }
+        });
+    </script>
+</body>
+
+</html>

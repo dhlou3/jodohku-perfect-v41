@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Sembang Elite (The Triple Pillars)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getFirestore, doc, getDoc, onSnapshot, collection, query, orderBy, addDoc, serverTimestamp, getDocs 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        window.fs_sdk = { doc, getDoc, onSnapshot, collection, query, orderBy, addDoc, serverTimestamp, getDocs };
+    </script>
+    <style>
+        :root { --gold: #BD8B52; --bg-cream: #FCFAF7; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit', sans-serif; }
+        body { background:#E5E7EB; min-height:100vh; display:flex; justify-content:center; align-items:center; overflow:hidden; }
+        .phone { width:375px; height:812px; background:white; border-radius:44px; border:8px solid #1E293B; position:relative; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 40px 80px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+        @media (max-width: 480px) { body { background: white; } .phone { width: 100vw; height: 100vh; border: none; border-radius: 0; } }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .header { padding: 55px 24px 15px; padding-top: max(55px, env(safe-area-inset-top)); background:white; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; justify-content:space-between; }
+        .header h1 { font-family:'Playfair Display', serif; font-size:26px; font-weight:1000; color:#111827; }
+        .tab-bar { display:flex; background:white; border-bottom:1px solid #F3F4F6; }
+        .tab { flex:1; padding:15px; text-align:center; font-size:11px; font-weight:900; color:#9CA3AF; text-transform:uppercase; letter-spacing:1px; cursor:pointer; transition:0.3s; position:relative; }
+        .tab.active { color:var(--gold); }
+        .tab.active::after { content:''; position:absolute; bottom:0; left:25%; width:50%; height:3px; background:var(--gold); border-radius:100px; }
+        .content-slider { flex:1; display:flex; width:300%; transition:0.3s ease-out; }
+        .column { width:33.333%; height:100%; overflow-y:auto; padding:20px; background:var(--bg-cream); scrollbar-width:none; padding-bottom:120px; }
+        .match-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+        .match-card { background:white; border-radius:24px; padding:15px; text-align:center; border:1.5px solid white; box-shadow:0 8px 20px rgba(0,0,0,0.03); cursor:pointer; }
+        .match-av { width:75px; height:75px; border-radius:50%; margin:0 auto 12px; border:3px solid var(--gold); padding:3px; overflow:hidden; }
+        .match-av img, .match-av div { width:100%; height:100%; border-radius:50%; object-fit:cover; display:flex; align-items:center; justify-content:center; background:#F3F4F6; font-weight:900; color:var(--gold); font-size:24px; }
+        .match-n { font-size:14px; font-weight:800; color:#111827; }
+        .chat-list { display:flex; flex-direction:column; gap:12px; }
+        .chat-item { background:white; padding:18px; border-radius:24px; display:flex; align-items:center; gap:15px; border:1px solid rgba(0,0,0,0.02); box-shadow:0 4px 15px rgba(0,0,0,0.02); cursor:pointer; position:relative; }
+        .chat-av { width:55px; height:55px; border-radius:10%; overflow:hidden; flex-shrink:0; background:#F3F4F6; display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--gold); }
+        .chat-av img, .chat-av div { width:100%; height:100%; object-fit:cover; display:flex; align-items:center; justify-content:center; }
+        .chat-info { flex:1; min-width:0; }
+        .chat-name { font-size:16px; font-weight:800; color:#111827; margin-bottom:2px; }
+        .chat-msg { font-size:13px; color:#6B7280; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .chat-time { position:absolute; top:20px; right:20px; font-size:9px; font-weight:800; color:#9CA3AF; }
+        #chatOverlay { position:absolute; top:0; left:100%; width:100%; height:100%; background:white; z-index:200; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display:flex; flex-direction:column; }
+        #chatOverlay.active { transform: translateX(-100%); }
+        .chat-header { padding: 55px 20px 15px; padding-top: max(55px, env(safe-area-inset-top)); background:white; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:12px; }
+        /* Chat UI Redesign - Elite Sentinel Theme */
+        .msg { padding: 12px 16px; border-radius: 20px; margin-bottom: 15px; font-size: 13px; line-height: 1.5; max-width: 90%; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .m-time { font-size: 9px; opacity: 0.6; margin-top: 4px; display: block; text-align: right; }
+        .m-sender { font-size: 9px; font-weight: 900; text-transform: uppercase; margin-bottom: 4px; display: block; letter-spacing: 0.5px; }
+        .me { 
+            align-self: flex-end; 
+            background: linear-gradient(135deg, #BD8B52, #a6733a); 
+            color: white; 
+            border-bottom-right-radius: 2px;
+            margin-left: 10%;
+        }
+        .them { 
+            align-self: flex-start; 
+            background: white; 
+            color: #1e293b; 
+            border-bottom-left-radius: 2px;
+            border: 1px solid #e2e8f0;
+            margin-right: 10%;
+        }
+        .chat-overlay-bg { position:fixed; inset:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(10px); z-index:190; display:none; opacity:0; transition:0.3s; }
+        #chatOverlay.active + .chat-overlay-bg { display:block; opacity:1; }
+        .chat-input-bar { position:absolute; bottom: max(20px, env(safe-area-inset-bottom)); left:20px; right:20px; background:white; border-radius:100px; padding:6px 6px 6px 18px; display:flex; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.05); }
+        .chat-input-bar input { flex:1; border:none; outline:none; font-size:14px; font-weight:600; }
+        .chat-send-btn { width:44px; height:44px; background:var(--gold); color:white; border:none; border-radius:50%; font-size:18px; cursor:pointer; }
+
+        /* WALI GUARD OVERLAY */
+        #waliGuard { position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:2000; display:none; align-items:center; justify-content:center; padding:30px; }
+        .guard-box { background:white; border-radius:32px; padding:40px 30px; text-align:center; max-width:320px; animation: slideUp 0.4s ease-out; }
+        .guard-icon { font-size:50px; margin-bottom:20px; }
+        .guard-title { font-family:'Playfair Display', serif; font-size:22px; font-weight:900; color:#111827; margin-bottom:12px; }
+        .guard-text { font-size:14px; color:#6B7280; line-height:1.6; margin-bottom:30px; font-weight:600; }
+        .guard-btn { display:block; width:100%; padding:18px; border-radius:100px; background:var(--gold); color:white; font-weight:900; font-size:14px; text-decoration:none; margin-bottom:12px; }
+        .guard-close { color:#9CA3AF; font-size:12px; font-weight:800; cursor:pointer; }
+
+        /* WALI INVITE MODAL */
+        #waliInviteModal { position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1500; display:none; align-items:center; justify-content:center; padding:20px; }
+        .invite-box { background:white; border-radius:32px; padding:30px; text-align:center; width:100%; max-width:320px; }
+        .wali-badge { background:#F0FDF4; color:#10B981; font-size:9px; font-weight:900; padding:2px 8px; border-radius:100px; margin-left:8px; vertical-align:middle; border:1px solid #BBF7D0; }
+        .wali-card { border:1.5px solid #BBF7D0 !important; background:#F0FDF4 !important; }
+
+        .nav-bar { 
+            width:100%; height:95px; background:white; border-top:1px solid #F3F4F6; 
+            display:flex; justify-content:space-around; padding:12px; padding-bottom: max(12px, env(safe-area-inset-bottom));
+            position:absolute; bottom:0; z-index:100; 
+        }
+        .nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#9CA3AF; font-size:10px; font-weight:800; flex:1; }
+        .nav-item.active { color:var(--gold); } 
+        .nav-icon { font-size:24px; margin-bottom:5px; }
+        
+        /* SENTINEL TOAST */
+        #sToast { 
+            position:absolute; bottom:120px; left:50%; transform:translateX(-50%) translateY(100px);
+            background:#111827; color:white; padding:12px 24px; border-radius:100px;
+            font-size:13px; font-weight:700; transition:0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index:3000;
+            white-space:nowrap; border:1px solid rgba(189,139,82,0.3); box-shadow:0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+        #sToast.show { transform:translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header"><h1>Sembang</h1><div style="font-size:22px;">✉️</div></header>
+        <div class="tab-bar"><div class="tab" onclick="setPage(0)" data-t="padan_tab">Padan</div><div class="tab active" onclick="setPage(1)" data-t="sembang_tab">Sembang</div><div class="tab" onclick="setPage(2)" data-t="wali_tab">Wali</div></div>
+        <div class="content-slider" id="slider" style="transform: translateX(-33.333%);">
+            <div class="column"><div id="pList" class="match-grid"></div></div>
+            <div class="column"><div id="cList" class="chat-list"></div></div>
+            <div class="column"><div id="wList" class="chat-list"></div></div>
+        </div>
+        <div id="chatOverlay">
+            <header class="chat-header">
+                <div onclick="closeChat()" style="cursor:pointer; font-size:24px;">‹</div>
+                <div id="activeAv" style="width:38px; height:38px; border-radius:10px; background:var(--gold); display:flex; align-items:center; justify-content:center; color:white; font-weight:900; overflow:hidden;"></div>
+                <div style="flex:1;"><div id="activeName" style="font-weight:900; font-size:16px;">...</div></div>
+            </header>
+            <div class="chat-area" id="chatArea"></div>
+            <div class="chat-input-bar"><input type="text" id="mIn" data-t="mesej_taaruf" placeholder="Mesej taaruf..."><button class="chat-send-btn" onclick="sendMsg()">➔</button></div>
+        </div>
+        <div id="cBg" class="chat-overlay-bg" onclick="closeChat()"></div>
+        <nav class="nav-bar">
+            <a href="home_preview.html" class="nav-item"><div class="nav-icon">🏠</div><span data-t="home">Utama</span></a>
+            <a href="explore_preview.html" class="nav-item"><div class="nav-icon">🔍</div><span data-t="explore">Jelajah</span></a>
+            <a href="sembang.html" class="nav-item active"><div class="nav-icon">💬</div><span data-t="chat">Sembang</span></a>
+            <a href="islam_preview.html" class="nav-item"><div class="nav-icon">🕌</div><span data-t="islam">Islam</span></a>
+            <a href="profile_preview.html" class="nav-item"><div class="nav-icon">👤</div><span data-t="profile">Saya</span></a>
+        </nav>
+
+        <!-- WALI GUARD OVERLAY -->
+        <div id="waliGuard">
+            <div class="guard-box">
+                <div class="guard-icon">🛡️</div>
+                <div class="guard-title" data-t="wali_required">Wali Diperlukan</div>
+                <div class="guard-text" id="guardText" data-t="wali_required_desc">Sila daftarkan Wali anda terlebih dahulu untuk memulakan pertemuan atau menerima jemputan taaruf.</div>
+                <a href="wali_setup_preview.html" class="guard-btn" data-t="daftar_wali_btn">DAFTAR WALI SEKARANG</a>
+                <div class="guard-close" onclick="document.getElementById('waliGuard').style.display='none'" data-t="mungkin_kemudian">Mungkin Kemudian</div>
+            </div>
+        </div>
+
+        <!-- WALI INVITE CONFIRMATION -->
+        <div id="waliInviteModal">
+            <div class="invite-box">
+                <div style="font-size:40px; margin-bottom:15px;">🤝</div>
+                <div style="font-family:'Playfair Display', serif; font-size:20px; font-weight:900; margin-bottom:10px;" data-t="jemput_wali_title">Jemput Wali?</div>
+                <div style="font-size:13px; color:#6B7280; line-height:1.5; margin-bottom:25px; font-weight:600;" data-t="jemput_wali_desc">Sila sahkan untuk menghantar butiran taaruf ini kepada Wali anda & Wali calon untuk tindakan lanjut.</div>
+                <button onclick="confirmWaliInvite()" style="display:block; width:100%; padding:16px; border-radius:100px; background:#10B981; color:white; border:none; font-weight:900; font-size:14px; cursor:pointer; margin-bottom:12px;" data-t="hantar_jemputan">HANTAR JEMPUTAN</button>
+                <div style="color:#9CA3AF; font-size:12px; font-weight:800; cursor:pointer;" onclick="document.getElementById('waliInviteModal').style.display='none'" data-t="batal">BATAL</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- BIOMETRIC SECURITY OVERLAY -->
+    <div id="biometricLock" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:3000; align-items:center; justify-content:center; padding:30px; backdrop-filter:blur(15px);">
+        <div class="guard-box" style="background:#0F172A; border:1px solid rgba(189,139,82,0.3); color:white;">
+            <div style="width:100px; height:100px; border:2px solid var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 25px; position:relative;">
+                <div style="font-size:40px; animation: pulse 2s infinite;">👤</div>
+                <div style="position:absolute; inset:-8px; border:1.5px solid rgba(189,139,82,0.2); border-radius:50%; animation: ping 1.5s infinite;"></div>
+            </div>
+            <div class="guard-title" style="color:white;" data-t="biometric_lock_title">Keselamatan Biometrik</div>
+            <div class="guard-text" style="color:#94A3B8;" data-t="biometric_lock_desc">Demi keselamatan anda, sila sahkan identiti sebelum melakukan tindakan ini.</div>
+            <button id="bioVerifyBtn" class="guard-btn" style="background:var(--gold);" data-t="biometric_verify_title">SAHKAN BIOMETRIK</button>
+            <div class="guard-close" onclick="document.getElementById('biometricLock').style.display='none'" data-t="batal">BATAL</div>
+        </div>
+    </div>
+
+    <!-- HALAL GUARD TOAST -->
+    <div id="sToast"></div>
+
+    <!-- MEETING SCHEDULER MODAL -->
+    <div id="meetingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2500; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(8px);">
+        <div class="guard-box" style="width:100%; max-width:340px; text-align:left; padding:30px;">
+            <div style="font-size:32px; margin-bottom:15px;">🗓️</div>
+            <div class="guard-title" data-t="bincang_pertemuan">Bincang Pertemuan</div>
+            <p style="font-size:12px; color:#6B7280; margin-bottom:20px; font-weight:600;" data-t="meeting_invite_desc">Sila tetapkan lokasi dan masa untuk pertemuan fizikal bersama calon.</p>
+            
+            <div style="margin-bottom:15px;">
+                <label style="font-size:10px; font-weight:900; color:#9CA3AF; text-transform:uppercase;" data-t="pilih_lokasi">Pilih Lokasi</label>
+                <input type="text" id="meetLoc" data-t="cari_lokasi_placeholder" placeholder="Cari kafe atau masjid..." style="width:100%; padding:12px; border-radius:12px; border:1.5px solid #F3F4F6; font-size:13px; font-weight:700; outline:none; margin-top:5px;">
+            </div>
+
+            <div style="display:flex; gap:10px; margin-bottom:25px;">
+                <div style="flex:1;">
+                    <label style="font-size:10px; font-weight:900; color:#9CA3AF; text-transform:uppercase;" data-t="tarikh_pertemuan">Tarikh</label>
+                    <input type="date" id="meetDate" style="width:100%; padding:12px; border-radius:12px; border:1.5px solid #F3F4F6; font-size:12px; font-weight:700; outline:none; margin-top:5px;">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:10px; font-weight:900; color:#9CA3AF; text-transform:uppercase;" data-t="masa_pertemuan">Masa</label>
+                    <input type="time" id="meetTime" style="width:100%; padding:12px; border-radius:12px; border:1.5px solid #F3F4F6; font-size:12px; font-weight:700; outline:none; margin-top:5px;">
+                </div>
+            </div>
+
+            <button onclick="hantarJemputanMeeting()" class="guard-btn" style="background:#10B981; border:none; width:100%;" data-t="hantar_jemputan_meeting">HANTAR JEMPUTAN</button>
+            <div class="guard-close" onclick="document.getElementById('meetingModal').style.display='none'" style="text-align:center; display:block; margin-top:15px;" data-t="batal">BATAL</div>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        @keyframes ping { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.4); opacity: 0; } }
+    </style>
+    <script type="module">
+        import { DB } from './database.js';
+        const { doc, getDoc, onSnapshot, collection, query, orderBy, serverTimestamp, addDoc, getDocs } = window.fs_sdk;
+        
+        let activeMatchId = null; let myUid = null; let myPhone = null; let myEmail = null; let unsub = null;
+        
+        const isMe = (id, p, e) => {
+            if (id && myUid && id === myUid) return true;
+            if (p && myPhone && p === myPhone) return true;
+            if (e && myEmail && e.toLowerCase() === myEmail.toLowerCase()) return true;
+            return false;
+        };
+
+        function formatMsgTime(ts) {
+            if(!ts) return "";
+            const d = ts.toDate ? ts.toDate() : new Date(ts);
+            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        window.setPage = (idx) => { document.getElementById('slider').style.transform = `translateX(-${(idx*100)/3}%)`; const tabs = document.querySelectorAll('.tab'); tabs.forEach((t, i) => t.classList.toggle('active', i === idx)); };
+        window.openChat = async (mid) => {
+            activeMatchId = mid; 
+            const db = window.firestore_db; 
+            const mSnap = await getDoc(doc(db, "chats", mid)); if(!mSnap.exists()) return;
+            const match = mSnap.data(); 
+            const targetId = isMe(match.memberA, match.memberAPhone, match.memberAEmail) ? match.memberB : match.memberA;
+            const tSnap = await getDoc(doc(db, "users", targetId)); const target = tSnap.data() || { fullName: "User" };
+            const displayName = target.fullName || target.name || "User";
+            
+            document.getElementById('activeName').innerText = displayName;
+            document.getElementById('activeAv').innerHTML = target.photoUrl ? `<img src="${target.photoUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=BD8B52&color=fff'">` : `<div style="width:100%; height:100%; background:var(--gold); display:flex; align-items:center; justify-content:center; color:white; font-weight:900;">${(displayName || "U")[0]}</div>`;
+            
+            const header = document.querySelector('.chat-header');
+            if(!document.getElementById('hBtn')) {
+                const btn = document.createElement('div'); btn.id = 'hBtn'; btn.style = "cursor:pointer; font-size:22px; padding:8px; background:#F0FDF4; border-radius:12px; border:1px solid #BBF7D0;";
+                btn.innerHTML = "🤝"; btn.onclick = () => window.triggerWaliInvite(); header.appendChild(btn);
+                
+                const mBtn = document.createElement('div'); mBtn.id = 'mBtn'; mBtn.style = "cursor:pointer; font-size:22px; padding:8px; background:#FDF2F8; border-radius:12px; border:1px solid #FBCFE8; margin-left:8px;";
+                mBtn.innerHTML = "🗓️"; mBtn.onclick = () => document.getElementById('meetingModal').style.display = 'flex'; header.appendChild(mBtn);
+            }
+
+            window.closeChat = () => {
+                document.getElementById('chatOverlay').classList.remove('active');
+                document.getElementById('cBg').style.opacity = '0';
+                setTimeout(() => document.getElementById('cBg').style.display = 'none', 300);
+                if(unsub) unsub();
+            };
+
+            document.getElementById('chatOverlay').classList.add('active');
+            document.getElementById('cBg').style.display = 'block'; setTimeout(() => document.getElementById('cBg').style.opacity = '1', 10);
+            
+            if(unsub) unsub();
+            unsub = onSnapshot(query(collection(db, "chats", mid, "messages"), orderBy("time", "asc")), async (snap) => {
+                const area = document.getElementById('chatArea'); 
+                const shouldScroll = area.scrollTop + area.offsetHeight >= area.scrollHeight - 50;
+                area.innerHTML = '';
+                snap.forEach(d => {
+                    const m = d.data(); const el = document.createElement('div');
+                    const timeStr = formatMsgTime(m.time);
+                    if(m.type === 'wali_invite') {
+                        el.style = "align-self:stretch; background:white; border:1.5px solid #BBF7D0; padding:20px; border-radius:24px; text-align:center; box-shadow:0 10px 25px rgba(16,185,129,0.05); margin:10px 0;";
+                        el.innerHTML = `<div style="font-size:24px; margin-bottom:10px;">🛡️</div><div style="font-size:14px; font-weight:800; color:#065F46; margin-bottom:4px;">GUARDIAN PROTOCOL INITIATED</div><div style="font-size:13px; font-weight:600; color:#374151; margin-bottom:16px; line-height:1.4;">${m.text}</div>${m.from !== myUid ? `<div style="display:flex; gap:10px;"><button onclick="acceptInvite('${mid}')" style="flex:1; padding:12px; border-radius:12px; background:#10B981; color:white; border:none; font-weight:800; font-size:12px;">ACCEPT</button><button onclick="document.getElementById('waliGuard').style.display='none'" style="flex:1; padding:12px; border-radius:12px; background:#F3F4F6; color:#6B7280; border:none; font-weight:800; font-size:12px;">DECLINE</button></div>` : `<div style="font-size:11px; font-weight:700; color:#9CA3AF;">Awaiting Guardian Feedback...</div>`}`;
+                    } else if(m.type === 'meeting_invite') {
+                        const d = m.meetingDetails || {};
+                        const waliAIsWoman = match.memberAGender === 'woman';
+                        const isApproved = waliAIsWoman ? match.meetingWaliAConfirmed : match.meetingWaliBConfirmed;
+                        
+                        el.style = `align-self:stretch; background:white; border:1.5px solid ${isApproved ? '#10B981' : '#FBCFE8'}; padding:20px; border-radius:24px; text-align:center; box-shadow:0 10px 25px ${isApproved ? 'rgba(16,185,129,0.1)' : 'rgba(219,39,119,0.05)'}; margin:10px 0;`;
+                        
+                        if(isApproved) {
+                            el.innerHTML = `<div style="font-size:24px; margin-bottom:10px;">✅</div><div style="font-size:14px; font-weight:800; color:#065F46; margin-bottom:4px;">MEETING OFFICIALLY APPROVED!</div><div style="font-size:11px; font-weight:700; color:#166534; background:#DCFCE7; padding:10px; border-radius:15px; margin-bottom:15px;">📍 ${d.place}<br>📅 ${d.date} | ⏰ ${d.time}</div><div style="font-size:11px; font-weight:700; color:#059669; text-transform:uppercase; letter-spacing:1px;">READY FOR TAARUF</div>`;
+                        } else {
+                            el.innerHTML = `<div style="font-size:24px; margin-bottom:10px;">🗓️</div><div style="font-size:14px; font-weight:800; color:#9D174D; margin-bottom:4px;">TAARUF MEETING SCHEDULED</div><div style="font-size:11px; font-weight:700; color:#6B7280; background:#FDF2F8; padding:10px; border-radius:15px; margin-bottom:15px;">📍 ${d.place}<br>📅 ${d.date} | ⏰ ${d.time}</div><div style="font-size:11px; font-weight:700; color:#94A3B8; text-transform:uppercase; letter-spacing:1px;">AWAITING GUARDIAN REVIEW</div>`;
+                        }
+                    } else if(m.type === 'system') {
+                        el.style = "align-self:center; background:rgba(189,139,82,0.1); color:var(--gold); padding:8px 16px; border-radius:100px; font-size:11px; font-weight:800; margin:10px 0; border:1px dashed var(--gold);"; el.innerText = m.text;
+                    } else {
+                        const senderName = isMe(m.from, m.fromPhone, m.fromEmail) ? "ME" : (displayName || "CALON");
+                        el.className = `msg ${isMe(m.from, m.fromPhone, m.fromEmail) ? 'me' : 'them'}`; 
+                        el.innerHTML = `<span class="m-sender">${senderName}</span>${m.text}<span class="m-time">${timeStr}</span>`;
+                    }
+                    area.appendChild(el);
+                });
+                if(shouldScroll) area.scrollTop = area.scrollHeight;
+                else area.scrollTop = area.scrollHeight; 
+            });
+        };
+        window.triggerWaliInvite = async () => { 
+            const ready = await DB.isWaliReady();
+            if(!ready) {
+                document.getElementById('guardText').innerText = window.I18N.t('wali_guard_invite');
+                document.getElementById('waliGuard').style.display = 'flex';
+                return;
+            }
+            document.getElementById('waliInviteModal').style.display = 'flex'; 
+        };
+
+        window.withBiometricSecurity = (callback) => {
+            const lock = document.getElementById('biometricLock');
+            const btn = document.getElementById('bioVerifyBtn');
+            lock.style.display = 'flex';
+            btn.onclick = async () => {
+                btn.disabled = true;
+                btn.innerText = window.I18N.t('biometric_scan') || "Scanning...";
+                await new Promise(r => setTimeout(r, 1500));
+                btn.innerText = window.I18N.t('biometric_success') || "Verified!";
+                await new Promise(r => setTimeout(r, 800));
+                lock.style.display = 'none';
+                btn.disabled = false;
+                btn.innerText = window.I18N.t('biometric_verify_title');
+                callback();
+            };
+        };
+
+        window.confirmWaliInvite = async () => { 
+            document.getElementById('waliInviteModal').style.display = 'none'; 
+            window.withBiometricSecurity(async () => {
+                await DB.sendWaliInvite(activeMatchId, myUid); 
+            });
+        };
+        window.hantarJemputanMeeting = async () => {
+            const loc = document.getElementById('meetLoc').value;
+            const date = document.getElementById('meetDate').value;
+            const time = document.getElementById('meetTime').value;
+            if(!loc || !date || !time) return alert("Sila isi semua maklumat pertemuan.");
+
+            document.getElementById('meetingModal').style.display = 'none';
+            window.withBiometricSecurity(async () => {
+                const ok = await DB.sendMeetingInvite(activeMatchId, myUid, { place: loc, date, time });
+                if(ok) {
+                    showSentinelToast(window.I18N.t('dossier_email_sim'));
+                    // Generate specialized meeting dossier
+                    await generateTaarufReport(activeMatchId, true);
+                }
+            });
+        };
+
+        function showSentinelToast(msg) {
+            const toast = document.getElementById('sToast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.style.display = 'none', 400);
+            }, 5000);
+        }
+
+        window.acceptInvite = async (mid) => {
+            const ready = await DB.isWaliReady();
+            if(!ready) {
+                document.getElementById('guardText').innerText = window.I18N.t('wali_guard_accept');
+                document.getElementById('waliGuard').style.display = 'flex';
+                return;
+            }
+            window.withBiometricSecurity(async () => {
+                const ok = await DB.acceptWaliInvite(mid, myUid);
+                if(ok) { 
+                    showSentinelToast(window.I18N.t('report_gen_success')); 
+                    await generateTaarufReport(mid); 
+                }
+            });
+        };
+
+        async function generateTaarufReport(mid, isMeeting = false) {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF(); const db = window.firestore_db;
+            const { getDoc, doc: fsDoc, collection, getDocs, orderBy, query } = window.fs_sdk;
+            
+            const mSnap = await getDoc(fsDoc(db, "chats", mid)); if(!mSnap.exists()) return;
+            const chat = mSnap.data();
+            const [u1Snap, u2Snap] = await Promise.all([getDoc(fsDoc(db, "users", chat.memberA)), getDoc(fsDoc(db, "users", chat.memberB))]);
+            const u1 = { uid: u1Snap.id, ...u1Snap.data() }; const u2 = { uid: u2Snap.id, ...u2Snap.data() };
+            const me = u1.uid === myUid ? u1 : u2; const partner = u1.uid === myUid ? u2 : u1;
+            const msgsSnap = await getDocs(query(collection(db, "chats", mid, "messages"), orderBy("time", "asc")));
+            
+            const getImg = (url) => new Promise((res) => { if(!url) res(null); const img = new Image(); img.crossOrigin = "anonymous"; img.onload = () => { const canvas = document.createElement("canvas"); canvas.width = img.width; canvas.height = img.height; const ctx = canvas.getContext("2d"); ctx.drawImage(img, 0, 0); res(canvas.toDataURL("image/jpeg")); }; img.onerror = () => res(null); img.src = url; });
+            const myPicData = await getImg(me.photoUrl);
+
+            // PAGE 1: EXECUTIVE DASHBOARD
+            doc.setFillColor(252, 250, 247); doc.rect(0, 0, 210, 297, "F");
+            doc.setDrawColor(189, 139, 82); doc.setLineWidth(0.5); doc.rect(5, 5, 200, 287);
+            doc.setFillColor(189, 139, 82); doc.rect(0, 0, 210, 40, "F");
+            doc.setFontSize(22); doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.text("GUARDIAN HANDSHAKE DOSSIER", 105, 25, { align: "center" });
+
+            // LEFT SIDE: PROFILE PHOTO
+            const x = 15;
+            doc.setDrawColor(189, 139, 82); doc.setLineWidth(1); doc.rect(x, 50, 70, 70);
+            if(myPicData) doc.addImage(myPicData, 'JPEG', x, 50, 70, 70);
+            
+            doc.setTextColor(31, 41, 55); doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.text((me.fullName || "Participant").toUpperCase(), x+35, 135, {align:"center"});
+            doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.text(`${me.age || "?"} Years Old | ${me.state || "Malaysia"}`, x+35, 143, {align:"center"});
+
+            // RIGHT SIDE: GREETING & BIO
+            const rx = 100;
+            doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.setTextColor(189, 139, 82); doc.text("Greetings Guardian,", rx, 58);
+            doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(31, 41, 55); doc.setLineHeightFactor(1.4);
+            const introMsg = [
+                "This comprehensive dossier provides a verified background of the candidate.",
+                "Jodohku Sentinel protocol ensures transparency through chat review and",
+                "identity verification. Your blessing is the final key to this meeting."
+            ];
+            doc.text(introMsg, rx, 65);
+
+            doc.setFont("helvetica", "bold"); doc.text("CANDIDATE BIOGRAPHY:", rx, 90);
+            doc.setFont("helvetica", "normal"); doc.setTextColor(71, 85, 105);
+            doc.text(doc.splitTextToSize(me.bio || "No biography provided.", 95), rx, 97);
+
+            // INFO GRID
+            doc.setDrawColor(229, 231, 235); doc.line(15, 160, 195, 160);
+            doc.setTextColor(189, 139, 82); doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text("DETAILED CANDIDATE INFORMATION", 105, 172, {align:"center"});
+            
+            const gridY = 185; const col1 = 20, col2 = 110;
+            doc.setFontSize(9); doc.setTextColor(31, 41, 55);
+            doc.setFont("helvetica", "bold"); doc.text("PROFESSION:", col1, gridY); 
+            doc.setFont("helvetica", "normal"); doc.text(me.profession || "Executive", col1+45, gridY);
+            doc.setFont("helvetica", "bold"); doc.text("EST. SALARY:", col2, gridY); 
+            doc.setFont("helvetica", "normal"); doc.text(me.salary || "N/A", col2+45, gridY);
+            
+            doc.setFont("helvetica", "bold"); doc.text("EDUCATION:", col1, gridY+10); 
+            doc.setFont("helvetica", "normal"); doc.text(me.education || "University", col1+45, gridY+10);
+            doc.setFont("helvetica", "bold"); doc.text("HOBBIES:", col2, gridY+10); 
+            doc.setFont("helvetica", "normal"); doc.text(me.hobbies || "Reading, Travel", col2+45, gridY+10);
+
+            doc.setFont("helvetica", "bold"); doc.text("INTERESTS:", col1, gridY+20); 
+            doc.setFont("helvetica", "normal"); doc.text(me.interests || "Family, Religion", col1+45, gridY+20);
+
+            // LOGISTICS
+            doc.setDrawColor(189, 139, 82); doc.setLineWidth(0.5); doc.roundedRect(15, 235, 180, 45, 5, 5);
+            doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text("PROPOSED TAARUF LOGISTICS", 105, 245, {align:"center"});
+            if(isMeeting && chat.meetingDetails) {
+                doc.setFontSize(14); doc.setTextColor(189, 139, 82); doc.text(`SITE: ${chat.meetingDetails.place}`, 105, 258, {align:"center"});
+                doc.setFontSize(10); doc.setTextColor(31, 41, 55); doc.setFont("helvetica", "normal");
+                doc.text(`SCHEDULED FOR: ${chat.meetingDetails.date} at ${chat.meetingDetails.time}`, 105, 268, {align:"center"});
+            } else {
+                doc.setFontSize(11); doc.setTextColor(100); doc.text("Logistics will be confirmed upon initial handshake review.", 105, 260, {align:"center"});
+            }
+
+            // PAGE 2: TRANSCRIPT & PORTAL
+            doc.addPage(); doc.setFillColor(252, 250, 247); doc.rect(0, 0, 210, 297, "F");
+            doc.setDrawColor(189, 139, 82); doc.rect(5, 5, 200, 287);
+            doc.setFontSize(16); doc.setTextColor(189, 139, 82); doc.setFont("helvetica", "bold"); doc.text("CONVERSATION TRANSCRIPT", 105, 25, {align:"center"});
+            
+            let ty = 45;
+            msgsSnap.forEach(d => {
+                const m = d.data(); const sName = m.from === u1Snap.id ? u1.fullName : u2.fullName;
+                const t = m.time ? m.time.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "";
+                if(ty > 220) { doc.addPage(); ty = 25; doc.setFillColor(252, 250, 247); doc.rect(0, 0, 210, 297, "F"); doc.setDrawColor(189, 139, 82); doc.rect(5, 5, 200, 287); }
+                doc.setFontSize(9); doc.setTextColor(31, 41, 55); doc.setFont("helvetica", "bold"); doc.text(`${sName}: `, 20, ty);
+                doc.setFont("helvetica", "normal"); doc.text(doc.splitTextToSize(m.text || "", 150), 45, ty);
+                doc.setFontSize(7); doc.setTextColor(150, 150, 150); doc.text(t, 180, ty);
+                ty += 10;
+            });
+            
+            // ACTION PORTAL
+            const mySide = chat.memberA === myUid ? 'A' : 'B';
+            const confirmUrl = `${window.location.origin}/wali_confirm.html?mid=${mid}&side=${mySide}&type=${isMeeting?'meeting':'taaruf'}`;
+            doc.setFillColor(189,139,82); doc.roundedRect(30, 240, 150, 30, 5, 5, "F");
+            doc.setTextColor(255,255,255); doc.setFontSize(16); doc.text(">>> AUTHORIZE MEETING <<<", 105, 260, {align:"center"});
+            doc.setFontSize(9); doc.text("Secure Sentinel Verification Link", 105, 275, {align:"center"});
+            doc.link(30, 240, 150, 30, { url: confirmUrl });
+
+            doc.save(`Elite_Dossier_${partner.fullName || "Candidate"}.pdf`);
+            console.log(`[Elite Security] Dossier generated for ${isMeeting?'meeting':'taaruf'}. Email sent to Wali with link: ${confirmUrl}`);
+        }
+        window.closeChat = () => { document.getElementById('chatOverlay').classList.remove('active'); if(unsub) unsub(); };
+        window.sendMsg = async () => { 
+            const input = document.getElementById('mIn'); 
+            const text = input.value.trim(); 
+            if(!text || !activeMatchId) return; 
+
+            const res = await DB.sendMessage(activeMatchId, myUid, text, 'text', myPhone, myEmail); 
+            input.value = ''; 
+
+            if(res && res.flagged) {
+                let msg = "Sentinel AI: Mesej disekat.";
+                if(res.type === 'unofficial_meeting') msg = "🛡️ Gunakan Butang 'MEET' untuk pertemuan rasmi.";
+                else if(res.type === 'bad_language') msg = "⚠️ Sila jaga kesantunan bahasa anda.";
+                else if(res.type === 'privacy_leak') msg = "🔒 Info peribadi disembunyikan demi keselamatan.";
+                
+                const toast = document.getElementById('sToast');
+                toast.innerText = msg;
+                toast.style.display = 'block';
+                setTimeout(() => toast.classList.add('show'), 10);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.style.display = 'none', 400);
+                }, 3000);
+            }
+        }
+        function formatTime(ts) {
+            if(!ts) return "Baru"; const date = ts.toDate ? ts.toDate() : new Date(ts); const now = new Date(); const diff = (now - date) / 1000;
+            if(diff < 60) return "Seketika tadi"; if(diff < 3600) return Math.floor(diff/60) + "m";
+            if(date.toDateString() === now.toDateString()) return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1); if(date.toDateString() === yesterday.toDateString()) return "Semalam";
+            return date.toLocaleDateString([], {day:'numeric', month:'short'});
+        }
+        async function init() {
+            setPage(1); for(let i=0; i<10; i++) { if(window.firestore_db) break; await new Promise(r => setTimeout(r, 200)); }
+            const me = await DB.getCurrentUser(); if(!me) { document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed; bottom:110px; width:100%; text-align:center; color:red; font-size:10px; z-index:9999;">Session Error: No User</div>'); return; }
+            myUid = me.uid; myPhone = me.phone || ""; myEmail = me.email || "";
+            const db = window.firestore_db; const { collection, onSnapshot, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            const updateUI = async (snapDocs) => {
+                pList.innerHTML = ''; cList.innerHTML = ''; wList.innerHTML = '';
+                
+                const emptyMsg = (key) => `<div style="grid-column: 1/-1; text-align:center; padding:60px 40px; color:#9CA3AF; font-size:13px; font-weight:700;">${window.I18N.t(key)}</div>`;
+
+                if (snapDocs.length === 0) { 
+                    pList.innerHTML = emptyMsg('tiada_padanan_lagi'); 
+                    cList.innerHTML = emptyMsg('tiada_sembang_lagi');
+                    wList.innerHTML = emptyMsg('tiada_wali_lagi');
+                    return; 
+                }
+                for (const d of snapDocs) {
+                    const c = d.data(); 
+                    const isA = isMe(c.memberA, c.memberAPhone, c.memberAEmail);
+                    const partnerId = isA ? c.memberB : c.memberA;
+                    if(!partnerId) continue;
+                    try {
+                        let partner = { uid: partnerId, fullName: "Calon Jodohku" }; const pSnap = await getDoc(doc(db, "users", partnerId)); if(pSnap.exists()) partner = { uid: pSnap.id, ...pSnap.data() };
+                        const displayName = partner.fullName || partner.name || "User";
+                        const av = partner.photoUrl ? `<img src="${partner.photoUrl}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=BD8B52&color=fff'">` : `<div>${(displayName || "U")[0]}</div>`;
+                        const chatId = d.id; const msg = c.lastMessage || "Padanan Berjaya! ✨"; const time = formatTime(c.lastTime);
+                        if(c.isWaliActive) wList.appendChild(createItem(chatId, partner, av, true, msg, time, c));
+                        else if(!c.lastTime || c.lastMessage === "Padanan Berjaya! ✨") pList.appendChild(createMatchCard(chatId, partner, av));
+                        else cList.appendChild(createItem(chatId, partner, av, false, msg, time, c));
+                    } catch (e) { console.error("❌ UI Render Error:", e); }
+                }
+            };
+            onSnapshot(collection(db, "chats"), (snapshot) => {
+                const myChats = snapshot.docs.filter(d => { 
+                    const data = d.data(); 
+                    const isAnyA = isMe(data.memberA, data.memberAPhone, data.memberAEmail);
+                    const isAnyB = isMe(data.memberB, data.memberBPhone, data.memberBEmail);
+                    return isAnyA || isAnyB; 
+                });
+                updateUI(myChats);
+                
+                // Final check for specific column empty states after loop
+                setTimeout(() => {
+                    const emptyMsg = (key) => `<div style="text-align:center; padding:60px 40px; color:#9CA3AF; font-size:13px; font-weight:700;">${window.I18N.t(key)}</div>`;
+                    if(!document.getElementById('pList').innerHTML) document.getElementById('pList').innerHTML = emptyMsg('tiada_padanan_lagi');
+                    if(!document.getElementById('cList').innerHTML) document.getElementById('cList').innerHTML = emptyMsg('tiada_sembang_lagi');
+                    if(!document.getElementById('wList').innerHTML) document.getElementById('wList').innerHTML = emptyMsg('tiada_wali_lagi');
+                }, 500);
+            });
+        }
+        function createMatchCard(hid, u, av) {
+            const displayName = u.fullName || u.name || "User"; const name = displayName.split(' ')[0];
+            const div = document.createElement('div'); div.className = 'match-card'; div.innerHTML = `<div class="match-av">${av}</div><div class="match-n">${name}</div>`;
+            div.onclick = () => openChat(hid); return div;
+        }
+        function createItem(hid, u, av, isWali, lastMsg, lastTime, c) {
+            const name = u.fullName || u.name || "User";
+            const div = document.createElement('div'); div.className = `chat-item ${isWali ? 'wali-card' : ''}`;
+            
+            let waliInfoContent = `<div class="chat-msg">${lastMsg}</div>`;
+            if(isWali && c) {
+                const sideMe = c.memberA === myUid ? 'A' : 'B';
+                const sideThem = sideMe === 'A' ? 'B' : 'A';
+                const statusMe = c[`wali${sideMe}Confirmed`] ? window.I18N.t('wali_confirmed') : window.I18N.t('wali_pending');
+                const statusThem = c[`wali${sideThem}Confirmed`] ? window.I18N.t('wali_confirmed') : window.I18N.t('wali_pending');
+                const allGood = c.waliAConfirmed && c.waliBConfirmed;
+                
+                waliInfoContent = `
+                    <div style="font-size:11px; font-weight:800; color:var(--gold); margin-bottom:6px;">
+                        ${window.I18N.t('wali_anda') || "Wali Anda"}: ${statusMe} | ${window.I18N.t('wali_calon') || "Wali Calon"}: ${statusThem}
+                        ${allGood ? `<div style="margin-top:4px; font-size:12px; color:#166534;">${window.I18N.t('all_safe_handshake')}</div>` : ''}
+                    </div>
+                    ${c.meetingPending ? `
+                    <div style="background:#FDF2F8; border:1px solid #FBCFE8; padding:10px; border-radius:12px; margin-top:10px;">
+                        <div style="font-size:9px; font-weight:900; color:#BE185D; text-transform:uppercase; margin-bottom:4px;">STATUS PERTEMUAN FIZIKAL</div>
+                        <div style="font-size:10px; font-weight:700; color:#475569;">
+                            Wali A: <span style="color:${c.meetingWaliAConfirmed ? '#166534' : '#BE185D'}">${c.meetingWaliAConfirmed ? 'CONFIRMED ✅' : 'PENDING...'}</span> | 
+                            Wali B: <span style="color:${c.meetingWaliBConfirmed ? '#166534' : '#BE185D'}">${c.meetingWaliBConfirmed ? 'CONFIRMED ✅' : 'PENDING...'}</span>
+                        </div>
+                    </div>` : ''}
+                    <div style="display:flex; gap:6px; margin-top:10px;">
+                        <button onclick="event.stopPropagation(); window.copyWaliLink('${hid}', '${sideMe}', 'taaruf')" style="font-size:8px; padding:4px 8px; border-radius:6px; border:1px solid #E5E7EB; background:white; font-weight:900;" data-t="copy_wali_link">${window.I18N.t('copy_wali_link')}</button>
+                        ${c.meetingPending ? `<button onclick="event.stopPropagation(); window.copyWaliLink('${hid}', '${sideMe}', 'meeting')" style="font-size:8px; padding:4px 8px; border-radius:6px; background:#FDF2F8; border:1px solid #FBCFE8; color:#BE185D; font-weight:900;">Salin Pautan Pertemuan</button>` : ''}
+                    </div>
+                `;
+            }
+
+            div.innerHTML = `
+                <div class="chat-av">${av}</div>
+                <div class="chat-info">
+                    <div class="chat-name">${name}${isWali ? '<span class="wali-badge">WALI</span>' : ''}</div>
+                    ${waliInfoContent}
+                </div>
+                <div class="chat-time">${lastTime}</div>
+            `;
+            div.onclick = () => openChat(hid); 
+            return div;
+        }
+
+        window.copyWaliLink = (mid, side, type = 'taaruf') => {
+            const url = `${window.location.origin}/wali_confirm.html?mid=${mid}&side=${side}&type=${type}`;
+            navigator.clipboard.writeText(url);
+            alert(window.I18N.t('link_copied_alert'));
+        };
+        init();
+    </script>
+</body>
+</html>

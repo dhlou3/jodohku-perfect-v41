@@ -1,0 +1,32 @@
+{
+  "login": "Sign In",
+  "welcome_back": "Welcome Home",
+  "login_subtitle": "Sign in to your Jodohku account",
+  "phone_no": "Phone Number",
+  "password": "Password",
+  "register_new": "Create New Account",
+  "full_name": "Full Name (As per MyKad/Passport)",
+  "ic_no": "National ID Number",
+  
+  "empire_sultan": "Sultan Mode",
+  "empire_sovereign": "Sovereign Rank",
+  "ai_sentinel": "AI Sentinel Guardian",
+  "security_audit": "Security Audit",
+  
+  "wali_hub": "Guardian Hub",
+  "wali_dashboard": "Guardian Dashboard",
+  "wali_approval": "Guardian Consent",
+  
+  "taaruf_engine": "Taaruf Protocol",
+  "taaruf_questions": "30 Serious Taaruf Questions",
+  "nikah_roadmap": "Pathway to Nikah",
+  
+  "safe_venue": "JAKIM Verified Locations",
+  "vendor_marketplace": "Nikah Vendor Directory",
+  "search_halal": "Search Halal Cafes...",
+  
+  "match_score": "{score}% Soulmate Sync",
+  "trust_score": "{score}% Integrity Level",
+  "is_verified": "Verified Member",
+  "is_sovereign": "Exclusive Profile"
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Global Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/app_styles.css">
+    <style>
+        .error-msg { background: rgba(225, 29, 72, 0.1); color: #E11D48; padding: 15px; border-radius: 16px; margin-bottom: 20px; font-size: 13px; font-weight: 600; text-align: center; display: none; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="notch"></div>
+        
+        <div class="page-content" style="display: flex; flex-direction: column; height: 100%;">
+            <a href="landing_preview.html" style="color: var(--cyan); text-decoration: none; font-size: 14px; margin-bottom: 20px; display: block;">← Back</a>
+            
+            <h1 class="logo-large">Jodoh<span>ku</span></h1>
+            <p class="tagline">Langkah pertama ke arah halal happiness.</p>
+
+            <div id="errorMsg" class="error-msg"></div>
+
+            <div class="input-group">
+                <label>FULL NAME (AS PER IC)</label>
+                <div class="input-box">
+                    <input type="text" id="nameField" placeholder="Contoh: Amin Mohamed">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>IC NUMBER (12 DIGITS)</label>
+                <div class="input-box">
+                    <input type="tel" id="icField" placeholder="896541223652" maxlength="12">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>PHONE NUMBER (SMS VERIFY)</label>
+                <div class="input-box">
+                    <span style="color: var(--gold); font-weight: 700;">+60</span>
+                    <input type="tel" id="phoneField" placeholder="173160718">
+                </div>
+            </div>
+
+            <!-- Necessary for SMS Protection (Invisible) -->
+            <div id="recaptcha-anchor"></div>
+
+            <button class="btn btn-gold" id="regBtn" onclick="handleSMSRequest()" style="margin-top: auto;">SEND VERIFICATION CODE →</button>
+            <p style="text-align: center; margin-top: 20px; font-size: 11px; color: rgba(255,255,255,0.4);">
+                Secured by Google Cloud Platform 🛡️
+            </p>
+        </div>
+    </div>
+
+    <script type="module">
+        import './database.js?v=8';
+
+        window.handleSMSRequest = async function() {
+            const btn = document.getElementById('regBtn');
+            const name = document.getElementById('nameField').value.trim();
+            const ic = document.getElementById('icField').value.trim();
+            const phone = document.getElementById('phoneField').value.trim();
+            const errorEl = document.getElementById('errorMsg');
+            
+            errorEl.style.display = 'none';
+
+            if (!name || ic.length !== 12 || phone.length < 8) {
+                errorEl.innerText = "Sila lengkapkan nama, IC (12 digit) dan telefon.";
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            btn.innerText = "HANTAR SMS... ⏳";
+            btn.disabled = true;
+
+            const finalPhone = "+60" + (phone.startsWith('0') ? phone.substring(1) : phone);
+
+            // SAVE DATA TEMPORARILY (Pending verification)
+            sessionStorage.setItem('pending_user', JSON.stringify({
+                name: name,
+                ic: ic,
+                phone: finalPhone
+            }));
+
+            // REQUEST REAL SMS
+            const sent = await DB.requestOTP(finalPhone, 'recaptcha-anchor');
+
+            if (sent) {
+                window.location.href = 'otp_preview.html';
+            } else {
+                btn.innerText = "SEND VERIFICATION CODE →";
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>

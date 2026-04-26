@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jodohku v4 - FINAL VERIFIED</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#FBF6EF; --emerald:#064E3B; --gold:#D4AF37; --amber:#C47A2E; --text:#2C1A08; --div:#E8DDD0; --dark-surf: #0F172A; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'DM Sans', sans-serif; }
+        body { background:#DDD0C4; display:flex; align-items:center; justify-content:center; height:100vh; overflow:hidden; }
+        #phone { width:375px; height:780px; background:var(--bg); border-radius:44px; border:10px solid #1a1a1a; position:relative; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,0.2); }
+        .screen { position:absolute; inset:0; display:none; flex-direction:column; background:var(--bg); overflow-y:auto; padding-bottom:100px; z-index: 10; }
+        .screen.active { display:flex; }
+        .ab { height:60px; display:flex; align-items:center; padding:45px 20px 10px; background:white; border-bottom:1px solid var(--div); flex-shrink:0; }
+        .logo { font-family:'Playfair Display', serif; font-size:26px; font-weight:900; color:var(--amber); }
+        .bn { position:absolute; bottom:0; width:100%; height:85px; background:white; border-top:1px solid var(--div); display:flex; justify-content:space-around; padding-top:10px; z-index:100; }
+        .ni { display:flex; flex-direction:column; align-items:center; color:#BBB; cursor:pointer; }
+        .ni.on { color:var(--amber); }
+        .ni span { font-size:10px; font-weight:700; margin-top:4px; }
+        
+        /* REGISTER PAGE (Based on media__1775691738853.png) */
+        .reg-screen { background: var(--dark-surf); color: white; padding: 40px 20px; min-height: 100%; }
+        .reg-title { font-family: 'Playfair Display'; font-size: 28px; font-weight: 900; }
+        .reg-sub { font-size: 11px; opacity: 0.7; margin: 4px 0 30px; }
+        .reg-label { font-size: 9px; font-weight: 900; color: #64748B; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .reg-input { width: 100%; padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 20px; color: white; }
+        
+        /* PORTRAITS */
+        .p-card { width:335px; height:490px; margin:20px auto; border-radius:32px; background:white; border:1px solid var(--div); overflow:hidden; position:relative; box-shadow:0 15px 30px rgba(0,0,0,0.08); }
+        .p-img { width:100%; height:100%; object-fit:cover; }
+        .p-overlay { position:absolute; bottom:0; width:100%; padding:35px 25px 25px; background:linear-gradient(0deg, var(--emerald) 0%, rgba(6,78,59,0.8) 40%, transparent 100%); color:white; }
+    </style>
+</head>
+<body>
+<div id="phone">
+    <!-- REGISTER SCREEN (Blueprint mode) -->
+    <div id="register" class="screen">
+        <div class="reg-screen">
+            <h1 class="reg-title">Register Account</h1>
+            <p class="reg-sub">Your first step towards halal happiness.</p>
+            
+            <p class="reg-label">Full Name (As per IC)</p>
+            <input class="reg-input" placeholder="Ahmad Bin Abdullah">
+            
+            <p class="reg-label">IC Number (12 Digits)</p>
+            <input class="reg-input" placeholder="000000000000">
+            
+            <p class="reg-label">Email Address</p>
+            <input class="reg-input" placeholder="name@email.com">
+            
+            <button onclick="nav('home', this)" style="background:var(--amber); color:white; border:none; padding:18px; width:100%; border-radius:12px; font-weight:900; letter-spacing:1px; cursor:pointer;">SETERUSNYA ›</button>
+        </div>
+    </div>
+
+    <!-- HOME SCREEN -->
+    <div id="home" class="screen active">
+        <div class="ab"><div class="logo">Jodohku</div></div>
+        <div id="deck"></div>
+        <div style="display:flex; justify-content:space-evenly; padding:15px; background:white; border-top:1px solid var(--div); flex-shrink:0;">
+            <button onclick="next()" style="width:68px; height:68px; border-radius:100px; border:1.5px solid #EEE; background:white; font-size:28px; cursor:pointer;">✕</button>
+            <button onclick="next()" style="width:68px; height:68px; border-radius:100px; border:none; background:var(--amber); color:white; font-size:28px; box-shadow:0 10px 20px rgba(196,122,46,0.35); cursor:pointer;">❤️</button>
+        </div>
+    </div>
+
+    <!-- ISLAM HUB -->
+    <div id="islam" class="screen">
+        <div style="background:linear-gradient(135deg, #064E3B, #065F46); padding:45px 25px; color:white;">
+            <h1 style="font-family:'Playfair Display'; font-size:26px;">Pusat Islam</h1>
+        </div>
+        <div style="padding:20px;">
+            <div style="background:white; border-radius:22px; padding:22px; border:1px solid var(--div); margin-bottom:18px;">
+                <h3 style="font-size:15px; margin-bottom:12px; color:var(--emerald);">🛡️ Mod Wali Aktif</h3>
+                <p style="font-size:12px;">Sistem pemantauan syariah diaktifkan.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bn">
+        <div class="ni on" onclick="nav('home', this)">❤️<span>Utama</span></div>
+        <div class="ni" onclick="nav('register', this)">📝<span>Daftar</span></div>
+        <div class="ni" onclick="nav('islam', this)">🕌<span>Islam Hub</span></div>
+    </div>
+</div>
+<script>
+    // THE REAL MEMBERS (NO MORE SCREENSHOTS)
+    const members = [
+        { name: "Nur Aisyah", loc: "Selangor", age: "24", img: "file:///C:/Users/amin/.gemini/antigravity/brain/3c0d9333-ad2b-44a3-a98f-83cf41583457/muslim_wedding_hijab_hero_1775652283587.png" },
+        { name: "Siti Aminah", loc: "Kuala Lumpur", age: "22", img: "file:///C:/Users/amin/.gemini/antigravity/brain/3c0d9333-ad2b-44a3-a98f-83cf41583457/media__1775696169898.jpg" },
+        { name: "Farah Wahida", loc: "Johor Bahru", age: "26", img: "file:///C:/Users/amin/.gemini/antigravity/brain/3c0d9333-ad2b-44a3-a98f-83cf41583457/media__1775696170001.jpg" },
+        { name: "Dania Hussein", loc: "Ipoh", age: "25", img: "file:///C:/Users/amin/.gemini/antigravity/brain/3c0d9333-ad2b-44a3-a98f-83cf41583457/media__1775695911154.png" }
+    ];
+
+    let current = 0;
+    function nav(id, el) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+        document.getElementById(id).classList.add('active');
+        if (el && el.classList) el.classList.add('on');
+    }
+    function render() {
+        const deck = document.getElementById('deck');
+        const m = members[current % members.length];
+        deck.innerHTML = `
+            <div class="p-card">
+                <img src="${m.img}" class="p-img" onerror="this.src='https://images.unsplash.com/photo-1588613404535-610114f86f7b?auto=format&fit=crop&q=80&w=400';">
+                <div class="p-overlay">
+                    <h2 style="font-family:'Playfair Display'; font-size:32px; font-weight:900;">${m.name}</h2>
+                    <p style="opacity:0.95; font-size:15px; font-weight:700;">${m.loc} • ${m.age} Tahun</p>
+                </div>
+            </div>
+        `;
+    }
+    function next() { current++; render(); }
+    render();
+</script>
+</body>
+</html>

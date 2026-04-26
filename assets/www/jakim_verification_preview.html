@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Verifikasi JAKIM Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --orange: #C67C22; --bg-midnight: #0B0E14; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .phone { width: 375px; height: 812px; background: var(--bg-midnight); border-radius: 44px; border: 8px solid #1E293B; position: relative; overflow: hidden; display: flex; flex-direction: column; color: white; box-shadow: 0 40px 80px rgba(0,0,0,0.4); }
+        .header { padding: 50px 24px 20px; display: flex; align-items: center; gap: 15px; }
+        .back-btn { font-size: 24px; cursor: pointer; color: white; opacity: 0.6; }
+        .content { flex: 1; padding: 20px 24px; display: flex; flex-direction: column; }
+        .title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 1000; line-height: 1.2; margin-bottom: 30px; }
+        .title span { color: var(--gold); }
+        .scanner-container { width: 100%; height: 200px; background: rgba(255,255,255,0.03); border: 2px dashed rgba(189, 139, 82, 0.3); border-radius: 24px; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 30px; }
+        .id-card-mock { width: 80%; height: 120px; background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; padding: 15px; gap: 15px; }
+        .id-photo { width: 35px; height: 45px; background: rgba(255,255,255,0.05); border-radius: 4px; }
+        .id-lines { flex: 1; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+        .id-line { height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; }
+        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--gold); box-shadow: 0 0 15px var(--gold); animation: scan 3s infinite linear; opacity: 0; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        .btn-gold { width: 100%; padding: 22px; background: var(--gold); color: white; border-radius: 100px; font-size: 17px; font-weight: 900; border: none; cursor: pointer; margin-top: auto; transition: 0.3s; }
+        #successView { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-midnight); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header"><div class="back-btn" onclick="location.href='islam_preview.html'">←</div></header>
+        <div class="content" id="mainContent">
+            <h1 class="title" data-t="verifikasi_identiti">Verifikasi JAKIM & Identiti</h1>
+            <div class="scanner-container" id="scanner">
+                <div class="id-card-mock">
+                    <div class="id-photo"></div>
+                    <div class="id-lines">
+                        <div class="id-line" style="width:70%;"></div>
+                        <div class="id-line" style="width:90%;"></div>
+                        <div class="id-line" style="width:50%;"></div>
+                    </div>
+                </div>
+                <div class="scan-line" id="line"></div>
+            </div>
+            <div style="text-align:center; font-size:13px; font-weight:800; color:var(--gold); margin-bottom:20px; display:none;" id="statusMsg" data-t="imbas_ic_loading">🔍 MENGIMBAS KAD PENGENALAN...</div>
+            <button class="btn-gold" id="scanBtn" onclick="startScan()" data-t="mulakan_imbasan">MULAKAN IMBASAN IC</button>
+        </div>
+        <div id="successView">
+            <div style="font-size:80px; margin-bottom:30px;">🛡️</div>
+            <h2 data-t="submit_success_title">Dihantar untuk Semakan</h2>
+            <p style="font-size:13px; color:#9CA3AF; margin-top:10px;" data-t="submit_success_desc">Maklumat identiti anda telah dihantar kepada pasukan verifikasi kami.</p>
+            <button class="btn-gold" onclick="location.href='islam_preview.html'" style="margin-top:40px;" data-t="back">KEMBALI</button>
+        </div>
+    </div>
+    <script type="module">
+        import { DB } from './database.js';
+        
+        window.startScan = async function() {
+            const userId = localStorage.getItem('current_user_id'); if(!userId) return;
+            const btn = document.getElementById('scanBtn'); const line = document.getElementById('line'); const status = document.getElementById('statusMsg');
+            btn.disabled = true; line.style.opacity = "1"; status.style.display = "block";
+            
+            await new Promise(r => setTimeout(r, 4000));
+            
+            try { 
+                await DB.updateUser({ 
+                    isVerified: false, 
+                    verificationStatus: "pending", 
+                    identitySubmittedAt: new Date().toISOString() 
+                }); 
+                document.getElementById('successView').style.display = "flex"; 
+            } catch(e) { 
+                alert(window.I18N.t('tech_error') || "Ralat: " + e.message); 
+                btn.disabled = false; 
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if(window.I18N) window.I18N.translatePage();
+        });
+    </script>
+</body>
+</html>

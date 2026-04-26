@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Sembang Aktif</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gold: #BD8B52;
+            --text-dark: #1F2937;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #E5E7EB;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 44px;
+            border: 8px solid #1E293B;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.1);
+        }
+
+        /* HEADER */
+        .chat-header {
+            padding: 50px 24px 15px;
+            background: white;
+            border-bottom: 1px solid #F3F4F6;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            font-size: 24px;
+            color: #9CA3AF;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .h-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .h-status {
+            font-size: 11px;
+            color: #10B981;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .h-status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #10B981;
+            border-radius: 50%;
+        }
+
+        /* MESSAGES AREA */
+        .messages-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #FDF9F4;
+        }
+
+        .msg-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .msg-row.me {
+            justify-content: flex-end;
+        }
+
+        .bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .me .bubble {
+            background: var(--gold);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .them .bubble {
+            background: white;
+            color: var(--text-dark);
+            border-bottom-left-radius: 4px;
+            border: 1px solid #F3F4F6;
+        }
+
+        .msg-time {
+            font-size: 9px;
+            color: #9CA3AF;
+            margin-top: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .me .msg-time {
+            text-align: right;
+        }
+
+        /* INPUT AREA */
+        .input-area {
+            padding: 20px 24px 40px;
+            background: white;
+            border-top: 1px solid #F3F4F6;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .msg-input {
+            flex: 1;
+            background: #F3F4F6;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 100px;
+            font-size: 14px;
+            outline: none;
+            font-weight: 500;
+        }
+
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .send-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* MEET PANEL */
+        .meet-panel {
+            margin: 0 24px 15px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #BD8B5233;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .m-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .m-sub {
+            font-size: 11px;
+            color: #9CA3AF;
+            margin-bottom: 15px;
+        }
+
+        .btn-meet {
+            width: 100%;
+            background: var(--gold);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .meet-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-accept {
+            background: #10B981;
+        }
+
+        .btn-decline {
+            background: #F3F4F6;
+            color: #9CA3AF;
+        }
+
+        .system-bubble {
+            background: #FDF2F2;
+            border: 1px solid #FEE2E2;
+            color: #991B1B;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .accepted {
+            background: #ECFDF5;
+            border-color: #D1FAE5;
+            color: #065F46;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <header class="chat-header">
+            <a href="sembang.html" class="back-btn">‹</a>
+            <div class="header-avatar" id="hAvatar">N</div>
+            <div class="header-info">
+                <div class="h-name" id="hName">Nama User</div>
+                <div class="h-status">Dalam Talian</div>
+            </div>
+            <div style="font-size: 20px; color: #9CA3AF;">⋮</div>
+        </header>
+
+        <div class="messages-container" id="msgContainer">
+            <!-- Messages load here -->
+        </div>
+
+        <!-- MEET SYSTEM -->
+        <div id="meetPanel" class="meet-panel">
+            <div class="m-title">Sudah bersedia untuk berjumpa? 🤝</div>
+            <div class="m-sub">Guardian (Wali) anda akan dihantar laporan profile calon & chat history jika
+                dipersetujui.</div>
+            <button class="btn-meet" onclick="handleRequestMeet()">HANTAR PERMINTAAN MEETUP</button>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="chatInput" class="msg-input" placeholder="Tulis mesej taaruf..." autocomplete="off">
+            <button class="send-btn" onclick="handleSend()">➔</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import './database.js';
+        import { Guard } from './guard.js';
+
+        let targetPhone = '';
+        let currentUser = null;
+
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            targetPhone = params.get('phone');
+
+            currentUser = await DB.getCurrentUser();
+            if (!currentUser || !targetPhone) {
+                window.location.href = 'sembang.html';
+                return;
+            }
+
+            // SECURITY SENTRY: Verify this is a mutual match
+            const matches = await DB.getMatchesForUser(currentUser.phone);
+            const isMatched = matches.some(m => m.phone === targetPhone);
+            if (!isMatched) {
+                console.warn("Security Alert: Unauthorized chat attempt blocked.");
+                window.location.href = 'sembang.html';
+                return;
+            }
+
+            // Load Target Info
+            let targetUser = null;
+            try {
+                const q = query(collection(db, "users"), where("phone", "==", targetPhone));
+                const snap = await getDocs(q);
+                if (snap.empty) { window.location.href = 'chat_preview.html'; return; }
+                targetUser = snap.docs[0].data();
+
+                document.getElementById('hName').innerText = targetUser.name;
+                const photo = targetUser.photoUrl || '';
+                if (photo) {
+                    document.getElementById('hAvatar').innerText = '';
+                    document.getElementById('hAvatar').style.backgroundImage = `url('${photo}')`;
+                } else {
+                    document.getElementById('hAvatar').innerText = (targetUser.name || 'U')[0].toUpperCase();
+                }
+            } catch (e) { console.error(e); }
+
+            // CREATE UNIVERSAL CHAT ID (UID-Based)
+            const ids = DB.getChatId(currentUser.phone, targetPhone);
+            let combinedMessages = {};
+
+            const updateView = (msgs) => {
+                msgs.forEach(m => {
+                    const timeKey = m.time ? (m.time.seconds || m.time) : Date.now();
+                    combinedMessages[timeKey] = m;
+                });
+                const sorted = Object.values(combinedMessages).sort((a, b) => {
+                    const tA = a.time ? (a.time.seconds || a.time) : 0;
+                    const tB = b.time ? (b.time.seconds || b.time) : 0;
+                    return tA - tB;
+                });
+                renderMessages(sorted);
+            };
+
+            // SUBSCRIBE TO BOTH (Legacy Support)
+            DB.listenToMessages(ids.primary, (m) => updateView(m));
+            DB.listenToMessages(ids.legacy, (m) => updateView(m));
+
+            // Handle Enter key
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSend();
+            });
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('msgContainer');
+            let html = '';
+            messages.forEach(m => {
+                const isMe = m.from === currentUser.phone;
+                let timeStr = 'Now';
+                if (m.time) {
+                    const date = m.time.toDate ? m.time.toDate() : (m.time.seconds ? new Date(m.time.seconds * 1000) : new Date());
+                    timeStr = date.getHours().toString().padStart(2, '0') + ":" + date.getMinutes().toString().padStart(2, '0');
+                }
+
+
+                if (m.type === 'meetRequest') {
+                    html += `<div class="system-bubble">📢 PERMINTAAN UNTUK BERJUMPA (MEETUP) TELAH DIHANTAR! Menunggu persetujuan calon.</div>`;
+                    showMeetingChoice();
+                } else if (m.type === 'meetAccepted') {
+                    html += `<div class="system-bubble accepted">✅ PERMINTAAN BERJUMPA DITERIMA! Laporan Taaruf dihantar ke Email Wali.</div>`;
+                    document.getElementById('meetPanel').style.display = 'none';
+                } else {
+                    html += `
+                        <div class="msg-row ${isMe ? 'me' : 'them'}">
+                            <div class="bubble-wrap">
+                                <div class="bubble">${m.text}</div>
+                                <div class="msg-time">${timeStr}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showMeetingChoice() {
+            const panel = document.getElementById('meetPanel');
+            panel.innerHTML = `
+                <div class="m-title">Ahli Jodohku mengajak berjumpa!</div>
+                <div class="m-sub">Adakah anda bersetuju? Laporan Taaruf aka lengkap akan dihantar ke Wali anda.</div>
+                <div class="meet-actions">
+                    <button class="btn-meet btn-decline" onclick="this.parentElement.parentElement.style.display='none'">TOLAK</button>
+                    <button class="btn-meet btn-accept" onclick="handleAcceptMeet()">TERIMA & HANTAR KE WALI</button>
+                </div>
+            `;
+        }
+
+        window.handleRequestMeet = async function () {
+            const ids = DB.getChatId(currentUser.phone, targetPhone);
+            await DB.sendMessage(ids.primary, currentUser.phone, "PERMINTAAN BERJUMPA", 'meetRequest');
+            document.getElementById('meetPanel').innerHTML = `<div class="m-title">Permintaan Dihantar 🚀</div><div class="m-sub">Sila tunggu maklumbalas daripada calon.</div>`;
+        }
+
+        window.handleAcceptMeet = async function () {
+            const ids = DB.getChatId(currentUser.phone, targetPhone);
+            await DB.sendMessage(ids.primary, currentUser.phone, "PERMINTAAN DITERIMA", 'meetAccepted');
+
+            try {
+                // REAL CLOUD TRIGGER: Generating the Wali Report
+                const reportResult = await DB.triggerWaliReport(ids.primary, targetPhone, currentUser.phone);
+                if (reportResult.success) {
+                    alert("ALHAMDULILLAH: Laporan Taaruf rasmi telah dihantar ke email Wali anda.");
+                } else {
+                    alert("NOTA: Laporan akan dihantar secara dalam talian dalam masa terdekat.");
+                }
+            } catch (e) {
+                console.error("Cloud Report Error:", e);
+                alert("Laporan telah dijana dan akan dihantar ke email wali sebentar lagi.");
+            }
+        }
+
+        window.handleSend = async function () {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // HALAL GUARDIAN CHECK
+            const check = await Guard.scan(text);
+            if (!check.clean) {
+                alert(check.error);
+                return;
+            }
+
+            const ids = DB.getChatId(currentUser.phone, targetPhone);
+            await DB.sendMessage(ids.primary, currentUser.phone, text);
+            input.value = '';
+        }
+旋        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

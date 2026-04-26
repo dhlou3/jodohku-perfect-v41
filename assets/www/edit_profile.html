@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Profil Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { 
+            --gold: #BD8B52; 
+            --gold-dark: #8E6232;
+            --cream: #FCFAF7; 
+            --text-dark: #111827;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+        
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Outfit', sans-serif; }
+        
+        body { 
+            background: #F3F4F6; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden; 
+        }
+        
+        .phone { 
+            width: 375px; 
+            height: 812px; 
+            background: var(--cream); 
+            border-radius: 44px; 
+            border: 8px solid #1E293B; 
+            position: relative; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 50px 100px rgba(0,0,0,0.15); 
+        }
+
+        /* Glassmorphism Header */
+        .header { 
+            padding: 55px 24px 20px; 
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .back-btn { 
+            width: 40px; height: 40px; 
+            background: white; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--text-dark); 
+            text-decoration: none; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            font-size: 18px;
+            font-weight: 900;
+        }
+        
+        h1 { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 20px; 
+            font-weight: 900; 
+            color: var(--text-dark); 
+            letter-spacing: -0.5px;
+        }
+
+        .content { 
+            flex: 1; 
+            padding: 30px 24px; 
+            overflow-y: auto; 
+            scrollbar-width: none;
+        }
+
+        /* Luxury Cards */
+        .field-card { 
+            background: white; 
+            border-radius: 28px; 
+            padding: 24px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .field-card:focus-within {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(189, 139, 82, 0.1);
+            border-color: rgba(189, 139, 82, 0.2);
+        }
+
+        .field-label { 
+            font-size: 11px; 
+            font-weight: 950; 
+            color: var(--gold); 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            margin-bottom: 12px; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-group { position: relative; }
+        
+        input, textarea { 
+            width: 100%; 
+            border: none; 
+            outline: none; 
+            background: transparent; 
+            font-size: 17px; 
+            font-weight: 700; 
+            color: var(--text-dark); 
+            padding-bottom: 5px;
+        }
+        
+        textarea { height: 100px; resize: none; line-height: 1.6; font-weight: 500; }
+        
+        /* Decorative focus line */
+        .focus-line {
+            height: 2px;
+            width: 0;
+            background: linear-gradient(to right, var(--gold), var(--gold-dark));
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            transition: 0.4s;
+            border-radius: 2px;
+        }
+        .field-card:focus-within .focus-line { width: 100%; }
+
+        /* Save Button - Floating Footer */
+        .footer { 
+            padding: 24px; 
+            background: white; 
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .btn-save { 
+            width: 100%; 
+            padding: 22px; 
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); 
+            color: white; 
+            border-radius: 100px; 
+            font-size: 16px; 
+            font-weight: 900; 
+            border: none; 
+            cursor: pointer; 
+            box-shadow: 0 15px 35px rgba(189, 139, 82, 0.3); 
+            transition: 0.3s;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .btn-save:active { transform: scale(0.96); box-shadow: 0 5px 15px rgba(189, 139, 82, 0.2); }
+
+        /* Saving State Overlay */
+        .overlay { 
+            position: absolute; inset:0; 
+            background: rgba(255,255,255,0.9); 
+            backdrop-filter: blur(10px); 
+            z-index: 1000; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 20px;
+        }
+        
+        .spinner { width: 45px; height: 45px; border: 5px solid #F3F4F6; border-top: 5px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div id="saving" class="overlay">
+            <div class="spinner"></div>
+            <p id="savingText" style="font-weight: 900; color: var(--gold); letter-spacing: 1px;" data-t="updating_profile">KEMASKINI SEDANG BERJALAN...</p>
+        </div>
+
+        <header class="header">
+            <a href="profile_preview.html" class="back-btn">‹</a>
+            <h1 data-t="maklumat_profil">Profil Elite</h1>
+            <div style="width:40px;"></div> <!-- Spacer for centering -->
+        </header>
+
+        <div class="content">
+            <!-- Photo Card -->
+            <div class="field-card" style="display:flex; align-items:center; gap:20px;">
+                <div id="uAv" style="width:80px; height:80px; border-radius:15px; background:#BD8B52; display:flex; align-items:center; justify-content:center; color:white; font-size:32px; font-weight:900; overflow:hidden;">?</div>
+                <div style="flex:1;">
+                    <div class="field-label" data-t="your_photos">FOTO ANDA</div>
+                    <button onclick="location.href='onboarding_photos.html'" style="background:var(--gold); color:white; border:none; padding:8px 16px; border-radius:100px; font-size:12px; font-weight:800; cursor:pointer;" data-t="upload_pics">Muat Naik Foto</button>
+                </div>
+            </div>
+
+            <!-- Name Card -->
+            <div class="field-card">
+                <label class="field-label"><span data-t="full_name">Nama Penuh</span></label>
+                <div class="input-group">
+                    <input type="text" id="editName" data-t="edit_name_placeholder" placeholder="Masukkan nama penuh...">
+                    <div class="focus-line"></div>
+                </div>
+            </div>
+
+            <!-- Profession Card -->
+            <div class="field-card">
+                <label class="field-label"><span data-t="kerjaya">Profesion / Kerjaya</span></label>
+                <div class="input-group">
+                    <input type="text" id="editJob" data-t="edit_job_placeholder" placeholder="Contoh: Jurutera Perisian">
+                    <div class="focus-line"></div>
+                </div>
+            </div>
+
+            <!-- Location Card -->
+            <div class="field-card">
+                <label class="field-label"><span data-t="negeri">Negeri Kelahiran</span></label>
+                <div class="input-group">
+                    <input type="text" id="editState" data-t="edit_state_placeholder" placeholder="Contoh: Selangor">
+                    <div class="focus-line"></div>
+                </div>
+            </div>
+
+            <!-- Bio Card -->
+            <div class="field-card">
+                <label class="field-label"><span>📝</span> <span data-t="tentang_saya">Tentang Saya (Bio)</span></label>
+                <div class="input-group">
+                    <textarea id="editBio" data-t="edit_bio_placeholder" placeholder="Ceritakan sikit tentang diri anda yang boleh menarik perhatian pasangan..."></textarea>
+                    <div class="focus-line"></div>
+                </div>
+            </div>
+
+            <div style="text-align:center; padding:10px 0 30px;">
+                <p style="font-size:12px; color:#9CA3AF; font-weight:600; line-height:1.5;" data-t="holy_guard_desc">
+                    Semua maklumat profil anda dilindungi oleh Holy Guard Security Protocol
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button class="btn-save" onclick="save()" data-t="save_changes">Simpan Perubahan</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+        
+        async function load() {
+            try {
+                const u = await DB.getCurrentUser();
+                if(u) {
+                    const name = u.fullName || u.name || window.I18N.t('user');
+                    document.getElementById('editName').value = name;
+                    document.getElementById('editJob').value = u.jobTitle || u.job || "";
+                    document.getElementById('editBio').value = u.bio || "";
+                    document.getElementById('editState').value = u.birthState || "";
+                    document.getElementById('uAv').innerHTML = u.photoUrl ? `<img src="${u.photoUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=BD8B52&color=fff'">` : name[0];
+                }
+            } catch(e) { console.error("Editor load error:", e); }
+        }
+
+        window.save = async function() {
+            const overlay = document.getElementById('saving');
+            overlay.style.display = 'flex';
+            
+            try {
+                const data = {
+                    fullName: document.getElementById('editName').value,
+                    jobTitle: document.getElementById('editJob').value,
+                    bio: document.getElementById('editBio').value,
+                    birthState: document.getElementById('editState').value,
+                    cityName: document.getElementById('editState').value
+                };
+                
+                const ok = await DB.updateUser(data);
+                if(ok) {
+                    setTimeout(() => {
+                        window.location.href = 'profile_preview.html';
+                    }, 1200);
+                } else {
+                    overlay.style.display = 'none';
+                    alert(window.I18N.t('tech_error'));
+                }
+            } catch(e) {
+                overlay.style.display = 'none';
+                console.error("Save error:", e);
+            }
+        }
+        
+        load();
+    </script>
+</body>
+</html>

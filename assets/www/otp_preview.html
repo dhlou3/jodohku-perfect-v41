@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Sahkan Kod (Final Restore)</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap"
+        rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root {
+            --gold: #BD8B52;
+            --orange: #C67C22;
+            --bg-midnight: #0B0E14;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #000;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: var(--bg-midnight);
+            border-radius: 44px;
+            border: 8px solid #1E293B;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .page-content {
+            flex: 1;
+            padding: 50px 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 38px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            font-size: 15px;
+            color: #9CA3AF;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        .input-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 32px;
+            outline: none;
+            width: 100%;
+            font-weight: 800;
+            letter-spacing: 12px;
+            text-align: center;
+        }
+
+        .btn-gold {
+            width: 100%;
+            padding: 22px;
+            background: var(--gold);
+            color: white;
+            border-radius: 100px;
+            font-size: 17px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <div class="page-content">
+            <h1 data-t="verify_title">Sahkan Kod</h1>
+            <p class="tagline" data-t="enter_otp">Masukkan kod 6-digit (Gunakan 123456 untuk Demo).</p>
+            <div class="input-box"><input type="tel" id="oI" placeholder="••••••" maxlength="6" autofocus></div>
+            <button class="btn-gold" id="vB" data-t="verify_btn">SAHKAN & TERUSKAN</button>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        const firebaseConfig = { apiKey: "AIzaSyBZegwZmiUsddDY1-EcB27NYwuvxobkgx8", authDomain: "jodohku-61096.firebaseapp.com", projectId: "jodohku-61096", storageBucket: "jodohku-61096.firebasestorage.app", messagingSenderId: "982535553679", appId: "1:982535553679:web:b7146ace7d99475ce126fa", };
+        const app = initializeApp(firebaseConfig); const db = getFirestore(app);
+        document.getElementById('vB').onclick = async () => {
+            const code = document.getElementById('oI').value.trim(); if (code.length !== 6) return;
+            const raw = sessionStorage.getItem('pending_user'); if (!raw) { window.location.href = 'landing_preview.html'; return; }
+            const u = JSON.parse(raw); const mode = sessionStorage.getItem('jdk_registration_mode');
+            if (code === '123456') {
+                const uid = u.uid;
+                if (!uid) { alert("Sesi tamat. Sila log masuk semula."); window.location.href = 'login_preview.html'; return; }
+                if (mode === 'register') { 
+                    u.createdAt = serverTimestamp(); 
+                    await setDoc(doc(db, "users", uid), u); 
+                    window.location.href = 'onboarding_name.html'; 
+                } else {
+                    localStorage.setItem('current_user_id', uid);
+                    window.location.href = 'home_preview.html';
+                }
+            } else { alert("Kod salah."); }
+        };
+    </script>
+</body>
+
+</html>

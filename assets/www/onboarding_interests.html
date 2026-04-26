@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Minat & Rutin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --orange: #C67C22; --text-dark: #1F2937; --bg-cream: #FDF9F4; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .phone { width: 375px; height: 812px; background: white; border-radius: 44px; border: 8px solid #1E293B; position: relative; overflow: hidden; display: flex; flex-direction: column; padding-top: 40px; box-shadow: 0 40px 80px rgba(0,0,0,0.1); }
+        
+        .header { padding: 20px 24px; display: flex; align-items: center; gap: 20px; }
+        .back-btn { font-size: 24px; color: #9CA3AF; text-decoration: none; }
+        .progress-line { flex: 1; height: 6px; background: #F3F4F6; border-radius: 100px; display: flex; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--orange); width: 50%; }
+        
+        .content { flex: 1; padding: 30px 24px; overflow-y: auto; scrollbar-width: none; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 900; color: var(--text-dark); margin-bottom: 30px; line-height: 1.1; }
+        
+        .section-label { font-size: 13px; font-weight: 800; color: var(--orange); margin-bottom: 12px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        .chips-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 35px; }
+        .chip { padding: 12px 20px; border: 2px solid #F3F4F6; border-radius: 100px; font-size: 14px; font-weight: 700; color: #9CA3AF; cursor: pointer; transition: 0.3s; background: white; white-space: nowrap; }
+        .chip:hover { border-color: var(--orange); }
+        .chip.selected { background: var(--orange); color: white; border-color: var(--orange); box-shadow: 0 8px 15px rgba(198, 124, 34, 0.15); }
+
+        .footer { padding: 30px 24px 40px; background: white; }
+        .next-btn { width: 100%; padding: 20px; background: var(--orange); color: white; border-radius: 100px; font-size: 17px; font-weight: 800; text-align: center; border: none; cursor: pointer; text-decoration: none; display: block; box-shadow: 0 12px 24px rgba(198, 124, 34, 0.25); }
+        .skip-btn-top { position: absolute; top: 60px; right: 30px; font-size: 14px; font-weight: 800; color: #9CA3AF; text-decoration: none; z-index: 100; cursor: pointer; border: none; background: none; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="header">
+            <a href="onboarding_work.html" class="back-btn">←</a>
+            <div class="progress-line"><div class="progress-fill"></div></div>
+            <button onclick="window.location.href='onboarding_traits.html'" class="skip-btn-top" data-t="langkau">Langkau</button>
+        </div>
+        <div class="content">
+            <h1 data-t="interests_title">Apakah minat anda?</h1>
+            
+            <span class="section-label" data-t="label_deen">Kerohanian & Ilmu</span>
+            <div class="chips-container">
+                <div class="chip" data-t="interest_tadabbur">Tadabbur</div>
+                <div class="chip" data-t="interest_usrah">Usrah</div>
+                <div class="chip" data-t="interest_zikir">Zikir</div>
+                <div class="chip" data-t="interest_hadith">Hadis</div>
+                <div class="chip" data-t="interest_fiqh">Fiqh</div>
+                <div class="chip" data-t="interest_tajweed">Tajwid</div>
+                <div class="chip" data-t="interest_charity">Sedekah</div>
+            </div>
+
+            <span class="section-label" data-t="label_foodie">Makanan & Minuman</span>
+            <div class="chips-container">
+                <div class="chip" data-t="interest_cooking">Masakan</div>
+                <div class="chip" data-t="interest_japanese">Japanese</div>
+                <div class="chip" data-t="interest_korean">Korean</div>
+                <div class="chip" data-t="interest_middle_eastern">Arabian</div>
+                <div class="chip" data-t="interest_dessert">Desserts</div>
+                <div class="chip" data-t="interest_coffee">Coffee</div>
+                <div class="chip" data-t="interest_healthy">Healthy</div>
+                <div class="chip" data-t="interest_seafood">Seafood</div>
+                <div class="chip" data-t="interest_mamak">Mamak</div>
+            </div>
+
+            <span class="section-label" data-t="label_outdoors">Riadah & Lasak</span>
+            <div class="chips-container">
+                <div class="chip" data-t="interest_travel">Travel</div>
+                <div class="chip" data-t="interest_hiking">Hiking</div>
+                <div class="chip" data-t="interest_cycling">Cycling</div>
+                <div class="chip" data-t="interest_archery">Archery</div>
+                <div class="chip" data-t="interest_swimming">Swimming</div>
+                <div class="chip" data-t="interest_gym">Gym</div>
+                <div class="chip" data-t="interest_sports">Sports</div>
+                <div class="chip" data-t="interest_badminton">Badminton</div>
+                <div class="chip" data-t="interest_futsal">Futsal</div>
+            </div>
+
+            <span class="section-label" data-t="label_tech">Tekno & Gajet</span>
+            <div class="chips-container">
+                <div class="chip" data-t="interest_coding">Coding</div>
+                <div class="chip" data-t="interest_ai">AI</div>
+                <div class="chip" data-t="interest_crypto">Crypto</div>
+                <div class="chip" data-t="interest_gadgets">Gadgets</div>
+                <div class="chip" data-t="interest_gaming">Gaming</div>
+                <div class="chip" data-t="interest_content_creation">Content</div>
+            </div>
+
+            <span class="section-label" data-t="label_creativity">Kreativiti</span>
+            <div class="chips-container">
+                <div class="chip" data-t="interest_photo">Photography</div>
+                <div class="chip" data-t="interest_painting">Painting</div>
+                <div class="chip" data-t="interest_writing">Writing</div>
+                <div class="chip" data-t="interest_music">Music</div>
+                <div class="chip" data-t="interest_podcasting">Podcasting</div>
+                <div class="chip" data-t="interest_diy">DIY</div>
+            </div>
+
+            <span class="section-label" data-t="label_mind">Pengetahun</span>
+            <div class="chips-container">
+                <div class="chip" data-t="interest_reading">Reading</div>
+                <div class="chip" data-t="interest_history">History</div>
+                <div class="chip" data-t="interest_philosophy">Philosophy</div>
+                <div class="chip" data-t="interest_psychology">Psychology</div>
+                <div class="chip" data-t="interest_languages">Languages</div>
+                <div class="chip" data-t="interest_documentaries">Documentaries</div>
+            </div>
+
+            <span class="section-label" data-t="label_hobbies">Lain-lain</span>
+            <div class="chips-container">
+                <div class="chip" data-t="interest_garden">Gardening</div>
+                <div class="chip" data-t="interest_cats">Kucing</div>
+                <div class="chip" data-t="interest_cars">Kereta</div>
+                <div class="chip" data-t="interest_mindful">Mindfulness</div>
+            </div>
+        </div>
+        <div class="footer">
+            <button onclick="saveAndNext()" class="next-btn" data-t="seterusnya_btn">Seterusnya ➔</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+
+        let selectedInterests = [];
+
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const val = chip.getAttribute('data-t');
+                if (chip.classList.contains('selected')) {
+                    chip.classList.remove('selected');
+                    selectedInterests = selectedInterests.filter(i => i !== val);
+                } else {
+                    chip.classList.add('selected');
+                    selectedInterests.push(val);
+                }
+            });
+        });
+
+        window.saveAndNext = async function() {
+            if (selectedInterests.length < 3) {
+                const msg = window.I18N.getLang() === 'en' ? 'Select at least 3 interests.' : 'Pilih sekurang-kurangnya 3 minat.';
+                alert(msg);
+                return;
+            }
+            try {
+                const ok = await DB.updateUser({ interests: selectedInterests });
+                if (ok) window.location.href = 'onboarding_traits.html';
+                else alert('Sistem sibuk. Sila cuba lagi.');
+            } catch (e) { console.error(e); }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+             if (window.I18N) window.I18N.translatePage();
+             const user = await DB.getCurrentUser();
+             if (user && user.interests) {
+                 selectedInterests = user.interests;
+                 document.querySelectorAll('.chip').forEach(chip => {
+                     const val = chip.getAttribute('data-t');
+                     if (selectedInterests.includes(val)) {
+                         chip.classList.add('selected');
+                     }
+                 });
+             }
+        });
+    </script>
+</body>
+</html>

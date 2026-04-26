@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <title>Jodohku Admin - Factory Reset & Seed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; padding: 40px; background: #F3F4F6; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        h1 { color: #111827; margin-bottom: 10px; }
+        p { color: #6B7280; margin-bottom: 30px; }
+        .btn { display: block; width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
+        .btn-danger { background: #EF4444; color: white; }
+        .btn-danger:hover { background: #DC2626; }
+        .log { background: #111827; color: #10B981; padding: 20px; border-radius: 12px; font-family: monospace; font-size: 12px; height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Engine: Factory Reset & Elite Seed</h1>
+        <p>This will purge all users/chats and seed 20 fresh Elite accounts.</p>
+        <button class="btn btn-danger" onclick="executeReset()">EXECUTE PURGE & SEED</button>
+        <div class="log" id="log">Ready for pulse...</div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+        import { collection, getDocs, deleteDoc, doc, setDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        function log(msg) {
+            const el = document.getElementById('log');
+            el.innerHTML += `<div>> ${msg}</div>`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        const SEED_DATA = [
+            // REVIEWER (Special)
+            { id: "e_rev", name: "Reviewer Amin", age: 30, job: "Lead Reviewer", city: "Kuala Lumpur", gender: "man", phone: "+60123456789", photos: ["https://images.unsplash.com/photo-1519085185758-24dd5d14550a"] },
+
+            // MEN (10)
+            { id: "e_m1", name: "Zulkifli", age: 32, job: "Engineer", city: "Kuala Lumpur", gender: "man", phone: "+60100000001", photos: ["male_portrait_1_zulkifli_1776501383392.png", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"] },
+            { id: "e_m2", name: "Adam", age: 28, job: "Doctor", city: "Shah Alam", gender: "man", phone: "+60100000002", photos: ["male_portrait_2_adam_1776501396802.png", "https://images.unsplash.com/photo-1500648767791-00dcc994a43e"] },
+            { id: "e_m3", name: "Hafiz", age: 35, job: "Tech Lead", city: "Cyberjaya", gender: "man", phone: "+60100000003", photos: ["male_portrait_3_hafiz_1776501413199.png", "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce"] },
+            { id: "e_m4", name: "Imran", age: 30, job: "Architect", city: "Petaling Jaya", gender: "man", phone: "+60100000004", photos: ["male_portrait_4_imran_1776501499982.png", "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d"] },
+            { id: "e_m5", name: "Luqman", age: 29, job: "Pilot", city: "Sepang", gender: "man", phone: "+60100000005", photos: ["male_portrait_5_luqman_1776501512379.png", "https://images.unsplash.com/photo-1542345812-d98b5cd6cf98"] },
+            { id: "e_m6", name: "Faris", age: 31, job: "Chef", city: "Georgetown", gender: "man", phone: "+60100000006", photos: ["male_portrait_6_faris_1776502114725.png", "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79"] },
+            { id: "e_m7", name: "Amirul", age: 27, job: "Designer", city: "Johor Bahru", gender: "man", phone: "+60100000007", photos: ["male_portrait_7_amirul_1776502135375.png", "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"] },
+            { id: "e_m8", name: "Khairul", age: 33, job: "Lawyer", city: "Putrajaya", gender: "man", phone: "+60100000008", photos: ["male_portrait_8_khairul_1776502150293.png", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"] },
+            { id: "e_m9", name: "Daniel", age: 26, job: "Developer", city: "Melaka", gender: "man", phone: "+60100000009", photos: ["male_portrait_9_daniel_1776502166281.png", "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6"] },
+            { id: "e_m10", name: "Aiman", age: 34, job: "Analyst", city: "Kuala Lumpur", gender: "man", phone: "+60100000010", photos: ["male_portrait_10_aiman_1776502182839.png", "https://images.unsplash.com/photo-1480429370139-e0132c086e2a"] },
+
+            // WOMEN (10)
+            { id: "e_f1", name: "Siti Nurhaliza", age: 29, job: "Teacher", city: "Putrajaya", gender: "woman", phone: "+60110000001", photos: ["female_portrait_1_siti_1776501425678.png", "https://images.unsplash.com/photo-1567532939604-b6c5b0ad2e01"] },
+            { id: "e_f2", name: "Jasmine", age: 27, job: "Marketing", city: "Kuala Lumpur", gender: "woman", phone: "+60110000002", photos: ["female_portrait_2_jasmine_1776501442014.png", "https://images.unsplash.com/photo-1494790108377-be9c29b29330"] },
+            { id: "e_f3", name: "Aisyah", age: 25, job: "Designer", city: "Shah Alam", gender: "woman", phone: "+60110000003", photos: ["female_portrait_3_aisyah_1776501455999.png", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1"] },
+            { id: "e_f4", name: "Nurul", age: 31, job: "Pharmacist", city: "Bangi", gender: "woman", phone: "+60110000004", photos: ["female_portrait_4_nurul_1776501526109.png", "https://images.unsplash.com/photo-1531746020798-e795c5399c47"] },
+            { id: "e_f5", name: "Farah", age: 28, job: "Creator", city: "Petaling Jaya", gender: "woman", phone: "+60110000005", photos: ["female_portrait_5_farah_1776501540464.png", "https://images.unsplash.com/photo-1544005313-94ddf0286df2"] },
+            { id: "e_f6", name: "Zahra", age: 33, job: "HR", city: "Cyberjaya", gender: "woman", phone: "+60110000006", photos: ["https://images.unsplash.com/photo-1517841905240-472988babdf9", "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df"] },
+            { id: "e_f7", name: "Maya", age: 26, job: "Artist", city: "Johor Bahru", gender: "woman", phone: "+60110000007", photos: ["https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91", "https://images.unsplash.com/photo-1534528741775-53994a69daeb"] },
+            { id: "e_f8", name: "Hanna", age: 30, job: "Engineer", city: "Kuala Lumpur", gender: "woman", phone: "+60110000008", photos: ["https://images.unsplash.com/photo-1558898479-33c0057a5d12", "https://images.unsplash.com/photo-1531123897727-8f129e16f8ec"] },
+            { id: "e_f9", name: "Sofea", age: 27, job: "Dentist", city: "Ipoh", gender: "woman", phone: "+60110000009", photos: ["https://images.unsplash.com/photo-1521572267360-ee0c2909d518", "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d"] },
+            { id: "e_f10", name: "Laila", age: 32, job: "Lecturer", city: "Kuching", gender: "woman", phone: "+60110000010", photos: ["https://images.unsplash.com/photo-1502685104226-ee32379fefbe", "https://images.unsplash.com/photo-1534751435712-43680242180f"] },
+        ];
+
+        window.executeReset = async () => {
+            const db = window.firestore_db;
+            log("🔥 Initiating Purge...");
+
+            try {
+                // 1. Purge Users
+                const uSnap = await getDocs(collection(db, "users"));
+                log(`Deleting ${uSnap.size} user documents...`);
+                for (const d of uSnap.docs) await deleteDoc(d.ref);
+
+                // 2. Purge Chats
+                const cSnap = await getDocs(collection(db, "chats"));
+                log(`Deleting ${cSnap.size} chat documents...`);
+                for (const d of cSnap.docs) await deleteDoc(d.ref);
+
+                log("✅ Database Purge Complete.");
+                log("🌱 Seeding Elite Data...");
+
+                for (const user of SEED_DATA) {
+                    const docData = {
+                        fullName: user.name,
+                        age: user.age,
+                        gender: user.gender,
+                        phone: user.phone || "",
+                        jobTitle: user.job,
+                        city: user.city,
+                        photoUrl: user.photos[0],
+                        photos: user.photos,
+                        jodohkuId: `JDK-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+                        waliName: "Ali Bin Hassan",
+                        waliPhone: "+60123456789",
+                        prompt1: "Matlamat utama saya adalah membina keluarga sakinah.",
+                        prompt2: "Hobi saya adalah membaca dan mendalami ilmu agama.",
+                        likes: [],
+                        skips: [],
+                        isSultan: false,
+                        updatedAt: new Date()
+                    };
+                    await setDoc(doc(db, "users", user.id), docData);
+                    log(`Created Elite Account: ${user.name}`);
+                }
+
+                log("💎 SYSTEM SEEDED SUCCESSFULLY.");
+                log("Reload in 3s...");
+                setTimeout(() => location.reload(), 3000);
+
+            } catch (e) {
+                log(`❌ CRITICAL ERROR: ${e.message}`);
+                console.error(e);
+            }
+        };
+    </script>
+</body>
+</html>

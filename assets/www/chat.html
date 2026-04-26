@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Bilik Sembang SafeTaaruf</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gold: #BD8B52;
+            --bg-cream: #FCFAF7;
+            --safe-green: #10B981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #E5E7EB;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 44px;
+            border: 8px solid #1E293B;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                background: white;
+            }
+
+            .phone {
+                width: 100vw;
+                height: 100vh;
+                border: none;
+                border-radius: 0;
+            }
+        }
+
+        .header {
+            padding: 55px 20px 15px;
+            padding-top: max(55px, env(safe-area-inset-top));
+            background: white;
+            border-bottom: 1px solid #F3F4F6;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .jakim-badge {
+            background: var(--safe-green);
+            color: white;
+            font-size: 8px;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 100px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .chat-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--bg-cream);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 100px;
+            scrollbar-width: none;
+        }
+
+        .msg {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .me {
+            align-self: flex-end;
+            background: var(--gold);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .them {
+            align-self: flex-start;
+            background: white;
+            color: #111827;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .shariah-bar {
+            padding: 12px 20px;
+            background: white;
+            border-bottom: 1px solid #F3F4F6;
+            display: flex;
+            gap: 10px;
+        }
+
+        .s-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1.5px solid #E5E7EB;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .s-btn.meeting {
+            background: var(--gold);
+            color: white;
+            border: none;
+        }
+
+        .input-bar {
+            position: absolute;
+            bottom: max(30px, env(safe-area-inset-bottom));
+            left: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 100px;
+            padding: 6px 6px 6px 18px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+
+        .input-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--gold);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <header class="header">
+            <div onclick="location.href='chat_preview.html'" style="cursor:pointer; font-size:24px;">‹</div>
+            <div id="av"
+                style="width:38px; height:38px; border-radius:10px; background:var(--gold); display:flex; align-items:center; justify-content:center; color:white; font-weight:900; overflow:hidden;">
+            </div>
+            <div style="flex:1;">
+                <div id="targetName" style="font-weight:900; font-size:16px;">Nama...</div>
+                <div id="jBadge" class="jakim-badge" style="display:none;">🛡️ JAKIM VERIFIED</div>
+            </div>
+            <div style="font-size:20px;">⋮</div>
+        </header>
+
+        <div class="shariah-bar" id="shariahBar">
+            <div class="s-btn" onclick="inviteWali()">👥 INVITE WALI</div>
+            <div class="s-btn meeting" onclick="requestMeeting()">🤝 JOM MEETUP</div>
+        </div>
+
+        <div class="chat-area" id="chatArea"></div>
+
+        <div class="input-bar">
+            <input type="text" id="mIn" placeholder="Mesej taaruf...">
+            <button class="send-btn" onclick="send()">➔</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+        const mid = new URLSearchParams(window.location.search).get('matchId');
+        const myUid = localStorage.getItem('current_user_id');
+        let targetId = null;
+
+        async function init() {
+            if (!mid || !myUid) return;
+            const db = window.firestore_db;
+            const { doc, getDoc, onSnapshot, collection, query, orderBy, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+
+            const mSnap = await getDoc(doc(db, "chats", mid));
+            if (!mSnap.exists()) { console.error("Match not found: " + mid); return; }
+            const match = mSnap.data();
+            targetId = match.memberA === myUid ? match.memberB : match.memberA;
+
+            const tSnap = await getDoc(doc(db, "users", targetId));
+            const target = tSnap.data();
+            document.getElementById('targetName').innerText = target.fullName || "Hamba Allah";
+            document.getElementById('av').innerHTML = target.photoUrl ? `<img src="${target.photoUrl}" style="width:100%; height:100%; object-fit:cover;">` : (target.fullName || "U")[0];
+            if (target.isVerified) document.getElementById('jBadge').style.display = 'inline-flex';
+
+            onSnapshot(query(collection(db, "chats", mid, "messages"), orderBy("time", "asc")), (snap) => {
+                const area = document.getElementById('chatArea'); area.innerHTML = '';
+                snap.forEach(d => {
+                    const m = d.data();
+                    const el = document.createElement('div');
+                    el.className = `msg ${m.from === myUid ? 'me' : 'them'}`;
+                    el.innerText = m.text;
+                    area.appendChild(el);
+                });
+                area.scrollTop = area.scrollHeight;
+            });
+        }
+
+        window.send = async () => {
+            const input = document.getElementById('mIn');
+            const text = input.value.trim();
+            if (!text) return;
+            await DB.sendMessage(mid, myUid, text);
+            input.value = '';
+        }
+
+        window.inviteWali = () => {
+            alert("Menjemput Wali anda...");
+            DB.sendMessage(mid, myUid, "🤝 [SISTEM] Saya telah menjemput Wali saya untuk memantau perbualan ini.");
+        }
+
+        window.requestMeeting = () => {
+            if (confirm("Jom Meetup?")) {
+                DB.sendMessage(mid, myUid, "💍 [SISTEM] Permintaan 'Jom Meetup' telah dihantar.");
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

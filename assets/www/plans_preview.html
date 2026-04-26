@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Pilih Pelan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rahmah-green: #4ADE80;
+            --gold: #D4AF37;
+            --platinum: #E5E7EB;
+            --brand-gold: #BD8B52;
+            --text-dark: #1F2937;
+            --bg-sand: #FDF9F4;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        
+        body { 
+            background: #E5E7EB; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden;
+        }
+
+        .phone { 
+            width: 375px; 
+            height: 812px; 
+            background: var(--bg-sand); 
+            border-radius: 44px; 
+            border: 8px solid #1E293B; 
+            position: relative; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: white;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .back-btn { font-size: 24px; color: #9CA3AF; text-decoration: none; cursor: pointer; }
+        .header-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text-dark); }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 24px;
+            scrollbar-width: none;
+        }
+
+        .main-title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .main-subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        /* PLAN CARDS */
+        .plan-card {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #E5E7EB;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .plan-card.gold-card { border: 2px solid var(--gold); }
+        .plan-card.platinum-card { border: 2.5px solid #BD8B52; }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .badge-rahmah { background: #DCFCE7; color: #166534; }
+        .badge-gold { background: #FEF9C3; color: #854D0E; }
+        .badge-platinum { background: #FDE6D2; color: #9A3412; }
+
+        .plan-name { font-size: 22px; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
+        .plan-price { font-size: 28px; font-weight: 900; color: var(--brand-gold); margin-bottom: 5px; }
+        .plan-price span { font-size: 14px; color: #9CA3AF; font-weight: 500; }
+        .plan-desc { font-size: 13px; color: #9CA3AF; font-weight: 500; margin-bottom: 20px; }
+
+        .feature-list { list-style: none; }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #4B5563;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+        .feature-item.check { color: #10B981; }
+
+        .plan-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            text-align: center;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-gold { background: var(--gold); color: white; border: none; }
+        .btn-platinum { background: linear-gradient(to right, #BD8B52, #D97706); color: white; border: none; }
+        
+        .popular-badge {
+            white-space: nowrap;
+        }
+
+        /* SOVEREIGN PREMIUM */
+        .plan-card.sovereign-card { 
+            border: 3px solid #BD8B52; 
+            background: #FDF9F4; 
+            box-shadow: 0 20px 40px rgba(189, 139, 82, 0.15);
+        }
+        .badge-sovereign { background: #332211; color: #BD8B52; }
+        .btn-sovereign { background: #6F4E37; color: white; border: none; font-size: 16px; letter-spacing: 1px; }
+
+        /* PAYMENT OVERLAY */
+        #paymentOverlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 2000; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 40px;
+        }
+        .loader {
+            width: 80px; height: 80px; border: 8px solid #F3F4F6;
+            border-top: 8px solid #BD8B52; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 30px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .success-icon { font-size: 80px; color: #10B981; margin-bottom: 20px; animation: scaleIn 0.5s ease-out; }
+        @keyframes scaleIn { from { transform: scale(0); } to { transform: scale(1); } }
+        
+        .payment-methods-footer {
+            margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB;
+            text-align: center; font-size: 11px; color: #9CA3AF;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header class="header">
+            <a href="settings_preview.html" class="back-btn">‹</a>
+            <div class="header-title">Pilih Pelan</div>
+            <div style="width: 24px;"></div>
+        </header>
+
+        <div class="content">
+            <h1 class="main-title">Naik Taraf Jodohku</h1>
+            <p class="main-subtitle">Buka semua ciri premium untuk pengalaman terbaik mencari jodoh</p>
+
+            <!-- RAHMAH -->
+            <div class="plan-card">
+                <div class="badge badge-rahmah">✨ RAHMAH</div>
+                <div class="plan-name">Rahmah</div>
+                <div class="plan-price">PERCUMA</div>
+                <p class="plan-desc">Sesuai untuk permulaan</p>
+                <div class="feature-list">
+                    <div class="feature-item check">✓ 5 cadangan profil sehari</div>
+                    <div class="feature-item check">✓ 10 like sehari</div>
+                    <div class="feature-item check">✓ Sembang 3 perbualan</div>
+                    <div class="feature-item check">✓ Soalan Taaruf asas (10 soalan)</div>
+                    <div class="feature-item check">✓ Mod Wali asas</div>
+                    <div class="feature-item check">✓ Profil boleh dilihat ahli</div>
+                </div>
+            </div>
+
+            <!-- GOLD -->
+            <div class="plan-card gold-card">
+                <div class="badge badge-gold">✨ GOLD</div>
+                <div class="plan-name">Gold</div>
+                <div class="plan-price">RM 29 <span>/ bulan</span></div>
+                <p class="plan-desc">Sesuai untuk yang serius mencari</p>
+                <div class="feature-list">
+                    <div class="feature-item check">✓ 30 cadangan profil sehari</div>
+                    <div class="feature-item check">✓ 50 like sehari</div>
+                    <div class="feature-item check">✓ Sembang tanpa had</div>
+                    <div class="feature-item check">✓ Video Taaruf (tonton sahaja)</div>
+                    <div class="feature-item check">✓ Soalan Taaruf penuh (30 soalan)</div>
+                    <div class="feature-item check">✓ 1 Super Like sehari</div>
+                    <div class="feature-item check">✓ Mod Wali penuh</div>
+                    <div class="feature-item check">✓ Lencana Gold</div>
+                </div>
+                <button class="plan-btn btn-gold">PILIH GOLD</button>
+            </div>
+
+            <!-- PLATINUM -->
+            <div class="plan-card platinum-card">
+                <div class="popular-badge">⭐ PALING POPULAR — PLATINUM</div>
+                <div class="badge badge-platinum">💎 PLATINUM</div>
+                <div class="plan-name">Platinum</div>
+                <div class="plan-price">RM 69 <span>/ bulan</span></div>
+                <p class="plan-desc">Pengalaman paling lengkap</p>
+                <div class="feature-list">
+                    <div class="feature-item check">✓ Cadangan tanpa had</div>
+                    <div class="feature-item check">✓ Like tanpa had</div>
+                    <div class="feature-item check">✓ Lihat SIAPA yang suka anda</div>
+                    <div class="feature-item check">✓ Video Taaruf (muat naik & tonton)</div>
+                    <div class="feature-item check">✓ 3 Super Like sehari</div>
+                    <div class="feature-item check">✓ Mod Wali penuh + laporan</div>
+                    <div class="feature-item check">✓ Mod Pinangan Digital</div>
+                    <div class="feature-item check">✓ Lencana Platinum eksklusif</div>
+                    <div class="feature-item check">✓ Priority dalam carian</div>
+                </div>
+                <button class="plan-btn btn-platinum" onclick="startPayment('Platinum')">PILIH PLATINUM</button>
+            </div>
+
+            <!-- SOVEREIGN — NEW ELITE TIER -->
+            <div class="plan-card sovereign-card">
+                <div class="badge badge-sovereign">👑 SOVEREIGN</div>
+                <div class="plan-name">Sovereign</div>
+                <div class="plan-price">RM 149 <span>/ bulan</span></div>
+                <p class="plan-desc">Untuk yang inginkan yang terbaik</p>
+                <div class="feature-list">
+                    <div class="feature-item check">✓ Semua ciri Platinum</div>
+                    <div class="feature-item check">✓ Profil dipaparkan #1 dalam carian</div>
+                    <div class="feature-item check">✓ Lencana Sovereign eksklusif</div>
+                    <div class="feature-item check">✓ Khidmat pelanggan 24/7 VIP</div>
+                    <div class="feature-item check">✓ Ulasan profil oleh pakar matchmaker</div>
+                    <div class="feature-item check">✓ Sesi kaunseling pra-nikah percuma</div>
+                    <div class="feature-item check">✓ Pengesahan latar belakang penuh</div>
+                </div>
+                <button class="plan-btn btn-sovereign" onclick="startPayment('Sovereign')">PILIH SOVEREIGN</button>
+            </div>
+
+            <div class="payment-methods-footer">
+                Selamat dibayar • SSL 256-bit • Dibatalkan bila-bila masa<br>
+                FPX • Debit/Kredit • Touch 'n Go • Maybank2u • CIMB Clicks
+            </div>
+        </div>
+
+        <!-- PAYMENT SUCCESS OVERLAY -->
+        <div id="paymentOverlay">
+            <div id="loader" class="loader"></div>
+            <div id="successContent" style="display:none;">
+                <div class="success-icon">✅</div>
+                <h2 style="font-family:'Playfair Display'; font-size:28px; margin-bottom:10px;">Pembayaran Berjaya!</h2>
+                <p style="color:#6B7280; font-size:14px; margin-bottom:30px;">Selamat datang ke keahlian <span id="chosenPlan" style="color:var(--brand-gold); font-weight:800;"></span>.</p>
+                <button class="plan-btn btn-sovereign" onclick="window.location.href='profile_preview.html'">PULANG KE PROFIL</button>
+            </div>
+            <div id="processingText">
+                <h3 style="font-size:18px; margin-bottom:10px;">Memproses Pembayaran...</h3>
+                <p style="color:#6B7280; font-size:12px;">Sila jangan tutup tetingkap ini</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import './database.js';
+
+        window.startPayment = (plan) => {
+            const overlay = document.getElementById('paymentOverlay');
+            overlay.style.display = 'flex';
+            document.getElementById('chosenPlan').innerText = plan;
+
+            // Simulate Network Delay
+            setTimeout(async () => {
+                await DB.setPlan(plan);
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('processingText').style.display = 'none';
+                document.getElementById('successContent').style.display = 'block';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>

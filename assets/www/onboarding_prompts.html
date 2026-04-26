@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jodohku - Prompts Personaliti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
+    <style>
+        :root { --gold: #BD8B52; --orange: #C67C22; --text-dark: #1F2937; --bg-cream: #FDF9F4; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .phone { width: 375px; height: 812px; background: white; border-radius: 44px; border: 8px solid #1E293B; position: relative; overflow: hidden; display: flex; flex-direction: column; padding-top: 40px; box-shadow: 0 40px 80px rgba(0,0,0,0.1); }
+        
+        .header { padding: 20px 24px; display: flex; align-items: center; gap: 20px; }
+        .back-btn { font-size: 24px; color: #9CA3AF; text-decoration: none; }
+        .progress-line { flex: 1; height: 6px; background: #F3F4F6; border-radius: 100px; display: flex; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--orange); width: 85%; }
+        
+        .content { flex: 1; padding: 40px 24px; overflow-y: auto; scrollbar-width: none; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900; color: var(--text-dark); margin-bottom: 12px; line-height: 1.1; }
+        .subtitle { font-size: 15px; color: #6B7280; margin-bottom: 40px; line-height: 1.6; font-weight: 500; }
+        
+        .prompt-card { background: var(--bg-cream); border-radius: 24px; padding: 25px; margin-bottom: 25px; border: 2px solid transparent; transition: 0.3s; }
+        .prompt-card.active { border-color: var(--orange); background: white; box-shadow: 0 15px 35px rgba(198, 124, 34, 0.1); }
+        .prompt-title { font-size: 13px; font-weight: 900; color: var(--gold); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        
+        textarea { width: 100%; height: 80px; background: transparent; border: none; outline: none; font-size: 18px; font-weight: 600; color: var(--text-dark); resize: none; }
+        textarea::placeholder { color: #9CA3AF; font-weight: 400; }
+        
+        .footer { padding: 40px 24px; }
+        .next-btn { width: 100%; padding: 20px; background: var(--orange); color: white; border-radius: 100px; font-size: 17px; font-weight: 800; text-align: center; border: none; cursor: pointer; display: block; box-shadow: 0 12px 24px rgba(198, 124, 34, 0.25); }
+        .skip-btn-top { position: absolute; top: 60px; right: 30px; font-size: 14px; font-weight: 800; color: #9CA3AF; text-decoration: none; z-index: 100; cursor: pointer; border: none; background: none; }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="header">
+            <a href="onboarding_bio.html" class="back-btn">←</a>
+            <div class="progress-line"><div class="progress-fill"></div></div>
+            <button onclick="window.location.href='onboarding_photos.html'" class="skip-btn-top" data-t="langkau">Langkau</button>
+        </div>
+        <div class="content">
+            <h1 data-t="pilih_prompt">Pilih Prompt Suara Hati</h1>
+            <p class="subtitle" data-t="pilih_prompt_desc">Bantu mereka mengenali sisi unik anda melalui jawapan jujur dan santai.</p>
+            
+            <div class="prompt-card active">
+                <div class="prompt-title" data-t="prompt_q1">Cara memenangi hati saya...</div>
+                <textarea id="p1" data-t="tulis_jawapan" placeholder="Tulis jawapan anda di sini..."></textarea>
+            </div>
+
+            <div class="prompt-card">
+                <div class="prompt-title" data-t="prompt_q2">Impian perkahwinan saya adalah...</div>
+                <textarea id="p2" data-t="tulis_jawapan" placeholder="Tulis jawapan anda di sini..."></textarea>
+            </div>
+
+            <div class="prompt-card">
+                <div class="prompt-title" data-t="prompt_q3">Saya mencari pasangan yang...</div>
+                <textarea id="p3" data-t="tulis_jawapan" placeholder="Tulis jawapan anda di sini..."></textarea>
+            </div>
+        </div>
+        <div class="footer">
+            <button onclick="saveAndNext()" class="next-btn" data-t="seterusnya_btn">Seterusnya ➔</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { DB } from './database.js';
+
+        window.saveAndNext = async function() {
+            const prompts = [
+                { q: window.I18N.t('prompt_q1'), a: document.getElementById('p1').value.trim() },
+                { q: window.I18N.t('prompt_q2'), a: document.getElementById('p2').value.trim() },
+                { q: window.I18N.t('prompt_q3'), a: document.getElementById('p3').value.trim() }
+            ].filter(p => p.a !== "");
+
+            if(prompts.length === 0) { 
+                alert(window.I18N.t('isi_one_prompt')); 
+                return; 
+            }
+            const ok = await DB.updateUser({ prompts: prompts });
+            if(ok) window.location.href = 'onboarding_photos.html';
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            if(window.I18N) window.I18N.translatePage();
+            const user = await DB.getCurrentUser();
+            if(user && user.prompts) {
+                // Try to match by index for simplicity in this demo
+                user.prompts.forEach((p, idx) => {
+                    if(document.getElementById(`p${idx+1}`)) document.getElementById(`p${idx+1}`).value = p.a;
+                });
+            }
+            
+            document.querySelectorAll('textarea').forEach(t => {
+                t.onfocus = () => {
+                    document.querySelectorAll('.prompt-card').forEach(c => c.classList.remove('active'));
+                    t.closest('.prompt-card').classList.add('active');
+                };
+            });
+        });
+    </script>
+</body>
+</html>
