@@ -34,7 +34,13 @@ window.fs_sdk = {
 export const DB = {
     signInWithGoogle: async () => {
         try {
-            const result = await signInWithPopup(auth, googleProvider);
+            // Using Redirect for better stability in mobile environments
+            const isApp = window.location.protocol === 'file:';
+            if(isApp && window.AppBridge) {
+                window.AppBridge.postMessage('googleLogin');
+                return null;
+            }
+            const result = await (await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js")).signInWithPopup(auth, googleProvider);
             const user = result.user;
             return {
                 email: user.email,
