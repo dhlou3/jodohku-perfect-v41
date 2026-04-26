@@ -89,6 +89,7 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
             error: (e, _) => SliverFillRemaining(child: Center(child: Text('Error: $e'))),
           ),
         ],
+      ),
     );
   }
 
