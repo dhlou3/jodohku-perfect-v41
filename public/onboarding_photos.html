@@ -72,6 +72,24 @@
         let photos = [null, null, null, null, null, null];
         let activeIdx = 0;
 
+        // GLOBAL EXPOSURE FOR BUTTONS
+        window.triggerPicker = function(idx) { 
+            activeIdx = idx; 
+            document.getElementById('filePicker').click(); 
+        }
+
+        window.removePhoto = function(idx) { 
+            photos[idx] = null; 
+            updateGrid(); 
+        }
+
+        window.saveAndNext = async function() {
+            document.getElementById('loading').style.display = 'flex';
+            const finalPhotos = photos.filter(p => p !== null);
+            await DB.updateUser({ photos: finalPhotos, photoUrl: finalPhotos[0] || null });
+            window.location.href = 'onboarding_wali.html?v=41.4';
+        }
+
         async function compressImage(dataUrl, maxWidth = 800, maxHeight = 800) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -89,35 +107,36 @@
             });
         }
 
-        window.triggerPicker = function(idx) { activeIdx = idx; document.getElementById('filePicker').click(); }
         document.getElementById('filePicker').addEventListener('change', async (e) => {
             const file = e.target.files[0]; if (!file) return;
             document.getElementById('loading').style.display = 'flex';
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                const rawUrl = event.target.result;
-                const compressedUrl = await compressImage(rawUrl);
-                photos[activeIdx] = compressedUrl;
-                updateGrid();
+            try {
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const rawUrl = event.target.result;
+                    const compressedUrl = await compressImage(rawUrl);
+                    photos[activeIdx] = compressedUrl;
+                    updateGrid();
+                    document.getElementById('loading').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            } catch (err) {
+                console.error("Picker Error:", err);
                 document.getElementById('loading').style.display = 'none';
-            };
-            reader.readAsDataURL(file);
+            }
         });
 
         function updateGrid() {
             const slots = document.querySelectorAll('.photo-slot');
-            let count = 0;
             photos.forEach((p, i) => {
                 if (p) {
                     slots[i].innerHTML = `<img src="${p}"><div class="add-btn" style="background: #9CA3AF">-</div>`;
                     slots[i].classList.add('filled');
-                    slots[i].onclick = () => removePhoto(i);
-                    count++;
+                    slots[i].onclick = () => window.removePhoto(i);
                 } else {
                     slots[i].innerHTML = `<div class="add-btn">+</div>`;
                     slots[i].classList.remove('filled');
-                    slots[i].onclick = () => triggerPicker(i);
-                    count = count; // dummy
+                    slots[i].onclick = () => window.triggerPicker(i);
                 }
             });
             const btn = document.getElementById('nextBtn');
@@ -125,21 +144,15 @@
             else btn.classList.remove('ready');
         }
 
-        window.removePhoto = function(idx) { photos[idx] = null; updateGrid(); }
-        window.saveAndNext = async function() {
-            document.getElementById('loading').style.display = 'flex';
-            const finalPhotos = photos.filter(p => p !== null);
-            await DB.updateUser({ photos: finalPhotos, photoUrl: finalPhotos[0] || null });
-            window.location.href = 'onboarding_wali.html';
-        }
-
-        window.addEventListener('DOMContentLoaded', async () => {
+        window.addEventListener('load', async () => {
              if (window.I18N) window.I18N.translatePage();
-             const user = await DB.getCurrentUser();
-             if (user && user.photos && user.photos.length) {
-                 user.photos.forEach((p, i) => { if(i < 6) photos[i] = p; });
-                 updateGrid();
-             }
+             try {
+                const user = await DB.getCurrentUser();
+                if (user && user.photos && user.photos.length) {
+                    user.photos.forEach((p, i) => { if(i < 6) photos[i] = p; });
+                    updateGrid();
+                }
+             } catch(e) { console.error("Load Error:", e); }
         });
     </script>
 </body>
