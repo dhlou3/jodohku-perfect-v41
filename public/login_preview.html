@@ -114,21 +114,6 @@
             margin: 0 auto; cursor: pointer;
         }
 
-        .debug-console {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 12px;
-            font-family: monospace;
-            font-size: 11px;
-            color: #00ff00;
-            text-align: left;
-            max-height: 150px;
-            overflow-y: auto;
-            border: 2px solid #00ff00;
-            display: block; /* FORCED VISIBLE */
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
@@ -147,7 +132,6 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2s-2-.9-2-2v-2c0-1.1.9-2 2-2z"/><path d="M18 11c0-3.3-2.7-6-6-6s-6 2.7-6 6v10"/><path d="M22 11c0-5.5-4.5-10-10-10S2 5.5 2 11v10"/></svg>
             </div>
             <div class="footer-note">Don't have an account? <a href="register_preview.html">Register Now</a></div>
-            <div id="debugLog" class="debug-console"></div>
         </div>
     </div>
 
@@ -168,16 +152,8 @@
         firebase.initializeApp(firebaseConfig);
 
         const btn = document.getElementById('gBtn');
-        const debugEl = document.getElementById('debugLog');
-        
-        function log(msg) {
-            debugEl.style.display = 'block';
-            debugEl.innerHTML += `> ${msg}<br>`;
-            console.log(msg);
-        }
 
         async function handleAuthSuccess(user) {
-            log('Verifying profile for ' + user.email + '...');
             localStorage.setItem('current_user_id', user.uid);
             
             try {
@@ -185,10 +161,8 @@
                 const snap = await db.collection('users').doc(user.uid).get();
                 
                 if (snap.exists) {
-                    log('Profile found! Directing to Home...');
                     window.location.href = 'home_preview.html?v=38.7';
                 } else {
-                    log('No profile found. Directing to Onboarding...');
                     window.location.href = 'onboarding_name.html?v=38.7';
                 }
             } catch (err) {
@@ -197,8 +171,6 @@
         }
 
         btn.onclick = async () => {
-            alert("Starting Auth Flow...");
-            log('Starting Google Login...');
             btn.innerText = 'Connecting...';
             
             try {
@@ -206,7 +178,6 @@
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 
                 if (isMobile) {
-                    log('Detected Mobile - Using Redirect...');
                     await firebase.auth().signInWithRedirect(provider);
                 } else {
                     log('Detected Desktop - Using Popup...');

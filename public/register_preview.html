@@ -114,20 +114,6 @@
         .footer-note { margin-top: 24px; font-size: 14px; color: var(--text-dim); }
         .footer-note a { color: var(--gold); text-decoration: none; font-weight: 600; }
 
-        .debug-console {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 12px;
-            font-family: monospace;
-            font-size: 11px;
-            color: #00ff00;
-            text-align: left;
-            max-height: 150px;
-            overflow-y: auto;
-            border: 2px solid #00ff00;
-            display: block; /* FORCED VISIBLE */
-        }
     </style>
 </head>
 <body>
@@ -143,7 +129,6 @@
                 <span>Continue with Google</span>
             </button>
             <div class="footer-note">Already have an account? <a href="login_preview.html">Log In</a></div>
-            <div id="debugLog" class="debug-console"></div>
         </div>
     </div>
 
@@ -164,16 +149,8 @@
         firebase.initializeApp(firebaseConfig);
 
         const btn = document.getElementById('regBtn');
-        const debugEl = document.getElementById('debugLog');
-        
-        function log(msg) {
-            debugEl.style.display = 'block';
-            debugEl.innerHTML += `> ${msg}<br>`;
-            console.log(msg);
-        }
 
         async function handleAuthSuccess(user) {
-            log('Verifying profile for ' + user.email + '...');
             localStorage.setItem('current_user_id', user.uid);
             
             try {
@@ -181,10 +158,8 @@
                 const snap = await db.collection('users').doc(user.uid).get();
                 
                 if (snap.exists) {
-                    log('Return user found! Directing to Home...');
                     window.location.href = 'home_preview.html';
                 } else {
-                    log('New User detected. Directing to Setup...');
                     window.location.href = 'onboarding_name.html';
                 }
             } catch (err) {
@@ -193,18 +168,14 @@
         }
 
         btn.onclick = async () => {
-            alert("Starting Registration Auth...");
-            log('Starting Google Registration...');
             btn.innerText = 'Connecting...';
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 
                 if (isMobile) {
-                    log('Detected Mobile - Using Redirect...');
                     await firebase.auth().signInWithRedirect(provider);
                 } else {
-                    log('Detected Desktop - Using Popup...');
                     const result = await firebase.auth().signInWithPopup(provider);
                     if (result.user) {
                         await handleAuthSuccess(result.user);

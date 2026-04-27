@@ -14,16 +14,14 @@
             width: 100vw; height: 100vh; background:white; 
             display:flex; flex-direction:column; position:relative; overflow:hidden;
             transition: all 0.3s ease;
-            box-shadow: none;
         }
 
-        /* Desktop Mockup View - RE-TUNED */
-        @media (min-width: 500px) {
+        /* Desktop Mockup View */
+        @media (min-width: 481px) {
             body { background:#E5E7EB; }
             .phone { 
                 width:375px; height:812px; border-radius:44px; border:8px solid #1E293B; 
                 box-shadow:0 40px 80px rgba(0,0,0,0.1); 
-                margin: auto;
             }
         }
 
@@ -110,11 +108,6 @@
             <a href="sembang.html" class="nav-item"><div class="nav-icon">💬</div><span data-t="chat">Sembang</span></a>
             <a href="islam_preview.html" class="nav-item"><div class="nav-icon">🕌</div><span data-t="islam">Islam</span></a>
             <a href="profile_preview.html" class="nav-item"><div class="nav-icon">👤</div><span data-t="profile">Saya</span></a>
-            <div id="debugLog" class="debug-console">
-                <button onclick="localStorage.clear(); location.href='login_preview.html'" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; font-weight:900; margin-right:10px;">RESET SESSION</button>
-                <button onclick="window.seedProduction()" style="background:green; color:white; border:none; padding:5px 10px; border-radius:5px; font-weight:900;">SEED DATA</button>
-                <div id="logContent"></div>
-            </div>
         </nav>
 
         <!-- Filter Overlay & Drawer -->
