@@ -101,8 +101,20 @@
             margin: 0 auto; cursor: pointer;
         }
 
-        .footer-note { margin-top: 24px; font-size: 14px; color: var(--text-dim); }
-        .footer-note a { color: var(--gold); text-decoration: none; font-weight: 600; }
+        .debug-console {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 11px;
+            color: #00ff00;
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -121,6 +133,7 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2s-2-.9-2-2v-2c0-1.1.9-2 2-2z"/><path d="M18 11c0-3.3-2.7-6-6-6s-6 2.7-6 6v10"/><path d="M22 11c0-5.5-4.5-10-10-10S2 5.5 2 11v10"/></svg>
             </div>
             <div class="footer-note">Don't have an account? <a href="register_preview.html">Register Now</a></div>
+            <div id="debugLog" class="debug-console"></div>
         </div>
     </div>
 
@@ -151,49 +164,56 @@
             }
         };
 
+        const debugEl = document.getElementById('debugLog');
+        function log(msg) {
+            debugEl.style.display = 'block';
+            debugEl.innerHTML += `> ${msg}<br>`;
+            console.log(msg);
+        }
+
         btn.onclick = async () => {
+            log('Starting Google Login...');
             btn.innerText = 'Connecting...';
             
-            // 🛡️ UNIVERSAL WEB FLOW v37.0 (ELITE)
-            // We use the 100% verified Web flow for BOTH Phone and Browser.
-            // This bypasses all native Pigeon crashes and redirect loops.
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
-                
-                // Use Redirect instead of Popup for better mobile WebView support
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 
                 if (isMobile) {
+                    log('Detected Mobile - Using Redirect...');
                     await firebase.auth().signInWithRedirect(provider);
                 } else {
+                    log('Detected Desktop - Using Popup...');
                     const result = await firebase.auth().signInWithPopup(provider);
                     if (result.user) {
+                        log('Login Success: ' + result.user.email);
                         localStorage.setItem('current_user_id', result.user.uid);
                         window.location.href = 'home_preview.html';
                     }
                 }
             } catch (e) {
-                alert("Auth Error: " + e.message);
+                log('CRITICAL ERROR: ' + e.message);
                 btn.innerText = 'Continue with Google';
             }
         };
 
-        // Handle the redirect result when the page reloads
         window.onload = () => {
+            log('Page loaded. Checking for redirect result...');
             firebase.auth().getRedirectResult().then((result) => {
-                if (result.user) {
+                if (result && result.user) {
+                    log('Redirect Success: ' + result.user.email);
                     localStorage.setItem('current_user_id', result.user.uid);
                     window.location.href = 'home_preview.html';
+                } else {
+                    log('No active session found.');
                 }
             }).catch((error) => {
-                if (error.code !== 'auth/no-current-user') {
-                    console.error("Redirect Result Error:", error);
-                }
+                log('Redirect Error: ' + error.message);
             });
             
-            // Check for auto-trigger
             const params = new URLSearchParams(window.location.search);
             if (params.get('provider') === 'google') {
+                log('Auto-triggering login...');
                 btn.click();
             }
         };
