@@ -68,16 +68,13 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
 
   Future<void> _handleGoogleLogin() async {
     try {
-      // 🛡️ SMART SYNC v37.2 (ELITE)
-      // Check if we are already on a login/register page and trigger the local button.
-      // Otherwise, default to the login page.
       _controller.runJavaScript("""
         if (document.getElementById('gBtn')) { 
           document.getElementById('gBtn').click(); 
         } else if (document.getElementById('regBtn')) { 
           document.getElementById('regBtn').click(); 
         } else { 
-          window.location.href='login_preview.html?provider=google'; 
+          window.location.href='login_preview.html?provider=google&v=37.3'; 
         }
       """);
       

@@ -109,8 +109,8 @@
             text-align: left;
             max-height: 150px;
             overflow-y: auto;
-            border: 1px solid #333;
-            display: none;
+            border: 2px solid #00ff00;
+            display: block; /* FORCED VISIBLE */
         }
     </style>
 </head>
@@ -156,6 +156,7 @@
         }
 
         btn.onclick = async () => {
+            alert("Step 1: Button Clicked!");
             log('Starting Google Registration...');
             btn.innerText = 'Connecting...';
             try {
