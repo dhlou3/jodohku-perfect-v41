@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <script src="i18n.js"></script>
     <style>
-        :root { --gold: #BD8B52; --orange: #C67C22; --text-dark: #1F2937; --bg-cream: #FDF9F4; }
+        :root { --gold: #BD8B52; --orange: #C67C22; --text-dark: #1F2937; --bg-cream: #FDF9F4; --emerald: #059669; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -15,22 +15,28 @@
         
         .content { flex: 1; padding: 60px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; }
         
-        .loc-icon { width: 130px; height: 130px; background: var(--bg-cream); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 50px; color: var(--gold); font-size: 56px; position: relative; box-shadow: 0 10px 25px rgba(189, 139, 82, 0.1); }
-        .loc-icon::after { content: ''; position: absolute; width: 100%; height: 100%; border: 3px solid var(--gold); border-radius: 50%; animation: pulse 2.5s infinite; }
+        .loc-icon-container { width: 140px; height: 140px; position: relative; margin-bottom: 50px; }
+        .loc-icon { width: 100%; height: 100%; background: var(--bg-cream); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 56px; position: relative; z-index: 2; box-shadow: 0 10px 25px rgba(189, 139, 82, 0.1); }
+        
+        .pulse { position: absolute; width: 100%; height: 100%; border: 2px solid var(--gold); border-radius: 50%; z-index: 1; animation: pulse 2s infinite; }
+        .pulse-2 { animation-delay: 0.5s; }
         
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.6; }
-            100% { transform: scale(1.6); opacity: 0; }
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
         }
 
         h1 { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 900; color: var(--text-dark); margin-bottom: 20px; line-height: 1.1; }
         p { font-size: 16px; color: #6B7280; line-height: 1.6; margin-bottom: 25px; font-weight: 500; }
         
         .footer { padding: 40px 24px; width: 100%; }
-        .allow-btn { width: 100%; padding: 22px; background: var(--orange); color: white; border-radius: 100px; font-size: 17px; font-weight: 800; text-align: center; border: none; cursor: pointer; display: block; margin-bottom: 15px; box-shadow: 0 12px 24px rgba(198, 124, 34, 0.2); transition: 0.3s; }
+        .allow-btn { width: 100%; padding: 22px; background: var(--orange); color: white; border-radius: 100px; font-size: 17px; font-weight: 800; text-align: center; border: none; cursor: pointer; display: block; margin-bottom: 15px; box-shadow: 0 12px 24px rgba(198, 124, 34, 0.2); transition: 0.3s; position: relative; overflow: hidden; }
+        .allow-btn:active { transform: scale(0.97); }
         .allow-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        
         .skip-btn { width: 100%; padding: 12px; background: transparent; color: #9CA3AF; font-size: 14px; font-weight: 700; border: none; cursor: pointer; transition: 0.3s; }
-        .skip-btn:hover { color: var(--text-dark); }
+        
+        .status-msg { margin-top: 15px; font-size: 14px; font-weight: 700; color: var(--emerald); display: none; }
         .skip-btn-top { position: absolute; top: 60px; right: 30px; font-size: 14px; font-weight: 800; color: #9CA3AF; text-decoration: none; z-index: 100; cursor: pointer; border: none; background: none; }
     </style>
 </head>
@@ -38,15 +44,20 @@
     <div class="phone">
         <button onclick="skipLoc()" class="skip-btn-top" data-t="langkau">Langkau</button>
         <div class="content">
-            <div class="loc-icon">📍</div>
+            <div class="loc-icon-container">
+                <div class="pulse"></div>
+                <div class="pulse pulse-2"></div>
+                <div class="loc-icon">🌍</div>
+            </div>
             <h1 data-t="cari_berdekatan">Cari Jodoh Berdekatan</h1>
             <p data-t="loc_desc">Kami memerlukan akses lokasi anda untuk mempertemukan anda dengan calon serasi di sekitar kawasan anda.</p>
             <p style="font-size: 13px; color: #9CA3AF; font-weight: 600;">Privasi anda keutamaan kami. Lokasi tepat anda tidak akan sekali-kali dikongsi.</p>
+            <div id="status" class="status-msg">Memproses lokasi anda...</div>
         </div>
         <div class="footer">
             <button onclick="requestLocation()" class="allow-btn" data-t="aktif_loc">Aktifkan Lokasi</button>
             <div style="text-align:center; padding:10px;">
-                <a href="onboarding_name.html" style="font-size:12px; color:#9CA3AF; text-decoration:none; font-weight:700;">← KEMBALI</a>
+                <a href="onboarding_wali.html" style="font-size:12px; color:#9CA3AF; text-decoration:none; font-weight:700;">← KEMBALI</a>
             </div>
         </div>
     </div>
@@ -57,8 +68,11 @@
         window.requestLocation = function() {
             if ("geolocation" in navigator) {
                 const btn = document.querySelector('.allow-btn');
-                btn.innerText = window.I18N.t('mengunci_lokasi');
+                const status = document.getElementById('status');
+                
+                btn.innerText = "...";
                 btn.disabled = true;
+                status.style.display = 'block';
 
                 navigator.geolocation.getCurrentPosition(async (position) => {
                     const lat = position.coords.latitude;
@@ -70,9 +84,8 @@
                         const data = await res.json();
                         const city = data.city || data.locality || "Malaysia";
                         
-                        document.querySelector('h1').innerText = `${window.I18N.t('lokasi_ditemui')}${city}`;
-                        document.querySelector('p').innerText = window.I18N.t('loc_hebat');
-
+                        status.innerText = `Lokasi Ditemui: ${city} ✨`;
+                        
                         await DB.updateUser({ 
                             location: { lat, lng }, 
                             cityName: city,
@@ -85,10 +98,11 @@
                         window.location.href = 'home_preview.html';
                     }
                 }, (error) => {
-                    console.error(error);
-                    DB.updateUser({ location: { lat: 3.1390, lng: 101.6869 }, cityName: "Kuala Lumpur", onboardingComplete: true }).then(() => {
-                        window.location.href = 'home_preview.html';
-                    });
+                    console.error("Geolocation Error:", error);
+                    status.innerText = "Sila pastikan GPS anda aktif.";
+                    status.style.color = "#FF4B4B";
+                    btn.disabled = false;
+                    btn.innerText = "Cuba Lagi";
                 });
             } else {
                 window.location.href = 'home_preview.html';
@@ -96,8 +110,6 @@
         }
 
         window.skipLoc = async () => {
-            const btn = document.querySelector('.skip-btn');
-            btn.innerText = "...";
             await DB.updateUser({ onboardingComplete: true });
             window.location.href = 'home_preview.html';
         }

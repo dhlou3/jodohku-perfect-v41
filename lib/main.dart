@@ -3,6 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,9 +78,16 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
     }
   }
 
+  Future<void> _requestPermissions() async {
+    await [
+      Permission.location,
+    ].request();
+  }
+
   @override
   void initState() {
     super.initState();
+    _requestPermissions();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent("Mozilla/5.0 (Android 13; Mobile; rv:109.0) Gecko/116.0 Firefox/116.0")

@@ -33,21 +33,6 @@
             padding: 40px 24px;
         }
 
-        /* THE BOX OF TRUTH */
-        .version-box {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #FF0000;
-            color: white;
-            padding: 5px 10px;
-            font-size: 10px;
-            font-weight: bold;
-            border-radius: 4px;
-            z-index: 100;
-            opacity: 0.8;
-        }
-
         .hero-section {
             position: absolute;
             top: 25%;
@@ -118,9 +103,6 @@
 </head>
 <body>
     <div class="phone-container">
-        <!-- VERIFICATION BOX -->
-        <div class="version-box">BUILD: 28.0 - LOCALHOST MIRROR</div>
-
         <div class="hero-section">
             <div class="logo-symbol"></div>
             <h1>Create Account</h1>
@@ -160,7 +142,8 @@
                 const result = await firebase.auth().signInWithPopup(provider);
                 if (result.user) {
                     localStorage.setItem('current_user_id', result.user.uid);
-                    window.location.href = 'home_preview.html';
+                    // REDIRECT TO FIRST ONBOARDING PAGE
+                    window.location.href = 'onboarding_name.html';
                 }
             } catch (e) {
                 alert("Login Error: " + e.message);
