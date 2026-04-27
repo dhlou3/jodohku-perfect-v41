@@ -78,7 +78,7 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
       _controller.runJavaScript("window.location.href='login_preview.html?provider=google';");
       
     } catch (e) {
-      debugPrint("💎 [SENTINEL] Shield Failure: $error");
+      debugPrint("💎 [SENTINEL] Shield Failure: $e");
     }
   }
 
