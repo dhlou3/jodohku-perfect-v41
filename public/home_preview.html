@@ -176,10 +176,6 @@
     <script type="module">
         import { DB } from './database.js';
         
-        const logContent = document.getElementById('logContent');
-        function log(msg) {
-            logContent.innerHTML += `> ${msg}<br>`;
-        }
 
         let allProfiles = []; let profiles = []; let index = 0; let me = null; let currentPhotoIndex = 0;
         let selectedInterests = [];
@@ -188,23 +184,16 @@
 
         async function init() {
             try {
-                log('System Init...');
                 const id = localStorage.getItem('current_user_id');
-                log('Session ID: ' + id);
 
                 me = await DB.getCurrentUser();
                 if(!me) {
-                    log('No profile data found for this ID.');
                     return;
                 }
-                log('Logged in as: ' + (me.fullName || me.name));
-                log('Gender: ' + me.gender);
 
                 renderInterestChips();
 
-                log('Fetching candidates...');
                 allProfiles = await DB.getDiscoveryUsers();
-                log('Found ' + allProfiles.length + ' candidates.');
                 
                 applyFiltersLocally(); // Initial filter apply
                 render();

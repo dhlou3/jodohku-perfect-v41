@@ -180,34 +180,28 @@
                 if (isMobile) {
                     await firebase.auth().signInWithRedirect(provider);
                 } else {
-                    log('Detected Desktop - Using Popup...');
                     const result = await firebase.auth().signInWithPopup(provider);
                     if (result.user) {
                         await handleAuthSuccess(result.user);
                     }
                 }
             } catch (e) {
-                log('AUTH ERROR: ' + e.message);
+                console.error('AUTH ERROR: ' + e.message);
                 btn.innerText = 'Continue with Google';
             }
         };
 
         window.onload = () => {
-            log('Checking for redirect result...');
             firebase.auth().getRedirectResult().then(async (result) => {
                 if (result && result.user) {
-                    log('Redirect Success!');
                     await handleAuthSuccess(result.user);
-                } else {
-                    log('No cached session found.');
                 }
             }).catch((error) => {
-                log('Redirect Error: ' + error.message);
+                console.error('Redirect Error: ' + error.message);
             });
             
             const params = new URLSearchParams(window.location.search);
             if (params.get('provider') === 'google') {
-                log('Auto-triggering login...');
                 btn.click();
             }
         };
