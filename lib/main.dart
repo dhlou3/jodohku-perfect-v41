@@ -109,7 +109,16 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
     
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setUserAgent("Mozilla/5.0 (Android 13; Mobile; rv:109.0) Gecko/116.0 Firefox/116.0")
+      ..setUserAgent("Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36")
+      ..addJavaScriptChannel(
+        'FlutterApp',
+        onMessageReceived: (JavaScriptMessage message) {
+          if (message.message.startsWith('onLoginSuccess:')) {
+            final uid = message.message.split(':')[1];
+            _syncToken(uid);
+          }
+        },
+      )
       ..setNavigationDelegate(
         NavigationDelegate(
           onNavigationRequest: (NavigationRequest request) {
@@ -123,7 +132,7 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://jodohku-61096.web.app/landing_preview.html?v=38.0'));
+      ..loadRequest(Uri.parse('https://jodohku-61096.web.app/landing_preview.html?v=41.2'));
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;

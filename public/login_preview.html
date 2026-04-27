@@ -171,6 +171,9 @@
         
         async function handleAuthSuccess(user) {
             localStorage.setItem('current_user_id', user.uid);
+            if (window.FlutterApp) {
+                window.FlutterApp.postMessage('onLoginSuccess:' + user.uid);
+            }
             
             try {
                 const db = firebase.firestore();

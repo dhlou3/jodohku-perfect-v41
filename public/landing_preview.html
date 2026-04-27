@@ -74,8 +74,10 @@
         // AUTO-LOGIN CHECKER
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                // User is already signed in, check if profile exists
                 localStorage.setItem('current_user_id', user.uid);
+                if (window.FlutterApp) {
+                    window.FlutterApp.postMessage('onLoginSuccess:' + user.uid);
+                }
                 
                 const db = firebase.firestore();
                 db.collection('users').doc(user.uid).get().then((snap) => {
