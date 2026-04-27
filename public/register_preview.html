@@ -55,16 +55,14 @@
         }
         .logo-symbol::after {
             content: '';
-            position: absolute;
-            top: 50%; left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             width: 24px; height: 2px;
             background: var(--gold);
         }
         .logo-symbol::before {
             content: '';
-            position: absolute;
-            top: 50%; left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             width: 2px; height: 24px;
             background: var(--gold);
@@ -110,25 +108,52 @@
             <h1>Create Account</h1>
             <p class="tagline">Join the community for a blessed journey.</p>
         </div>
-
         <div class="auth-card">
             <button class="btn-google" id="regBtn">
                 <img src="https://img.icons8.com/color/48/000000/google-logo.png" width="20" height="20">
                 <span>Continue with Google</span>
             </button>
-
-            <div class="footer-note">
-                Already have an account? <a href="login_preview.html">Log In</a>
-            </div>
+            <div class="footer-note">Already have an account? <a href="login_preview.html">Log In</a></div>
         </div>
     </div>
 
+    <!-- FIREBASE BASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZegwZmiUsddDY1-EcB27NYwuvxobkgx8",
+            authDomain: "jodohku-61096.firebaseapp.com",
+            projectId: "jodohku-61096",
+            storageBucket: "jodohku-61096.firebasestorage.app",
+            messagingSenderId: "982535553679",
+            appId: "1:982535553679:web:b7146ace7d99475ce126fa",
+        };
+        firebase.initializeApp(firebaseConfig);
+
         const btn = document.getElementById('regBtn');
+
         btn.onclick = async () => {
             btn.innerText = 'Connecting...';
-            // BULLETPROOF TUNNEL
-            window.location.href = "appbridge://googleLogin";
+            // SMART DETECTION
+            const isApk = (navigator.userAgent.includes('Android') && !navigator.userAgent.includes('Chrome'));
+            
+            if (isApk) {
+                window.location.href = "appbridge://googleLogin";
+            } else {
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    const result = await firebase.auth().signInWithPopup(provider);
+                    if (result.user) {
+                        localStorage.setItem('current_user_id', result.user.uid);
+                        window.location.href = 'home_preview.html';
+                    }
+                } catch (e) {
+                    alert("Browser Error: " + e.message);
+                    btn.innerText = 'Continue with Google';
+                }
+            }
         };
     </script>
 </body>

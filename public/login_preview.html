@@ -48,11 +48,11 @@
             border: 2px solid var(--gold);
             border-radius: 50%;
             margin: 0 auto 24px;
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             background: rgba(189,139,82,0.1);
+            position: relative;
         }
         .logo-symbol::after {
             content: 'G';
@@ -94,16 +94,11 @@
         }
 
         .biometric-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+            width: 60px; height: 60px; border-radius: 50%;
             border: 1px solid rgba(189, 139, 82, 0.3);
             background: rgba(189, 139, 82, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto; cursor: pointer;
         }
 
         .footer-note { margin-top: 24px; font-size: 14px; color: var(--text-dim); }
@@ -117,27 +112,35 @@
             <h1>Welcome Back</h1>
             <p class="tagline">Explore matches and chat securely.</p>
         </div>
-
         <div class="auth-card">
             <button class="btn-google" id="gBtn">
                 <img src="https://img.icons8.com/color/48/000000/google-logo.png" width="22" height="22">
                 <span>Continue with Google</span>
             </button>
-
             <div class="biometric-btn" id="bioBtn">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2s-2-.9-2-2v-2c0-1.1.9-2 2-2z"/><path d="M18 11c0-3.3-2.7-6-6-6s-6 2.7-6 6v10"/><path d="M22 11c0-5.5-4.5-10-10-10S2 5.5 2 11v10"/></svg>
             </div>
-
-            <div class="footer-note">
-                Don't have an account? <a href="register_preview.html">Register Now</a>
-            </div>
+            <div class="footer-note">Don't have an account? <a href="register_preview.html">Register Now</a></div>
         </div>
     </div>
 
+    <!-- FIREBASE BASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZegwZmiUsddDY1-EcB27NYwuvxobkgx8",
+            authDomain: "jodohku-61096.firebaseapp.com",
+            projectId: "jodohku-61096",
+            storageBucket: "jodohku-61096.firebasestorage.app",
+            messagingSenderId: "982535553679",
+            appId: "1:982535553679:web:b7146ace7d99475ce126fa",
+        };
+        firebase.initializeApp(firebaseConfig);
+
         const btn = document.getElementById('gBtn');
         const trigger = document.getElementById('masterTrigger');
-        const bioBtn = document.getElementById('bioBtn');
         let taps = 0;
 
         trigger.onclick = () => {
@@ -148,14 +151,28 @@
             }
         };
 
-        bioBtn.onclick = () => {
-            alert("🔒 Biometrics: Please use Google Login for the first time to link your fingerprint.");
-        };
-
         btn.onclick = async () => {
             btn.innerText = 'Connecting...';
-            // BULLETPROOF TUNNEL
-            window.location.href = "appbridge://googleLogin";
+            // SMART DETECTION
+            const isApk = (navigator.userAgent.includes('Android') && !navigator.userAgent.includes('Chrome'));
+            
+            if (isApk) {
+                // PHONE MODE: Use Tunnel
+                window.location.href = "appbridge://googleLogin";
+            } else {
+                // WEB MODE: Use Popup
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    const result = await firebase.auth().signInWithPopup(provider);
+                    if (result.user) {
+                        localStorage.setItem('current_user_id', result.user.uid);
+                        window.location.href = 'home_preview.html';
+                    }
+                } catch (e) {
+                    alert("Browser Error: " + e.message);
+                    btn.innerText = 'Continue with Google';
+                }
+            }
         };
     </script>
 </body>
