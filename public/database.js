@@ -715,6 +715,9 @@ export const DB = {
                     const data = checkDoc.data();
                     // If the account is missing the new Elite Email or lat/lng, force sync
                     if (!data.email || !data.lat) needsUpgrade = true;
+                } else {
+                    // Critical: If e_rev is totally missing, we MUST bootstrap to seed the database
+                    needsUpgrade = true;
                 }
             }
 
