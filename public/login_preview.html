@@ -154,6 +154,7 @@
     <!-- FIREBASE BASE -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -167,26 +168,36 @@
         firebase.initializeApp(firebaseConfig);
 
         const btn = document.getElementById('gBtn');
-        const trigger = document.getElementById('masterTrigger');
-        let taps = 0;
-
-        trigger.onclick = () => {
-            taps++;
-            if (taps >= 5) {
-                localStorage.setItem('current_user_id', 'demo_admin_123');
-                window.location.href = 'home_preview.html';
-            }
-        };
-
         const debugEl = document.getElementById('debugLog');
+        
         function log(msg) {
             debugEl.style.display = 'block';
             debugEl.innerHTML += `> ${msg}<br>`;
             console.log(msg);
         }
 
+        async function handleAuthSuccess(user) {
+            log('Verifying profile for ' + user.email + '...');
+            localStorage.setItem('current_user_id', user.uid);
+            
+            try {
+                const db = firebase.firestore();
+                const snap = await db.collection('users').doc(user.uid).get();
+                
+                if (snap.exists) {
+                    log('Profile found! Directing to Home...');
+                    window.location.href = 'home_preview.html';
+                } else {
+                    log('No profile found. Directing to Onboarding...');
+                    window.location.href = 'onboarding_name.html';
+                }
+            } catch (err) {
+                log('Firestore Error: ' + err.message);
+            }
+        }
+
         btn.onclick = async () => {
-            alert("Step 1: Button Clicked!");
+            alert("Starting Auth Flow...");
             log('Starting Google Login...');
             btn.innerText = 'Connecting...';
             
@@ -201,26 +212,23 @@
                     log('Detected Desktop - Using Popup...');
                     const result = await firebase.auth().signInWithPopup(provider);
                     if (result.user) {
-                        log('Login Success: ' + result.user.email);
-                        localStorage.setItem('current_user_id', result.user.uid);
-                        window.location.href = 'home_preview.html';
+                        await handleAuthSuccess(result.user);
                     }
                 }
             } catch (e) {
-                log('CRITICAL ERROR: ' + e.message);
+                log('AUTH ERROR: ' + e.message);
                 btn.innerText = 'Continue with Google';
             }
         };
 
         window.onload = () => {
-            log('Page loaded. Checking for redirect result...');
-            firebase.auth().getRedirectResult().then((result) => {
+            log('Checking for redirect result...');
+            firebase.auth().getRedirectResult().then(async (result) => {
                 if (result && result.user) {
-                    log('Redirect Success: ' + result.user.email);
-                    localStorage.setItem('current_user_id', result.user.uid);
-                    window.location.href = 'home_preview.html';
+                    log('Redirect Success!');
+                    await handleAuthSuccess(result.user);
                 } else {
-                    log('No active session found.');
+                    log('No cached session found.');
                 }
             }).catch((error) => {
                 log('Redirect Error: ' + error.message);
