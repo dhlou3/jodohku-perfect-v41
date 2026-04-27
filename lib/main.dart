@@ -123,7 +123,7 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
           },
         ),
       )
-      ..loadFlutterAsset('assets/www/landing_preview.html');
+      ..loadRequest(Uri.parse('https://jodohku-61096.web.app/landing_preview.html?v=38.0'));
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
