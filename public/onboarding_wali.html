@@ -252,16 +252,33 @@
                 return;
             }
 
+            const btn = document.querySelector('.finish-btn');
+            btn.disabled = true;
+            btn.innerText = (window.I18N.t('penyediaan_profil') || 'Penyediaan Profil...');
+
             try {
+                const user = await DB.getCurrentUser();
+                const waliData = { name, ic, email, phone };
+                
                 const ok = await DB.updateUser({
                     waliName: name,
                     waliIC: ic,
                     waliEmail: email,
                     waliPhone: phone
                 });
-                if (ok) window.location.href = 'onboarding_location.html';
-                else alert(window.I18N.t('tech_error'));
-            } catch (e) { console.error(e); }
+
+                if (ok) {
+                    // 🛡️ ELITE SENTINEL: Trigger official invitation
+                    await DB.sendWaliInvitation(user, waliData);
+                    window.location.href = 'onboarding_location.html';
+                } else {
+                    alert(window.I18N.t('tech_error'));
+                }
+            } catch (e) { 
+                console.error(e); 
+                btn.disabled = false;
+                btn.innerText = (window.I18N.t('lengkapkan_btn') || 'Lengkapkan Profil ➔');
+            }
         }
 
         window.addEventListener('DOMContentLoaded', async () => {

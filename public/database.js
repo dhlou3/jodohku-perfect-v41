@@ -866,16 +866,67 @@ export const DB = {
         }
     },
 
-    disablePushNotifications: async () => {
+    getUserById: async (uid) => {
         try {
-            const uid = localStorage.getItem('current_user_id');
-            if(!uid) return false;
-            await updateDoc(doc(db, "users", uid), {
-                pushActive: false,
+            const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            const snap = await getDoc(doc(DB.db, "users", uid));
+            if (snap.exists()) return { uid: snap.id, ...snap.data() };
+            return null;
+        } catch (e) { return null; }
+    },
+
+    externalUpdateUser: async (uid, data) => {
+        try {
+            const { doc, updateDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            await updateDoc(doc(DB.db, "users", uid), {
+                ...data,
                 updatedAt: serverTimestamp()
             });
             return true;
         } catch (e) { return false; }
+    },
+
+    sendWaliInvitation: async (user, waliData) => {
+        try {
+            const { doc, setDoc, collection, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            const mailRef = doc(collection(DB.db, "mail"));
+            
+            // 🛡️ ELITE GUARDIAN PROTOCOL v5.0
+            await setDoc(mailRef, {
+                to: waliData.email,
+                from: "Jodohku Official <official@jodohku.my>",
+                message: {
+                    subject: `[RASMI] Jemputan Pengesahan Taaruf: ${user.fullName || 'Ahli Jodohku'}`,
+                    html: `
+                        <div style="font-family: sans-serif; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px;">
+                            <h2 style="color: #BD8B52;">Perisytiharan Taaruf Rasmi</h2>
+                            <p>Assalammualaikum Warahmatullahi Wabarakatuh, <b>Tuan/Puan ${waliData.name}</b>.</p>
+                            <p>Ahli di bawah jagaan anda, <b>${user.fullName}</b>, telah mendaftarkan anda sebagai Wali/Penjaga rasmi di platform Jodohku Malaysia.</p>
+                            <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                <b>Dossier Profil:</b><br>
+                                Nama: ${user.fullName}<br>
+                                ID Jodohku: ${user.jodohkuId || 'JDK-PRO'}<br>
+                                Status: Ahli Disahkan (Verified Member)
+                            </div>
+                            <p>Pihak Jodohku menjamin bahawa setiap perkenalan dilakukan mengikut syariat Islam dengan pengawasan Wali.</p>
+                            <a href="https://jodohku-61096.web.app/wali_dossier.html?uid=${user.uid}" 
+                               style="display: inline-block; padding: 14px 24px; background: #BD8B52; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                               LIHAT DOSSIER TAARUF LENGKAP ➔
+                            </a>
+                            <p style="font-size: 12px; color: #64748b; margin-top: 30px;">
+                                Emel ini dijana secara automatik oleh Jodohku Sentinel. Jika anda bukan individu yang dimaksudkan, sila abaikan emel ini.
+                            </p>
+                        </div>
+                    `
+                },
+                createdAt: serverTimestamp()
+            });
+            console.log("💎 [GUARDIAN] Invitation sent to " + waliData.email);
+            return true;
+        } catch (e) {
+            console.error("Wali Invite Error:", e);
+            return false;
+        }
     },
 
     logout: () => {
