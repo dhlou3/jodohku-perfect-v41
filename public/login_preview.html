@@ -167,27 +167,37 @@
         firebase.initializeApp(firebaseConfig);
 
         const btn = document.getElementById('gBtn');
-        const debugEl = document.getElementById('debugLog');
+        const bioBtn = document.getElementById('bioBtn');
         
         async function handleAuthSuccess(user) {
-            localStorage.setItem('current_user_id', user.uid);
+            const uid = user.uid || user.id;
+            localStorage.setItem('current_user_id', uid);
             if (window.FlutterApp) {
-                window.FlutterApp.postMessage('onLoginSuccess:' + user.uid);
+                window.FlutterApp.postMessage('onLoginSuccess:' + uid);
             }
             
             try {
                 const db = firebase.firestore();
-                const snap = await db.collection('users').doc(user.uid).get();
+                const snap = await db.collection('users').doc(uid).get();
                 
                 if (snap.exists) {
-                    window.location.href = 'home_preview.html?v=41.2';
+                    window.location.href = 'home_preview.html?v=41.4';
                 } else {
-                    window.location.href = 'onboarding_name.html?v=41.2';
+                    window.location.href = 'onboarding_name.html?v=41.4';
                 }
             } catch (err) {
                 console.error('Firestore Error:', err);
+                if (user.isBio) window.location.href = 'home_preview.html?v=41.4';
             }
         }
+
+        bioBtn.onclick = () => {
+            if (window.FlutterApp) {
+                window.FlutterApp.postMessage('requestBiometric');
+            } else {
+                alert('Biometrics only available on official mobile app.');
+            }
+        };
 
         btn.onclick = async () => {
             btn.innerText = 'Connecting...';

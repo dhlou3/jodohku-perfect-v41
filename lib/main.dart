@@ -7,6 +7,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -65,6 +67,34 @@ class HybridMainScreen extends StatefulWidget {
 class _HybridMainScreenState extends State<HybridMainScreen> {
   late final WebViewController _controller;
   String? _fcmToken;
+  final LocalAuthentication auth = LocalAuthentication();
+
+  Future<void> _handleBiometricRequest() async {
+    try {
+      final bool canAuth = await auth.isDeviceSupported() || await auth.canCheckBiometrics;
+      if (!canAuth) {
+        _controller.runJavaScript("alert('Biometrics not supported or setup missing.')");
+        return;
+      }
+
+      final bool didAuthenticate = await auth.authenticate(
+        localizedReason: 'Sila sahkan identiti untuk masuk Jodohku Malaysia.',
+        options: const AuthenticationOptions(stickyAuth: true, biometricsOnly: true),
+      );
+
+      if (didAuthenticate) {
+        final prefs = await SharedPreferences.getInstance();
+        final savedUid = prefs.getString('saved_uid');
+        if (savedUid != null) {
+          _controller.runJavaScript("handleAuthSuccess({uid: '$savedUid', isBio: true})");
+        } else {
+          _controller.runJavaScript("alert('Sila Log Masuk dengan Google sekali untuk mengaktifkan biometrik.')");
+        }
+      }
+    } catch (e) {
+      debugPrint("BIOMETRIC_ERROR: $e");
+    }
+  }
 
   Future<void> _handleGoogleLogin() async {
     try {
@@ -74,12 +104,11 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
         } else if (document.getElementById('regBtn')) { 
           document.getElementById('regBtn').click(); 
         } else { 
-          window.location.href='login_preview.html?provider=google&v=37.3'; 
+          window.location.href='login_preview.html?provider=google&v=41.4'; 
         }
       """);
-      
     } catch (e) {
-      debugPrint("💎 [SENTINEL] Shield Failure: $e");
+      debugPrint("Shield Failure: $e");
     }
   }
 
@@ -94,6 +123,9 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
   }
 
   Future<void> _syncToken(String uid) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('saved_uid', uid);
+    
     if (_fcmToken != null) {
       await FirebaseFirestore.instance.collection('users').doc(uid).update({
         'fcmTokens': FieldValue.arrayUnion([_fcmToken]),
@@ -116,6 +148,8 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
           if (message.message.startsWith('onLoginSuccess:')) {
             final uid = message.message.split(':')[1];
             _syncToken(uid);
+          } else if (message.message == 'requestBiometric') {
+            _handleBiometricRequest();
           }
         },
       )
@@ -132,7 +166,7 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://jodohku-61096.web.app/landing_preview.html?v=41.2'));
+      ..loadRequest(Uri.parse('https://jodohku-61096.web.app/landing_preview.html?v=41.4'));
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
