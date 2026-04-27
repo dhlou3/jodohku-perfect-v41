@@ -47,6 +47,13 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("com.google.android.gms:play-services-auth:20.7.0")
+        force("com.google.android.gms:play-services-base:18.2.0")
+    }
+}
+
 flutter {
     source = "../.."
 }
