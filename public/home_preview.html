@@ -110,6 +110,10 @@
             <a href="sembang.html" class="nav-item"><div class="nav-icon">💬</div><span data-t="chat">Sembang</span></a>
             <a href="islam_preview.html" class="nav-item"><div class="nav-icon">🕌</div><span data-t="islam">Islam</span></a>
             <a href="profile_preview.html" class="nav-item"><div class="nav-icon">👤</div><span data-t="profile">Saya</span></a>
+            <div id="debugLog" class="debug-console">
+                <button onclick="localStorage.clear(); location.href='login_preview.html'" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; font-weight:900; margin-bottom:10px;">RESET SESSION</button>
+                <div id="logContent"></div>
+            </div>
         </nav>
 
         <!-- Filter Overlay & Drawer -->
@@ -178,6 +182,11 @@
     <script type="module">
         import { DB } from './database.js';
         
+        const logContent = document.getElementById('logContent');
+        function log(msg) {
+            logContent.innerHTML += `> ${msg}<br>`;
+        }
+
         let allProfiles = []; let profiles = []; let index = 0; let me = null; let currentPhotoIndex = 0;
         let selectedInterests = [];
 
@@ -185,21 +194,23 @@
 
         async function init() {
             try {
-                console.log("🎬 Discovery engine starting...");
-                const myId = localStorage.getItem('current_user_id'); 
-                if(!myId) return;
-                
+                log('System Init...');
+                const id = localStorage.getItem('current_user_id');
+                log('Session ID: ' + id);
+
                 me = await DB.getCurrentUser();
-                if(!me) return;
-                
-                // Location Prep
-                const loc = await DB.updateUserLocation();
-                if(loc) { me.lat = loc.lat; me.lng = loc.lng; }
+                if(!me) {
+                    log('No profile data found for this ID.');
+                    return;
+                }
+                log('Logged in as: ' + (me.fullName || me.name));
+                log('Gender: ' + me.gender);
 
                 renderInterestChips();
 
+                log('Fetching candidates...');
                 allProfiles = await DB.getDiscoveryUsers();
-                console.log(`✅ Raw candidates found: ${allProfiles.length}`);
+                log('Found ' + allProfiles.length + ' candidates.');
                 
                 applyFiltersLocally(); // Initial filter apply
                 render();
