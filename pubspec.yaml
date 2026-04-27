@@ -29,7 +29,7 @@ dependencies:
   cached_network_image: ^3.3.0
   flutter_svg: ^2.0.9
   webview_flutter: 4.4.2
-  google_sign_in: 6.2.1
+  google_sign_in: 6.1.4
   local_auth: ^2.1.8
 
 dev_dependencies:
