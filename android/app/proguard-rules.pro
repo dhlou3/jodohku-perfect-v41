@@ -1,0 +1,6 @@
+-keep class com.google.android.gms.auth.api.signin.** { *; }
+-keep class io.flutter.plugins.googlesignin.** { *; }
+-keep class com.google.android.gms.common.api.Status { *; }
+-keep class com.google.android.gms.auth.api.signin.GoogleSignInAccount { *; }
+-keep class * extends com.google.android.gms.common.api.Status { *; }
+-keep class * extends com.google.android.gms.auth.api.signin.GoogleSignInAccount { *; }
