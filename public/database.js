@@ -1,20 +1,20 @@
 // Jodohku - Global Professional Database Manager (ULTRAMAX STABILITY)
 console.log("💎 [System] Database logic initializing...");
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-    getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, 
-    addDoc, serverTimestamp, arrayUnion, arrayRemove, orderBy, onSnapshot, limit 
+import {
+    getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs,
+    addDoc, serverTimestamp, arrayUnion, arrayRemove, orderBy, onSnapshot, limit
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBZegwZmiUsddDY1-EcB27NYwuvxobkgx8",
-  authDomain: "jodohku-61096.firebaseapp.com",
-  projectId: "jodohku-61096",
-  storageBucket: "jodohku-61096.firebasestorage.app",
-  messagingSenderId: "982535553679",
-  appId: "1:982535553679:web:b7146ace7d99475ce126fa",
+    apiKey: "AIzaSyBZegwZmiUsddDY1-EcB27NYwuvxobkgx8",
+    authDomain: "jodohku-61096.firebaseapp.com",
+    projectId: "jodohku-61096",
+    storageBucket: "jodohku-61096.firebasestorage.app",
+    messagingSenderId: "982535553679",
+    appId: "1:982535553679:web:b7146ace7d99475ce126fa",
 };
 
 // GLOBAL ERROR HANDLING FOR FIREBASE
@@ -26,9 +26,9 @@ const messaging = getMessaging(app);
 
 // EXPOSE TO WINDOW FOR GLOBAL ACCESS IN PREVIEW FILES
 window.firestore_db = db;
-window.fs_sdk = { 
-    doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, 
-    addDoc, serverTimestamp, arrayUnion, arrayRemove, orderBy, onSnapshot, limit 
+window.fs_sdk = {
+    doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs,
+    addDoc, serverTimestamp, arrayUnion, arrayRemove, orderBy, onSnapshot, limit
 };
 
 export const DB = {
@@ -36,7 +36,7 @@ export const DB = {
         try {
             // Using Redirect for better stability in mobile environments
             const isApp = window.location.protocol === 'file:';
-            if(isApp && window.AppBridge) {
+            if (isApp && window.AppBridge) {
                 window.AppBridge.postMessage('googleLogin');
                 return null;
             }
@@ -59,12 +59,12 @@ export const DB = {
         try {
             let id = localStorage.getItem('current_user_id');
             const DEV_MODE = false; // 🛠️ TOGGLE THIS: Set to 'false' for Production Release
-            
+
             // AUTOMATIC SESSION WATCHDOG (Elite Seeding Support)
             if (!id || id === 'undefined') {
                 if (DEV_MODE) {
                     console.log("🕵️ DEV_MODE: Initializing Guest Reviewer session...");
-                    id = "e_rev"; 
+                    id = "e_rev";
                     localStorage.setItem('current_user_id', id);
                 } else {
                     console.log("🛑 PRODUCTION: No session found. Redirecting to Landing...");
@@ -72,14 +72,14 @@ export const DB = {
                     return null;
                 }
             }
-            
+
             let snap = await getDoc(doc(db, "users", id));
-            
+
             // SELF-HEALING: Create Reviewer account if missing
             if (!snap.exists() && id === "e_rev") {
                 console.log("🛠️ Seeding Reviewer Profile...");
                 const revData = {
-                    fullName: "Admin Reviewer", age: 30, gender: "man", 
+                    fullName: "Admin Reviewer", age: 30, gender: "man",
                     jobTitle: "Elite QA", city: "Kuala Lumpur",
                     photoUrl: "https://images.unsplash.com/photo-1519085185758-24dd5d14550a",
                     jodohkuId: "JDK-ADMIN-001",
@@ -97,40 +97,40 @@ export const DB = {
         try {
             console.log("🚀 [DB] Starting Discovery Search...");
             const me = await DB.getCurrentUser();
-            if(!me) return [];
+            if (!me) return [];
 
             const myGender = (me.gender || "man").toLowerCase();
             const isMale = ["man", "lelaki", "male"].includes(myGender);
-            
+
             // ELITE GENDER TARGETING
             let targets = isMale ? ["woman", "wanita", "perempuan"] : ["man", "lelaki", "male"];
-            
+
             console.log(`🔍 [DB] Target Genders: ${targets.join(', ')}`);
 
             const q = query(
-                collection(db, "users"), 
-                where("gender", "in", targets), 
+                collection(db, "users"),
+                where("gender", "in", targets),
                 limit(200)
             );
-            
+
             const snapshot = await getDocs(q);
-            let all = snapshot.docs.map(d => ({uid: d.id, ...d.data()}));
-            
+            let all = snapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
+
             console.log(`✅ [DB] Found ${all.length} candidates in target group.`);
 
             // SELF-HEALING: If no candidates found for your target gender, show anyone for testing
             if (all.length === 0) {
                 console.log("⚠️ [DB] No gender-matched candidates. Widening search to all users...");
                 const fallbackSnap = await getDocs(query(collection(db, "users"), limit(50)));
-                all = fallbackSnap.docs.map(d => ({uid: d.id, ...d.data()}));
+                all = fallbackSnap.docs.map(d => ({ uid: d.id, ...d.data() }));
             }
 
             const myMatches = await DB.getMatches(me.uid);
             const matchedUids = myMatches.map(m => m.memberA === me.uid ? m.memberB : m.memberA);
             const excluded = [...(me.likes || []), ...(me.skips || []), me.uid, ...matchedUids];
-            
+
             let filtered = all.filter(u => !excluded.includes(u.uid));
-            
+
             // EMERGENCY TEST RESET: If user has liked/skipped everyone, show them again for engagement
             if (filtered.length === 0 && all.length > 1) {
                 console.log("♻️ [DB] Resetting local view to prevent empty feed...");
@@ -138,19 +138,19 @@ export const DB = {
             }
 
             return filtered;
-        } catch (e) { 
-            console.error("🚨 [DB] Discovery Failure:", e.message); 
+        } catch (e) {
+            console.error("🚨 [DB] Discovery Failure:", e.message);
             // FINAL FALLBACK: return 20 random users just to show SOMETHING
             const snap = await getDocs(query(collection(db, "users"), limit(20)));
-            return snap.docs.map(d => ({uid: d.id, ...d.data()})).filter(u => u.uid !== localStorage.getItem('current_user_id'));
+            return snap.docs.map(d => ({ uid: d.id, ...d.data() })).filter(u => u.uid !== localStorage.getItem('current_user_id'));
         }
     },
 
     recordLike: async (myId, targetId) => {
         try {
             const me = await DB.getCurrentUser();
-            if(!me) return false;
-            
+            if (!me) return false;
+
             // 1. Record my like on my profile
             await updateDoc(doc(db, "users", myId), { likes: arrayUnion(targetId) });
 
@@ -162,11 +162,11 @@ export const DB = {
                 photoUrl: me.photoUrl || "",
                 timestamp: serverTimestamp()
             });
-            
+
             const targetSnap = await getDoc(doc(db, "users", targetId));
             if (!targetSnap.exists()) return true;
             const target = { uid: targetSnap.id, ...targetSnap.data() };
-            
+
             // 3. Check for a Match
             if ((target.likes || []).includes(me.uid)) {
                 await DB.createMatch(me, target);
@@ -180,17 +180,17 @@ export const DB = {
         const isMeA = me.uid < target.uid;
         const memberA = isMeA ? me : target;
         const memberB = isMeA ? target : me;
-        
+
         const chatId = `chat_${memberA.uid}_${memberB.uid}`;
         await setDoc(doc(db, "chats", chatId), {
-            id: chatId, 
-            memberA: memberA.uid, 
+            id: chatId,
+            memberA: memberA.uid,
             memberB: memberB.uid,
-            memberAPhone: memberA.phone || "", 
+            memberAPhone: memberA.phone || "",
             memberBPhone: memberB.phone || "",
             memberAEmail: memberA.email || "",
             memberBEmail: memberB.email || "",
-            createdAt: serverTimestamp(), 
+            createdAt: serverTimestamp(),
             lastMessage: "Padanan Berjaya! ✨",
             isWaliActive: false,
             waliAConfirmed: false,
@@ -199,54 +199,23 @@ export const DB = {
         // Also ensure mutual likes
         await updateDoc(doc(db, "users", me.uid), { likes: arrayUnion(target.uid) });
         await updateDoc(doc(db, "users", target.uid), { likes: arrayUnion(me.uid) });
-
-        // 🔔 ELITE NOTIFICATION BRIDGE: Trigger Push Notifications for both parties
-        try {
-            const pushData = {
-                title: "Padanan Baru! ✨",
-                body: "Tahniah! Anda telah berpadan. Sila mulakan taaruf.",
-                type: "match_alert",
-                chatId: chatId,
-                createdAt: serverTimestamp()
-            };
-            
-            // Notify Member A
-            if (memberA.fcmTokens && memberA.fcmTokens.length > 0) {
-                await addDoc(collection(db, "notifications"), {
-                    ...pushData,
-                    recipientId: memberA.uid,
-                    tokens: memberA.fcmTokens
-                });
-            }
-            
-            // Notify Member B
-            if (memberB.fcmTokens && memberB.fcmTokens.length > 0) {
-                await addDoc(collection(db, "notifications"), {
-                    ...pushData,
-                    recipientId: memberB.uid,
-                    tokens: memberB.fcmTokens
-                });
-            }
-        } catch (pushErr) {
-            console.error("Push Notification Bridge Error:", pushErr);
-        }
     },
 
     acceptFan: async (fanId) => {
         try {
             const myId = localStorage.getItem('current_user_id');
             const me = await DB.getCurrentUser();
-            if(!me) return false;
-            
+            if (!me) return false;
+
             const fanSnap = await getDoc(doc(db, "users", fanId));
-            if(!fanSnap.exists()) return false;
+            if (!fanSnap.exists()) return false;
             const fan = { uid: fanSnap.id, ...fanSnap.data() };
-            
+
             // 1. Create the mutual match
             await DB.createMatch(me, fan);
-            
+
             // 2. Clean up the fan request (it's now a match)
-            await deleteDoc(doc(db, "users", myId, "likes_received", fanId)); 
+            await deleteDoc(doc(db, "users", myId, "likes_received", fanId));
             return true;
         } catch (e) { console.error("Accept Fan Error:", e); return false; }
     },
@@ -254,7 +223,7 @@ export const DB = {
     refuseFan: async (fanId) => {
         try {
             const myId = localStorage.getItem('current_user_id');
-            if(!myId) return false;
+            if (!myId) return false;
             await deleteDoc(doc(db, "users", myId, "likes_received", fanId));
             return true;
         } catch (e) { console.error("Refuse Fan Error:", e); return false; }
@@ -278,20 +247,20 @@ export const DB = {
     },
 
     listenToGlobalBadges: (myUid, callback) => {
-        if (!myUid) return () => {};
+        if (!myUid) return () => { };
         const qFans = collection(db, "users", myUid, "likes_received");
-        
+
         // Return unsubscribe function for two listeners
         const unsubUser = onSnapshot(doc(db, "users", myUid), async (userSnap) => {
             const userData = userSnap.data() || {};
             const matchCount = await DB.getMatchesCount(myUid);
-            
+
             // Second listener for Fans (subcollection)
             onSnapshot(qFans, (fanSnap) => {
-                callback({ 
-                    fans: fanSnap.size, 
-                    matches: matchCount, 
-                    isSultan: userData.isSultan || false 
+                callback({
+                    fans: fanSnap.size,
+                    matches: matchCount,
+                    isSultan: userData.isSultan || false
                 });
             });
         });
@@ -316,12 +285,12 @@ export const DB = {
             // 1. Try UID Path (Modern)
             const q = query(collection(db, "users", uid, "likes_received"), orderBy("timestamp", "desc"));
             const snap = await getDocs(q);
-            if(!snap.empty) return snap.docs.map(d => d.data());
-            
+            if (!snap.empty) return snap.docs.map(d => d.data());
+
             // 2. Try Phone Path (Legacy Hybrid)
             const me = await DB.getCurrentUser();
-            if(me && me.phone) {
-                const phoneId = me.phone.replace(/\D/g,'');
+            if (me && me.phone) {
+                const phoneId = me.phone.replace(/\D/g, '');
                 const q2 = query(collection(db, "users", phoneId, "likes_received"), orderBy("timestamp", "desc"));
                 const snap2 = await getDocs(q2);
                 return snap2.docs.map(d => d.data());
@@ -334,8 +303,8 @@ export const DB = {
         try {
             const me = await DB.getCurrentUser();
             const snapshot = await getDocs(query(collection(db, "users"), limit(40)));
-            let all = snapshot.docs.map(d => ({uid: d.id, ...d.data()}));
-            
+            let all = snapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
+
             // Remove self and existing matches/likes
             const excluded = [...(me.likes || []), ...(me.skips || []), me.uid];
             all = all.filter(u => !excluded.includes(u.uid) && u.gender !== me.gender);
@@ -358,10 +327,10 @@ export const DB = {
     searchProfiles: async (term) => {
         try {
             const snapshot = await getDocs(query(collection(db, "users"), limit(100)));
-            const all = snapshot.docs.map(d => ({uid: d.id, ...d.data()}));
+            const all = snapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
             const t = term.toLowerCase();
-            return all.filter(u => 
-                (u.fullName && u.fullName.toLowerCase().includes(t)) || 
+            return all.filter(u =>
+                (u.fullName && u.fullName.toLowerCase().includes(t)) ||
                 (u.jodohkuId && u.jodohkuId.toLowerCase().includes(t))
             );
         } catch (e) { return []; }
@@ -372,37 +341,37 @@ export const DB = {
             const me = await DB.getCurrentUser();
             const phone = me ? me.phone : "";
             const email = me ? me.email : "";
-            
+
             // DUAL-FETCH: Search by UID, Email, and Phone Number for legacy support
             const queries = [
                 query(collection(db, "chats"), where("memberA", "==", uid)),
                 query(collection(db, "chats"), where("memberB", "==", uid))
             ];
-            
-            if(phone) {
+
+            if (phone) {
                 queries.push(query(collection(db, "chats"), where("memberAPhone", "==", phone)));
                 queries.push(query(collection(db, "chats"), where("memberBPhone", "==", phone)));
             }
 
-            if(email) {
+            if (email) {
                 queries.push(query(collection(db, "chats"), where("memberAEmail", "==", email)));
                 queries.push(query(collection(db, "chats"), where("memberBEmail", "==", email)));
             }
 
             const snapshots = await Promise.all(queries.map(q => getDocs(q)));
-            
+
             // De-duplicate results by chat ID
             const resultsMap = {};
             snapshots.forEach(s => s.docs.forEach(d => { resultsMap[d.id] = d.data(); }));
             const results = Object.values(resultsMap);
-            
+
             // Get partner info for each match
             const matchesWithDetails = await Promise.all(results.map(async (chat) => {
                 const partnerId = chat.memberA === uid ? chat.memberB : chat.memberA;
                 const pSnap = await getDoc(doc(db, "users", partnerId));
                 return { ...chat, partner: pSnap.exists() ? pSnap.data() : { name: "User" } };
             }));
-            
+
             return matchesWithDetails;
         } catch (e) { console.error("Error fetching matches:", e); return []; }
     },
@@ -509,7 +478,7 @@ export const DB = {
     sendMeetingInvite: async (chatId, senderId, data) => {
         try {
             const inviteText = window.I18N ? window.I18N.t('meeting_invite_desc') : "Saya ingin mengajak anda berjumpa secara rasmi.";
-            
+
             // 1. Send special invitation message
             await addDoc(collection(db, "chats", chatId, "messages"), {
                 from: senderId,
@@ -546,7 +515,7 @@ export const DB = {
                 [field]: true,
                 lastUpdate: serverTimestamp()
             });
-            
+
             // Check if BOTH confirmed
             const snap = await getDoc(doc(db, "chats", chatId));
             const c = snap.data();
@@ -576,7 +545,7 @@ export const DB = {
             const q2 = query(collection(db, "chats"), where("memberBPhone", "==", phone));
             const [s1, s2] = await Promise.all([getDocs(q1), getDocs(q2)]);
             const results = [...s1.docs.map(d => d.data()), ...s2.docs.map(d => d.data())];
-            
+
             const list = await Promise.all(results.map(async (c) => {
                 const partnerPhone = c.memberAPhone === phone ? c.memberBPhone : c.memberAPhone;
                 const qU = query(collection(db, "users"), where("phone", "==", partnerPhone));
@@ -598,15 +567,15 @@ export const DB = {
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return Math.round(R * c);
     },
 
     calculateMatchScore: (me, other) => {
         if (!me || !other) return 0;
-        
+
         // 🏗️ TRUE ELITE ENGINE v6.0: Worldview vs Context model
         let score = 65; // Barakah Baseline
         let bonuses = 0;
@@ -639,7 +608,7 @@ export const DB = {
 
         tracks.forEach(t => {
             if (isNegated(fullMyCriteria, t.kw) && new RegExp(t.kw, 'i').test(fullTargetContext)) {
-                penalties += 15; 
+                penalties += 15;
             }
         });
 
@@ -665,10 +634,10 @@ export const DB = {
 
         // Final Score Generation
         score = score + bonuses - penalties;
-        
+
         // Add subtle natural variance (0-4%)
         const variance = (Math.sin(score * 1234) + 1) * 2;
-        
+
         return Math.max(45, Math.min(99, Math.round(score + variance)));
     },
 
@@ -701,8 +670,8 @@ export const DB = {
     updateUser: async (data) => {
         try {
             const uid = localStorage.getItem('current_user_id');
-            if(!uid) return false;
-            
+            if (!uid) return false;
+
             // Generate JDK-ID if missing from existing user
             const snap = await getDoc(doc(db, "users", uid));
             if (snap.exists() && !snap.data().jodohkuId) {
@@ -726,7 +695,7 @@ export const DB = {
     isWaliReady: async () => {
         try {
             const me = await DB.getCurrentUser();
-            if(!me) return false;
+            if (!me) return false;
             // Check for modern wali object or legacy waliName field
             return (me.wali && me.wali.fullName) || me.waliName || me.isWaliVerified;
         } catch (e) { return false; }
@@ -737,7 +706,7 @@ export const DB = {
         try {
             console.log("🚀 [SYSTEM] Checking Elite Database integrity...");
             const snap = await getDocs(query(collection(db, "users"), limit(1)));
-            
+
             // Check if we need to force an update (e.g. if we detect the Reviewer has no photo or old photo)
             let needsUpgrade = snap.empty;
             if (!snap.empty) {
@@ -752,65 +721,65 @@ export const DB = {
             if (needsUpgrade) {
                 console.log("🌱 [SYSTEM] Detected Old/Empty Schema. Initiating Elite Force-Sync...");
                 const SEED = [
-                    { 
-                        id: "e_rev", name: "Admin Reviewer", email: "admin@jodohku.my", phone: "+60123456789", gender: "man", job: "Elite QA", 
-                        lat: 3.1390, lng: 101.6869, 
+                    {
+                        id: "e_rev", name: "Admin Reviewer", email: "admin@jodohku.my", phone: "+60123456789", gender: "man", job: "Elite QA",
+                        lat: 3.1390, lng: 101.6869,
                         photos: ["https://images.unsplash.com/photo-1519085185758-24dd5d14550a"],
                         bio: "Mencari teman syurga yang berkongsi minat dalam teknologi.",
                         traits: ["trait_extrovert", "trait_saver"],
                         interests: ["interest_coding", "interest_ai", "interest_coffee"]
                     },
-                    { 
-                        id: "e_m1", name: "Zulkifli", email: "zulkifli@jodohku.my", phone: "+60100000001", gender: "man", job: "Engineer", 
-                        lat: 3.1390, lng: 101.6869, 
+                    {
+                        id: "e_m1", name: "Zulkifli", email: "zulkifli@jodohku.my", phone: "+60100000001", gender: "man", job: "Engineer",
+                        lat: 3.1390, lng: 101.6869,
                         photos: ["https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d", "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d"],
                         bio: "Seorang yang serius dalam kerjaya tetapi santai di hujung minggu.",
                         traits: ["trait_introvert", "trait_homebody"],
                         interests: ["interest_cycling", "interest_hiking"]
                     },
-                    { 
-                        id: "e_m2", name: "Adam", email: "adam@jodohku.my", phone: "+60100000002", gender: "man", job: "Doctor", 
-                        lat: 3.1400, lng: 101.6900, 
+                    {
+                        id: "e_m2", name: "Adam", email: "adam@jodohku.my", phone: "+60100000002", gender: "man", job: "Doctor",
+                        lat: 3.1400, lng: 101.6900,
                         photos: ["https://images.unsplash.com/photo-1542345812-d98b5cd6cf98", "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79"],
                         bio: "Menghargai kejujuran dan ketenangan.",
                         traits: ["trait_extrovert", "trait_traveler"],
                         interests: ["interest_gym", "interest_healthy"]
                     },
-                    { 
-                        id: "e_m3", name: "Hafiz", email: "hafiz@jodohku.my", phone: "+60100000003", gender: "man", job: "Tech Lead", 
-                        lat: 3.1500, lng: 101.7100, 
+                    {
+                        id: "e_m3", name: "Hafiz", email: "hafiz@jodohku.my", phone: "+60100000003", gender: "man", job: "Tech Lead",
+                        lat: 3.1500, lng: 101.7100,
                         photos: ["https://images.unsplash.com/photo-1492562080023-ab3db95bfbce", "https://images.unsplash.com/photo-1500648767791-00dcc994a43e"],
                         bio: "Coding is my life, but family is my heart.",
                         traits: ["trait_introvert", "trait_saver"],
                         interests: ["interest_ai", "interest_gaming"]
                     },
-                    { 
-                        id: "e_f1", name: "Siti Nurhaliza", email: "siti@jodohku.my", phone: "+60110000001", gender: "woman", job: "Teacher", 
-                        lat: 3.0738, lng: 101.5183, 
+                    {
+                        id: "e_f1", name: "Siti Nurhaliza", email: "siti@jodohku.my", phone: "+60110000001", gender: "woman", job: "Teacher",
+                        lat: 3.0738, lng: 101.5183,
                         photos: ["https://images.unsplash.com/photo-1567532939604-b6c5b0ad2e01", "https://images.unsplash.com/photo-1531746020798-e795c5399c47"],
                         bio: "Pencinta ilmu dan gemar memasak untuk yang tersayang.",
                         traits: ["trait_introvert", "trait_homebody"],
                         interests: ["interest_reading", "interest_cooking", "interest_tadabbur"]
                     },
-                    { 
-                        id: "e_f2", name: "Jasmine", email: "jasmine@jodohku.my", phone: "+60110000002", gender: "woman", job: "Marketing", 
-                        lat: 3.1100, lng: 101.6200, 
+                    {
+                        id: "e_f2", name: "Jasmine", email: "jasmine@jodohku.my", phone: "+60110000002", gender: "woman", job: "Marketing",
+                        lat: 3.1100, lng: 101.6200,
                         photos: ["https://images.unsplash.com/photo-1494790108377-be9c29b29330", "https://images.unsplash.com/photo-1524504388940-b1c1722653e1"],
                         bio: "Suka travel dan mencuba makanan baru.",
                         traits: ["trait_extrovert", "trait_traveler"],
                         interests: ["interest_travel", "interest_japanese", "interest_seafood"]
                     },
-                    { 
-                        id: "e_f3", name: "Layla", email: "layla@jodohku.my", phone: "+60110000003", gender: "woman", job: "Designer", 
-                        lat: 3.1500, lng: 101.7000, 
+                    {
+                        id: "e_f3", name: "Layla", email: "layla@jodohku.my", phone: "+60110000003", gender: "woman", job: "Designer",
+                        lat: 3.1500, lng: 101.7000,
                         photos: ["https://images.unsplash.com/photo-1524504388940-b1c1722653e1", "https://images.unsplash.com/photo-1531123897727-8f129e16f8ec"],
                         bio: "Seni adalah cara saya melihat dunia.",
                         traits: ["trait_introvert", "trait_saver"],
                         interests: ["interest_painting", "interest_swimming"]
                     },
-                    { 
-                        id: "e_f4", name: "Sarah", email: "sarah@jodohku.my", phone: "+60110000004", gender: "woman", job: "Architect", 
-                        lat: 3.1300, lng: 101.6500, 
+                    {
+                        id: "e_f4", name: "Sarah", email: "sarah@jodohku.my", phone: "+60110000004", gender: "woman", job: "Architect",
+                        lat: 3.1300, lng: 101.6500,
                         photos: ["https://images.unsplash.com/photo-1531746020798-e795c5399c47", "https://images.unsplash.com/photo-1534751435712-43680242180f"],
                         bio: "Membina bangunan dan masa depan yang kukuh.",
                         traits: ["trait_extrovert", "trait_spender"],
@@ -821,22 +790,22 @@ export const DB = {
                     const docRef = doc(db, "users", u.id);
                     const docSnap = await getDoc(docRef);
                     const data = {
-                        fullName: u.name, 
-                        email: u.email || "", 
-                        phone: u.phone, 
-                        gender: u.gender, 
+                        fullName: u.name,
+                        email: u.email || "",
+                        phone: u.phone,
+                        gender: u.gender,
                         jobTitle: u.job,
                         bio: u.bio || "",
                         traits: u.traits || [],
                         interests: u.interests || [],
                         lat: u.lat || 3.1390,
                         lng: u.lng || 101.6869,
-                        city: "Kuala Lumpur", 
-                        photoUrl: u.photos[0], 
+                        city: "Kuala Lumpur",
+                        photoUrl: u.photos[0],
                         photos: u.photos,
                         updatedAt: serverTimestamp()
                     };
-                    
+
                     if (!docSnap.exists()) {
                         await setDoc(docRef, { ...data, likes: [], skips: [] });
                     } else {
@@ -858,13 +827,13 @@ export const DB = {
     enablePushNotifications: async () => {
         try {
             const uid = localStorage.getItem('current_user_id');
-            if(!uid) return false;
+            if (!uid) return false;
 
             const permission = await Notification.requestPermission();
-            
+
             // ELITE RESILIENCE: If browser denies, we still enable 'Preview Mode' to keep the UX smooth
             if (permission === 'granted') {
-                const token = await getToken(messaging, { 
+                const token = await getToken(messaging, {
                     vapidKey: 'BM67p9Y3gZfR6I4v8m5L_9Y1Y7I-Y9I1Y7I-Y9I1Y7I-Y9I1Y7I' // Placeholder VAPID key
                 });
                 if (token) {
@@ -877,17 +846,17 @@ export const DB = {
                 }
             } else {
                 console.warn("🔔 [Push] Permission denied. Enabling 'Elite Preview Mode'...");
-                await updateDoc(doc(db, "users", uid), { 
-                    pushActive: true, 
+                await updateDoc(doc(db, "users", uid), {
+                    pushActive: true,
                     pushToken: "MOCK_PREVIEW",
                     updatedAt: serverTimestamp()
                 });
                 return true;
             }
             return false;
-        } catch (e) { 
-            console.error("Push Enable Error:", e); 
-            return false; 
+        } catch (e) {
+            console.error("Push Enable Error:", e);
+            return false;
         }
     },
 
@@ -915,7 +884,7 @@ export const DB = {
         try {
             const { doc, setDoc, collection, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
             const mailRef = doc(collection(DB.db, "mail"));
-            
+
             // 🛡️ ELITE GUARDIAN PROTOCOL v5.0
             await setDoc(mailRef, {
                 to: waliData.email,
