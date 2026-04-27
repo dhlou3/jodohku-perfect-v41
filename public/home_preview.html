@@ -111,7 +111,8 @@
             <a href="islam_preview.html" class="nav-item"><div class="nav-icon">🕌</div><span data-t="islam">Islam</span></a>
             <a href="profile_preview.html" class="nav-item"><div class="nav-icon">👤</div><span data-t="profile">Saya</span></a>
             <div id="debugLog" class="debug-console">
-                <button onclick="localStorage.clear(); location.href='login_preview.html'" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; font-weight:900; margin-bottom:10px;">RESET SESSION</button>
+                <button onclick="localStorage.clear(); location.href='login_preview.html'" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; font-weight:900; margin-right:10px;">RESET SESSION</button>
+                <button onclick="window.seedProduction()" style="background:green; color:white; border:none; padding:5px 10px; border-radius:5px; font-weight:900;">SEED DATA</button>
                 <div id="logContent"></div>
             </div>
         </nav>
@@ -216,6 +217,15 @@
                 render();
             } catch(e) { console.error("BOOT_ERROR: ", e); }
         }
+
+        window.seedProduction = async () => {
+            log('Starting Nuclear Seed...');
+            try {
+                await DB.bootstrapElite();
+                log('Seed Success! Refreshing...');
+                setTimeout(() => location.reload(), 1500);
+            } catch(err) { log('Seed Failed: ' + err.message); }
+        };
 
         function renderInterestChips() {
             const box = document.getElementById('interestChips');
