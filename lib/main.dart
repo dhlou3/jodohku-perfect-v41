@@ -43,7 +43,9 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
 
   Future<void> _handleGoogleLogin() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId: "982535553679-k423dugfs6jt4hftqlunes5b6g0jjmv7.apps.googleusercontent.com",
+      );
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       
       if (googleUser == null) return;
