@@ -11,9 +11,38 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
         body { background: #E5E7EB; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .phone { 
-            width: 375px; height: 812px; background: white; border-radius: 44px; border: 8px solid #1E293B; 
-            position: relative; overflow: hidden; display: flex; flex-direction: column; 
-            box-shadow: 0 40px 80px rgba(0,0,0,0.1); 
+            width: 100vw; height: 100vh; background:white; 
+            display:flex; flex-direction:column; position:relative; overflow:hidden;
+            transition: all 0.3s ease;
+            box-shadow: none;
+        }
+
+        /* Desktop Mockup View */
+        @media (min-width: 500px) {
+            body { background:#E5E7EB; }
+            .phone { 
+                width:375px; height:812px; border-radius:44px; border:8px solid #1E293B; 
+                box-shadow:0 40px 80px rgba(0,0,0,0.1); 
+                margin: auto;
+            }
+        }
+
+        .debug-console {
+            position: absolute;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 11px;
+            z-index: 1000;
+            border: 2px solid #00ff00;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none; 
         }
 
         /* Profile Header Case */
@@ -215,16 +244,29 @@
             <a href="sembang.html" class="nav-item"><div class="nav-icon">💬</div><span data-t="chat">Sembang</span></a>
             <a href="islam_preview.html" class="nav-item"><div class="nav-icon">🕌</div><span data-t="islam">Islam</span></a>
             <a href="profile_preview.html" class="nav-item active"><div class="nav-icon">👤</div><span data-t="profile">Saya</span></a>
+            <div id="debugLog" class="debug-console"></div>
         </nav>
     </div>
 
     <script type="module">
         import { DB } from './database.js';
         
+        const debugEl = document.getElementById('debugLog');
+        function log(msg) {
+            debugEl.style.display = 'block';
+            debugEl.innerHTML += `> ${msg}<br>`;
+        }
+
         async function load() {
             try {
+                log('System Init...');
+                const id = localStorage.getItem('current_user_id');
+                log('Session ID: ' + id);
+
                 const u = await DB.getCurrentUser();
                 if(u) {
+                    log('Profile Data Loaded for: ' + (u.fullName || u.name));
+                    log('Firestore UID: ' + u.uid);
                     const name = u.fullName || u.name || window.I18N.t('participant');
                     document.getElementById('uNm').innerText = name;
                     document.getElementById('uAv').innerHTML = u.photoUrl ? `<img src="${u.photoUrl}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=BD8B52&color=fff'">` : name[0];
