@@ -153,25 +153,48 @@
 
         btn.onclick = async () => {
             btn.innerText = 'Connecting...';
-            // SMART DETECTION
-            const isApk = (navigator.userAgent.includes('Android') && !navigator.userAgent.includes('Chrome'));
             
-            if (isApk) {
-                // PHONE MODE: Use Tunnel
-                window.location.href = "appbridge://googleLogin";
-            } else {
-                // WEB MODE: Use Popup
-                try {
-                    const provider = new firebase.auth.GoogleAuthProvider();
+            // 🛡️ UNIVERSAL WEB FLOW v37.0 (ELITE)
+            // We use the 100% verified Web flow for BOTH Phone and Browser.
+            // This bypasses all native Pigeon crashes and redirect loops.
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                
+                // Use Redirect instead of Popup for better mobile WebView support
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                
+                if (isMobile) {
+                    await firebase.auth().signInWithRedirect(provider);
+                } else {
                     const result = await firebase.auth().signInWithPopup(provider);
                     if (result.user) {
                         localStorage.setItem('current_user_id', result.user.uid);
                         window.location.href = 'home_preview.html';
                     }
-                } catch (e) {
-                    alert("Browser Error: " + e.message);
-                    btn.innerText = 'Continue with Google';
                 }
+            } catch (e) {
+                alert("Auth Error: " + e.message);
+                btn.innerText = 'Continue with Google';
+            }
+        };
+
+        // Handle the redirect result when the page reloads
+        window.onload = () => {
+            firebase.auth().getRedirectResult().then((result) => {
+                if (result.user) {
+                    localStorage.setItem('current_user_id', result.user.uid);
+                    window.location.href = 'home_preview.html';
+                }
+            }).catch((error) => {
+                if (error.code !== 'auth/no-current-user') {
+                    console.error("Redirect Result Error:", error);
+                }
+            });
+            
+            // Check for auto-trigger
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('provider') === 'google') {
+                btn.click();
             }
         };
     </script>
