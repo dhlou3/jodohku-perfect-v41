@@ -49,12 +49,48 @@
             </div>
         </div>
     </div>
+    <!-- FIREBASE BASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZegwZmiUsddDY1-EcB27NYwuvxobkgx8",
+            authDomain: "jodohku-61096.firebaseapp.com",
+            projectId: "jodohku-61096",
+            storageBucket: "jodohku-61096.firebasestorage.app",
+            messagingSenderId: "982535553679",
+            appId: "1:982535553679:web:b7146ace7d99475ce126fa",
+        };
+        firebase.initializeApp(firebaseConfig);
+
         function toggleLang() {
             const current = window.I18N.getLang();
             const next = current === 'ms' ? 'en' : 'ms';
             window.I18N.setLang(next);
         }
+
+        // AUTO-LOGIN CHECKER
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // User is already signed in, check if profile exists
+                localStorage.setItem('current_user_id', user.uid);
+                
+                const db = firebase.firestore();
+                db.collection('users').doc(user.uid).get().then((snap) => {
+                    if (snap.exists) {
+                        window.location.href = 'home_preview.html?v=41.1';
+                    } else {
+                        // User exists but has no profile data (onboarding not finished)
+                        window.location.href = 'onboarding_name.html?v=41.1';
+                    }
+                }).catch((err) => {
+                    console.error("Persistence Check Error:", err);
+                    window.location.href = 'login_preview.html';
+                });
+            }
+        });
     </script>
 </body>
 </html>

@@ -94,38 +94,36 @@ export const DB = {
     },
 
     getDiscoveryUsers: async () => {
-        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("WATCHDOG_TIMEOUT")), 10000));
         try {
-            console.log("🚀 [DB] Starting Discovery Watchdog...");
+            console.log("🚀 [DB] Starting Discovery Search...");
             const me = await DB.getCurrentUser();
             if(!me) return [];
 
-            const g = (me.gender || "man").toLowerCase();
-            const isMale = ["man", "lelaki", "male"].includes(g);
-            const targets = isMale ? ["woman", "wanita", "perempuan"] : ["man", "lelaki"];
+            const myGender = (me.gender || "man").toLowerCase();
+            const isMale = ["man", "lelaki", "male"].includes(myGender);
             
-            // ELITE SERVER-SIDE QUERY: Only fetch targeted genders to maximize pool depth
-            const queryFetch = async () => {
-                const q = query(
-                    collection(db, "users"), 
-                    where("gender", "in", targets), 
-                    limit(1000)
-                );
-                const snapshot = await getDocs(q);
-                return snapshot.docs.map(d => ({uid: d.id, ...d.data()}));
-            };
+            // ELITE GENDER TARGETING
+            let targets = isMale ? ["woman", "wanita", "perempuan"] : ["man", "lelaki", "male"];
+            
+            console.log(`🔍 [DB] Target Genders: ${targets.join(', ')}`);
 
-            const all = await Promise.race([queryFetch(), timeout]);
+            const q = query(
+                collection(db, "users"), 
+                where("gender", "in", targets), 
+                limit(200)
+            );
             
-            // SELF-HEALING: If no candidates found for your gender, show everyone for testing
+            const snapshot = await getDocs(q);
+            let all = snapshot.docs.map(d => ({uid: d.id, ...d.data()}));
+            
+            console.log(`✅ [DB] Found ${all.length} candidates in target group.`);
+
+            // SELF-HEALING: If no candidates found for your target gender, show anyone for testing
             if (all.length === 0) {
                 console.log("⚠️ [DB] No gender-matched candidates. Widening search to all users...");
-                const fallbackSnap = await getDocs(query(collection(db, "users"), limit(100)));
-                const fallbackList = fallbackSnap.docs.map(d => ({uid: d.id, ...d.data()}));
-                return fallbackList.filter(u => u.uid !== me.uid);
+                const fallbackSnap = await getDocs(query(collection(db, "users"), limit(50)));
+                all = fallbackSnap.docs.map(d => ({uid: d.id, ...d.data()}));
             }
-
-            console.log(`✅ [DB] Found ${all.length} candidates.`);
 
             const myMatches = await DB.getMatches(me.uid);
             const matchedUids = myMatches.map(m => m.memberA === me.uid ? m.memberB : m.memberA);
@@ -133,22 +131,18 @@ export const DB = {
             
             let filtered = all.filter(u => !excluded.includes(u.uid));
             
-            // EMERGENCY TEST RESET: If you've liked/skipped everyone, reset for demo purposes
-            if (filtered.length === 0 && excluded.length > 1) {
-                console.log("♻️ [DB] Resetting Likes/Skips to refill test discovery feed...");
-                await updateDoc(doc(db, "users", me.uid), { likes: [], skips: [] });
-                return all.filter(u => u.uid !== me.uid);
+            // EMERGENCY TEST RESET: If user has liked/skipped everyone, show them again for engagement
+            if (filtered.length === 0 && all.length > 1) {
+                console.log("♻️ [DB] Resetting local view to prevent empty feed...");
+                filtered = all.filter(u => u.uid !== me.uid);
             }
 
             return filtered;
         } catch (e) { 
-            console.error("🚨 [DB] Watchdog caught failure:", e.message); 
-            if(e.message === "WATCHDOG_TIMEOUT") {
-                // FALLBACK: If complex query hangs, fetch simple and filter local
-                const snap = await getDocs(query(collection(db, "users"), limit(50)));
-                return snap.docs.map(d => ({uid: d.id, ...d.data()})).filter(u => u.uid !== localStorage.getItem('current_user_id'));
-            }
-            return []; 
+            console.error("🚨 [DB] Discovery Failure:", e.message); 
+            // FINAL FALLBACK: return 20 random users just to show SOMETHING
+            const snap = await getDocs(query(collection(db, "users"), limit(20)));
+            return snap.docs.map(d => ({uid: d.id, ...d.data()})).filter(u => u.uid !== localStorage.getItem('current_user_id'));
         }
     },
 
