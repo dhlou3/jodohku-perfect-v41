@@ -186,10 +186,10 @@
                 
                 if (snap.exists) {
                     log('Profile found! Directing to Home...');
-                    window.location.href = 'home_preview.html';
+                    window.location.href = 'home_preview.html?v=38.7';
                 } else {
                     log('No profile found. Directing to Onboarding...');
-                    window.location.href = 'onboarding_name.html';
+                    window.location.href = 'onboarding_name.html?v=38.7';
                 }
             } catch (err) {
                 log('Firestore Error: ' + err.message);
