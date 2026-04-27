@@ -147,7 +147,6 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2s-2-.9-2-2v-2c0-1.1.9-2 2-2z"/><path d="M18 11c0-3.3-2.7-6-6-6s-6 2.7-6 6v10"/><path d="M22 11c0-5.5-4.5-10-10-10S2 5.5 2 11v10"/></svg>
             </div>
             <div class="footer-note">Don't have an account? <a href="register_preview.html">Register Now</a></div>
-            <div id="debugLog" class="debug-console"></div>
         </div>
     </div>
 
@@ -170,14 +169,7 @@
         const btn = document.getElementById('gBtn');
         const debugEl = document.getElementById('debugLog');
         
-        function log(msg) {
-            debugEl.style.display = 'block';
-            debugEl.innerHTML += `> ${msg}<br>`;
-            console.log(msg);
-        }
-
         async function handleAuthSuccess(user) {
-            log('Verifying profile for ' + user.email + '...');
             localStorage.setItem('current_user_id', user.uid);
             
             try {
@@ -185,20 +177,16 @@
                 const snap = await db.collection('users').doc(user.uid).get();
                 
                 if (snap.exists) {
-                    log('Profile found! Directing to Home...');
-                    window.location.href = 'home_preview.html?v=38.7';
+                    window.location.href = 'home_preview.html?v=41.2';
                 } else {
-                    log('No profile found. Directing to Onboarding...');
-                    window.location.href = 'onboarding_name.html?v=38.7';
+                    window.location.href = 'onboarding_name.html?v=41.2';
                 }
             } catch (err) {
-                log('Firestore Error: ' + err.message);
+                console.error('Firestore Error:', err);
             }
         }
 
         btn.onclick = async () => {
-            alert("Starting Auth Flow...");
-            log('Starting Google Login...');
             btn.innerText = 'Connecting...';
             
             try {
@@ -206,37 +194,30 @@
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 
                 if (isMobile) {
-                    log('Detected Mobile - Using Redirect...');
                     await firebase.auth().signInWithRedirect(provider);
                 } else {
-                    log('Detected Desktop - Using Popup...');
                     const result = await firebase.auth().signInWithPopup(provider);
                     if (result.user) {
                         await handleAuthSuccess(result.user);
                     }
                 }
             } catch (e) {
-                log('AUTH ERROR: ' + e.message);
+                console.error('AUTH ERROR:', e);
                 btn.innerText = 'Continue with Google';
             }
         };
 
         window.onload = () => {
-            log('Checking for redirect result...');
             firebase.auth().getRedirectResult().then(async (result) => {
                 if (result && result.user) {
-                    log('Redirect Success!');
                     await handleAuthSuccess(result.user);
-                } else {
-                    log('No cached session found.');
                 }
             }).catch((error) => {
-                log('Redirect Error: ' + error.message);
+                console.error('Redirect Error:', error);
             });
             
             const params = new URLSearchParams(window.location.search);
             if (params.get('provider') === 'google') {
-                log('Auto-triggering login...');
                 btn.click();
             }
         };

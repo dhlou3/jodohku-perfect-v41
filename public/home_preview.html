@@ -177,12 +177,6 @@
 
     <script type="module">
         import { DB } from './database.js';
-        
-        const logContent = document.getElementById('logContent');
-        function log(msg) {
-            logContent.innerHTML += `> ${msg}<br>`;
-        }
-
         let allProfiles = []; let profiles = []; let index = 0; let me = null; let currentPhotoIndex = 0;
         let selectedInterests = [];
 
@@ -203,13 +197,11 @@
                 log('Gender: ' + me.gender);
 
                 renderInterestChips();
-
-                log('Fetching candidates...');
                 allProfiles = await DB.getDiscoveryUsers();
-                log('Found ' + allProfiles.length + ' candidates.');
                 
                 applyFiltersLocally(); 
                 render();
+                initSwipes();
             } catch(e) { 
                 console.error("BOOT_ERROR: ", e);
                 // Last ditch effort to render something
@@ -364,6 +356,22 @@
             if(res === 'match') alert(window.I18N.t('match_success') || "Tahniah! Padanan baru.");
             index++; currentPhotoIndex = 0; render(); 
         };
+
+        // SWIPE GESTURE ENGINE
+        let startX = 0; let startY = 0;
+        function initSwipes() {
+            const el = document.getElementById('pC');
+            el.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }, {passive: true});
+            el.addEventListener('touchend', e => {
+                const diffX = e.changedTouches[0].clientX - startX;
+                const diffY = e.changedTouches[0].clientY - startY;
+                if(Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 80) {
+                    if(diffX > 0) window.like();
+                    else window.next();
+                }
+            }, {passive: true});
+        }
+
         init();
     </script>
 </body>
