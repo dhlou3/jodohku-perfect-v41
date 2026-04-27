@@ -199,6 +199,37 @@ export const DB = {
         // Also ensure mutual likes
         await updateDoc(doc(db, "users", me.uid), { likes: arrayUnion(target.uid) });
         await updateDoc(doc(db, "users", target.uid), { likes: arrayUnion(me.uid) });
+
+        // 🔔 ELITE NOTIFICATION BRIDGE: Trigger Push Notifications for both parties
+        try {
+            const pushData = {
+                title: "Padanan Baru! ✨",
+                body: "Tahniah! Anda telah berpadan. Sila mulakan taaruf.",
+                type: "match_alert",
+                chatId: chatId,
+                createdAt: serverTimestamp()
+            };
+            
+            // Notify Member A
+            if (memberA.fcmTokens && memberA.fcmTokens.length > 0) {
+                await addDoc(collection(db, "notifications"), {
+                    ...pushData,
+                    recipientId: memberA.uid,
+                    tokens: memberA.fcmTokens
+                });
+            }
+            
+            // Notify Member B
+            if (memberB.fcmTokens && memberB.fcmTokens.length > 0) {
+                await addDoc(collection(db, "notifications"), {
+                    ...pushData,
+                    recipientId: memberB.uid,
+                    tokens: memberB.fcmTokens
+                });
+            }
+        } catch (pushErr) {
+            console.error("Push Notification Bridge Error:", pushErr);
+        }
     },
 
     acceptFan: async (fanId) => {
