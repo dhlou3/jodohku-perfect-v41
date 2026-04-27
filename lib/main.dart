@@ -68,14 +68,18 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
 
   Future<void> _handleGoogleLogin() async {
     try {
-      // 🛡️ UNIVERSAL WEB FLOW v36.0 (ELITE)
-      // Since native Pigeon is unstable, we use the 100% verified Web flow 
-      // that already works perfectly on Localhost.
-      debugPrint("💎 [SENTINEL] Switching to Universal Web Login...");
-      
-      // We simply tell the WebView to load the Login page 
-      // where the Web Firebase SDK handles Google perfectly.
-      _controller.runJavaScript("window.location.href='login_preview.html?provider=google';");
+      // 🛡️ SMART SYNC v37.2 (ELITE)
+      // Check if we are already on a login/register page and trigger the local button.
+      // Otherwise, default to the login page.
+      _controller.runJavaScript("""
+        if (document.getElementById('gBtn')) { 
+          document.getElementById('gBtn').click(); 
+        } else if (document.getElementById('regBtn')) { 
+          document.getElementById('regBtn').click(); 
+        } else { 
+          window.location.href='login_preview.html?provider=google'; 
+        }
+      """);
       
     } catch (e) {
       debugPrint("💎 [SENTINEL] Shield Failure: $e");

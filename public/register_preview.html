@@ -97,8 +97,21 @@
             cursor: pointer;
         }
         
-        .footer-note { margin-top: 24px; font-size: 14px; color: var(--text-dim); }
         .footer-note a { color: var(--gold); text-decoration: none; font-weight: 600; }
+        .debug-console {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 11px;
+            color: #00ff00;
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -114,6 +127,7 @@
                 <span>Continue with Google</span>
             </button>
             <div class="footer-note">Already have an account? <a href="login_preview.html">Log In</a></div>
+            <div id="debugLog" class="debug-console"></div>
         </div>
     </div>
 
@@ -134,20 +148,56 @@
 
         const btn = document.getElementById('regBtn');
 
+        const debugEl = document.getElementById('debugLog');
+        function log(msg) {
+            debugEl.style.display = 'block';
+            debugEl.innerHTML += `> ${msg}<br>`;
+            console.log(msg);
+        }
+
         btn.onclick = async () => {
+            log('Starting Google Registration...');
             btn.innerText = 'Connecting...';
             try {
-                // LOCALHOST STYLE AUTH (Works via User-Agent Hack)
                 const provider = new firebase.auth.GoogleAuthProvider();
-                const result = await firebase.auth().signInWithPopup(provider);
-                if (result.user) {
-                    localStorage.setItem('current_user_id', result.user.uid);
-                    // REDIRECT TO FIRST ONBOARDING PAGE
-                    window.location.href = 'onboarding_name.html';
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                
+                if (isMobile) {
+                    log('Detected Mobile - Using Redirect...');
+                    await firebase.auth().signInWithRedirect(provider);
+                } else {
+                    log('Detected Desktop - Using Popup...');
+                    const result = await firebase.auth().signInWithPopup(provider);
+                    if (result.user) {
+                        log('Registration Success: ' + result.user.email);
+                        localStorage.setItem('current_user_id', result.user.uid);
+                        window.location.href = 'onboarding_name.html';
+                    }
                 }
             } catch (e) {
-                alert("Login Error: " + e.message);
+                log('CRITICAL ERROR: ' + e.message);
                 btn.innerText = 'Continue with Google';
+            }
+        };
+
+        window.onload = () => {
+            log('Page loaded. Checking for redirect result...');
+            firebase.auth().getRedirectResult().then((result) => {
+                if (result && result.user) {
+                    log('Redirect Success: ' + result.user.email);
+                    localStorage.setItem('current_user_id', result.user.uid);
+                    window.location.href = 'onboarding_name.html';
+                } else {
+                    log('No active session found.');
+                }
+            }).catch((error) => {
+                log('Redirect Error: ' + error.message);
+            });
+
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('provider') === 'google') {
+                log('Auto-triggering registration...');
+                btn.click();
             }
         };
     </script>
