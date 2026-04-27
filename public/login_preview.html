@@ -224,6 +224,14 @@
         };
 
         window.onload = () => {
+            // SILENT LISTENER: Instantly catches Auth State changes on Mobile WebViews
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (user) {
+                    btn.innerText = 'Authenticated. Loading...';
+                    await handleAuthSuccess(user);
+                }
+            });
+
             firebase.auth().getRedirectResult().then(async (result) => {
                 if (result && result.user) {
                     await handleAuthSuccess(result.user);

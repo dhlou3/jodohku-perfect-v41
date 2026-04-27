@@ -31,6 +31,54 @@ window.fs_sdk = {
     addDoc, serverTimestamp, arrayUnion, arrayRemove, orderBy, onSnapshot, limit
 };
 
+// ==========================================
+// 🚀 GLOBAL SYSTEM UPGRADES (UI & ROUTING)
+// ==========================================
+if (typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', () => {
+        // 1. EMULATOR VIEW REMOVER: Forces the app to go 100% full screen
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .phone, .phone-container {
+                width: 100vw !important;
+                height: 100vh !important;
+                border-radius: 0px !important;
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+            }
+            body { 
+                background: var(--background, #111827) !important; 
+                display: block !important;
+            }
+            @media (min-width: 481px) {
+                .phone, .phone-container {
+                    width: 100vw !important;
+                    height: 100vh !important;
+                    border-radius: 0 !important;
+                    border: none !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 2. SMART ROUTER: Intercepts '.back-btn' to prevent onboarding loops
+        const params = new URLSearchParams(window.location.search);
+        const fromParam = params.get('from');
+        if (fromParam) {
+            const backBtn = document.querySelector('.back-btn');
+            if (backBtn) {
+                backBtn.href = 'javascript:void(0)';
+                backBtn.onclick = (e) => {
+                    e.preventDefault();
+                    window.location.href = fromParam + '_preview.html?v=41.5';
+                };
+            }
+        }
+    });
+}
+// ==========================================
+
 export const DB = {
     signInWithGoogle: async () => {
         try {
