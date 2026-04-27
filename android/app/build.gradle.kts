@@ -53,12 +53,7 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
 
-configurations.all {
-    resolutionStrategy {
-        force("com.google.android.gms:play-services-auth:20.7.0")
-        force("com.google.android.gms:play-services-base:18.2.0")
-    }
-}
+// Automatic Version Resolution Active
 
 flutter {
     source = "../.."

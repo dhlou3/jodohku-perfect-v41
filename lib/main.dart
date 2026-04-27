@@ -71,9 +71,15 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
       final GoogleSignIn googleSignIn = GoogleSignIn(
         serverClientId: "982535553679-k423dugfs6jt4hftqlunes5b6g0jjmv7.apps.googleusercontent.com",
       );
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn().catchError((error) {
+        debugPrint("💎 [SENTINEL] Google Error Caught: $error");
+        return null;
+      });
       
-      if (googleUser == null) return;
+      if (googleUser == null) {
+        debugPrint("💎 [SENTINEL] User cancelled or error occurred.");
+        return;
+      }
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(
