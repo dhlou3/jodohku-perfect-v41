@@ -4,11 +4,34 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+}
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'jdk_alerts',
+      'JDK Priority Alerts',
+      description: 'Incoming match and message notifications.',
+      importance: Importance.max,
+    );
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
   } catch (e) {
     debugPrint("Firebase Init Error: $e");
   }
@@ -41,6 +64,7 @@ class HybridMainScreen extends StatefulWidget {
 
 class _HybridMainScreenState extends State<HybridMainScreen> {
   late final WebViewController _controller;
+  String? _fcmToken;
 
   Future<void> _handleGoogleLogin() async {
     try {
@@ -63,16 +87,12 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
       if (user != null) {
         final String uid = user.uid;
         _controller.runJavaScript("localStorage.setItem('current_user_id', '$uid'); window.location.href='home_preview.html';");
+        _syncToken(uid);
       }
     } catch (e) {
       if (mounted) {
-        // 🕵️‍♂️ TRUE ERROR DETECTOR
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("DEBUG ERROR: $e"), 
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 10),
-          ),
+          SnackBar(content: Text("DEBUG ERROR: $e"), backgroundColor: Colors.red),
         );
       }
     }
@@ -81,13 +101,27 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
   Future<void> _requestPermissions() async {
     await [
       Permission.location,
+      Permission.notification,
     ].request();
+    
+    _fcmToken = await FirebaseMessaging.instance.getToken();
+    debugPrint("FCM TOKEN: $_fcmToken");
+  }
+
+  Future<void> _syncToken(String uid) async {
+    if (_fcmToken != null) {
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'fcmTokens': FieldValue.arrayUnion([_fcmToken]),
+        'pushActive': true,
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
     _requestPermissions();
+    
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent("Mozilla/5.0 (Android 13; Mobile; rv:109.0) Gecko/116.0 Firefox/116.0")
@@ -105,6 +139,25 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
         ),
       )
       ..loadFlutterAsset('assets/www/landing_preview.html');
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'jdk_alerts',
+              'JDK Priority Alerts',
+              icon: '@mipmap/ic_launcher',
+            ),
+          ),
+        );
+      }
+    });
   }
 
   @override
