@@ -2,7 +2,7 @@
 console.log("💎 [System] Database logic initializing...");
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-    getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs,
+    getFirestore, enableIndexedDbPersistence, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs,
     addDoc, serverTimestamp, arrayUnion, arrayRemove, orderBy, onSnapshot, limit
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -20,6 +20,12 @@ const firebaseConfig = {
 // GLOBAL ERROR HANDLING FOR FIREBASE
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+// 🚀 SPEED PATCH: Enable Offline Caching
+try {
+    enableIndexedDbPersistence(db).catch(e => console.warn("Offline Cache Disabled:", e.code));
+} catch (e) { console.warn("Persistence Init Error", e); }
+
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 const messaging = getMessaging(app);
@@ -36,7 +42,12 @@ window.fs_sdk = {
 // ==========================================
 if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', () => {
-        // 1. EMULATOR VIEW REMOVER: Forces the app to go 100% full screen
+        // SPEED PATCH: Force Font Swapping dynamically
+        document.querySelectorAll('link[href*="fonts.googleapis.com"]').forEach(link => {
+            if (!link.href.includes('display=swap')) link.href += '&display=swap';
+        });
+
+        // 1. EMULATOR VIEW REMOVER & GPU ACCELERATION
         const style = document.createElement('style');
         style.innerHTML = `
             .phone, .phone-container {
@@ -46,10 +57,18 @@ if (typeof window !== 'undefined') {
                 border: none !important;
                 box-shadow: none !important;
                 margin: 0 !important;
+                transform: translateZ(0); /* SPEED PATCH: GPU Acceleration */
+                -webkit-transform: translateZ(0);
+                backface-visibility: hidden;
             }
             body { 
                 background: var(--background, #111827) !important; 
                 display: block !important;
+            }
+            .card, .swipe, .content, .photo-gallery {
+                transform: translateZ(0); /* Force Hardware Acceleration for smooth scrolling */
+                -webkit-transform: translateZ(0);
+                will-change: transform;
             }
             @media (min-width: 481px) {
                 .phone, .phone-container {

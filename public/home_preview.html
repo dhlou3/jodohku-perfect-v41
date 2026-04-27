@@ -312,7 +312,7 @@
                         </div>
                         <div class="photo-nav left" onclick="changePhoto(-1)"></div>
                         <div class="photo-nav right" onclick="changePhoto(1)"></div>
-                        <img src="${currentPhoto}" class="hero-image" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=BD8B52&color=fff&size=512'">
+                        <img src="${currentPhoto}" loading="lazy" class="hero-image" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=BD8B52&color=fff&size=512'">
                         <div style="position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.9); backdrop-filter:blur(10px); padding:8px 16px; border-radius:100px; border:1.5px solid var(--gold); display:flex; align-items:center; gap:8px; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
                             <div style="font-size:16px;">✨</div>
                             <div>
