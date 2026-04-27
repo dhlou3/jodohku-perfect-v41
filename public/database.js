@@ -582,76 +582,69 @@ export const DB = {
     calculateMatchScore: (me, other) => {
         if (!me || !other) return 0;
         
-        // 🏗️ ELITE BRAIN v4.0: Dynamic Intelligence Engine
-        let score = 55; // Foundation Baseline (Lowered from 65 to allow more growth)
+        // 🏗️ TRUE ELITE ENGINE v6.0: Worldview vs Context model
+        let score = 65; // Barakah Baseline
         let bonuses = 0;
         let penalties = 0;
 
-        // 1. 📋 PROMPT & BIO DEEP SCAN (Keyword Analysis)
-        const meWords = [
-            ...(me.prompts || []).map(p => p.a),
-            me.bio || "",
-            me.statusHariIni || "",
-            me.hobiHujungMinggu || ""
-        ].join(" ").toLowerCase();
+        // 🛡️ 1. GATHER MY CRITERIA (30 Pillars + Bio + Prompts)
+        const my30Answers = (me.prompts || []).map(p => p.a).join(" ").toLowerCase();
+        const myPrompt = (me.promptText || me.promptA || "").toLowerCase(); // Check various field names for safety
+        const myBio = (me.bio || "").toLowerCase();
+        const fullMyCriteria = my30Answers + " " + myPrompt + " " + myBio;
 
-        const otherWords = [
-            ...(other.prompts || []).map(p => p.a),
-            other.bio || "",
-            other.statusHariIni || "",
-            other.hobiHujungMinggu || ""
-        ].join(" ").toLowerCase();
+        // 🎯 2. GATHER THEIR CONTEXT (Bio + Job + Interests + Traits)
+        const targetBio = (other.bio || other.statusHariIni || "").toLowerCase();
+        const targetJob = (other.profession || other.jobTitle || "").toLowerCase();
+        const targetInterests = (other.interests || []).join(" ").toLowerCase();
+        const targetTraits = (other.traits || []).join(" ").toLowerCase();
+        const fullTargetContext = targetBio + " " + targetJob + " " + targetInterests + " " + targetTraits;
 
-        const otherInterests = (other.interests || []).join(" ").toLowerCase();
-        const otherTraits = (other.traits || []).join(" ").toLowerCase();
-        const otherJob = (other.profession || other.jobTitle || "").toLowerCase();
+        // --- PHASE A: DEALBREAKER PROTECTION (Softened) ---
+        const isNegated = (text, keyword) => {
+            const regex = new RegExp(`(don't|no|not|tak nak|jangan|bukan|excluding|anti|neither)\\s*.*${keyword}`, 'i');
+            return regex.test(text);
+        };
 
-        const fullContextB = otherWords + " " + otherInterests + " " + otherTraits + " " + otherJob;
-
-        // 🎯 High-Value Synergy Keywords
-        const powerKeywords = [
-            { k: 'coffee|kopi|kafe', b: 8 },
-            { k: 'travel|kembara|jalan', b: 7 },
-            { k: 'tech|coding|it|ai', b: 10 },
-            { k: 'masak|cook|food|makan', b: 6 },
-            { k: 'gym|fit|sehat|health', b: 7 },
-            { k: 'buku|read|baca|ilmu', b: 6 },
-            { k: 'kucing|cat|animal', b: 5 },
-            { k: 'islam|deen|agama|tadabbur|zikir', b: 12 }
+        const tracks = [
+            { id: 'teacher', kw: 'teacher|cikgu|guru|lecturer' },
+            { id: 'smoker', kw: 'smoke|merokok|rokok|vape' },
+            { id: 'pets', kw: 'cat|kucing|animal' }
         ];
 
-        powerKeywords.forEach(pk => {
-            const regex = new RegExp(pk.k, 'i');
-            if (regex.test(meWords) && regex.test(fullContextB)) {
-                bonuses += pk.b;
+        tracks.forEach(t => {
+            if (isNegated(fullMyCriteria, t.kw) && new RegExp(t.kw, 'i').test(fullTargetContext)) {
+                penalties += 15; 
             }
         });
 
-        // 2. 🧩 INTEREST & TRAIT ALIGNMENT (Direct Array Comparison)
-        const myInterests = me.interests || [];
-        const commonInt = myInterests.filter(i => (other.interests || []).includes(i));
-        bonuses += (commonInt.length * 4); // +4% per shared interest
-
-        const myTraits = me.traits || [];
-        const commonTraits = myTraits.filter(t => (other.traits || []).includes(t));
-        bonuses += (commonTraits.length * 6); // +6% per shared personality trait
-
-        // 3. 🛡️ DEALBREAKER LOGIC
-        if (meWords.includes("smoking") || meWords.includes("merokok")) {
-            if (!fullContextB.includes("smoke") && !fullContextB.includes("rokok")) bonuses += 5;
+        // --- PHASE B: SPIRITUAL ALIGNMENT (Question #11 - Karakter & Iman) ---
+        const q11 = (me.prompts || []).find(p => p.key === 'q_t_11');
+        if (q11 && (q11.a.includes("Sangat") || q11.a.includes("Very"))) {
+            if (/tadabbur|zikir|charity|sedekah|islam|iman|agama/.test(fullTargetContext)) {
+                bonuses += 20; // Massive spiritual synergy bonus
+            }
         }
 
-        // 4. 📍 LOCATION PROXIMITY (Bonus for convenience)
+        // --- PHASE C: INTEREST SYNERGY STACKING ---
+        const synergies = ['coffee', 'hiking', 'travel', 'tech', 'cooking', 'reading', 'cats', 'garden'];
+        synergies.forEach(kw => {
+            if (fullMyCriteria.includes(kw) && fullTargetContext.includes(kw)) {
+                bonuses += 5;
+            }
+        });
+
+        // --- PHASE D: NATIVE PROXIMITY ---
         const dist = DB.calculateDistance(me, other);
         if (dist && dist < 50) bonuses += 5;
 
+        // Final Score Generation
         score = score + bonuses - penalties;
         
-        // Final Normalization: Ensure smooth, human-like variance
-        const seededRandom = (score * 9301 + 49297) % 233280;
-        const subtleVariance = (seededRandom / 233280.0) * 4; // Add 0-4% tiny variance
+        // Add subtle natural variance (0-4%)
+        const variance = (Math.sin(score * 1234) + 1) * 2;
         
-        return Math.max(45, Math.min(99, Math.round(score + subtleVariance)));
+        return Math.max(45, Math.min(99, Math.round(score + variance)));
     },
 
     getMatchLabel: (score) => {
