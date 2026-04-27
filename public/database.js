@@ -582,62 +582,76 @@ export const DB = {
     calculateMatchScore: (me, other) => {
         if (!me || !other) return 0;
         
-        // 🏗️ ELITE RESILIENCE v2.6+: High floor, extreme mismatch needed for drop.
-        let score = 65; // Barakah Baseline
+        // 🏗️ ELITE BRAIN v4.0: Dynamic Intelligence Engine
+        let score = 55; // Foundation Baseline (Lowered from 65 to allow more growth)
         let bonuses = 0;
         let penalties = 0;
 
-        // 1. 📋 TAARUF PARITY (Major Weight - Up to +20%)
-        const qA = me.prompts || [];
-        const qB = other.prompts || [];
-        let directMatch = 0;
-        qA.forEach(pa => {
-            const pb = qB.find(p => p.key === pa.key);
-            if (pb && pb.a === pa.a && pa.key.startsWith('q_t_')) directMatch++;
-        });
-        if (directMatch > 0) bonuses += Math.min(20, directMatch * 1);
+        // 1. 📋 PROMPT & BIO DEEP SCAN (Keyword Analysis)
+        const meWords = [
+            ...(me.prompts || []).map(p => p.a),
+            me.bio || "",
+            me.statusHariIni || "",
+            me.hobiHujungMinggu || ""
+        ].join(" ").toLowerCase();
 
-        // 2. 🌐 GLOBAL CONTEXT
-        const mePrompt = (me.dynamicPrompt || []).join(" ").toLowerCase();
-        const meAnswers = qA.map(p => p.q + " " + p.a).join(" ").toLowerCase();
-        const meRequirements = mePrompt + " " + meAnswers; 
+        const otherWords = [
+            ...(other.prompts || []).map(p => p.a),
+            other.bio || "",
+            other.statusHariIni || "",
+            other.hobiHujungMinggu || ""
+        ].join(" ").toLowerCase();
 
-        const otherJob = (other.profession || other.jobTitle || "").toLowerCase();
-        const otherBio = (other.bio || "").toLowerCase();
         const otherInterests = (other.interests || []).join(" ").toLowerCase();
-        const otherContext = otherJob + " " + otherBio + " " + otherInterests;
+        const otherTraits = (other.traits || []).join(" ").toLowerCase();
+        const otherJob = (other.profession || other.jobTitle || "").toLowerCase();
 
-        // 3. 🛡️ SOFTENED DEALBREAKER (Penalty: -15 per hit)
-        const isNegated = (text, keyword) => {
-            return new RegExp(`(don't|no|not|tak nak|jangan|bukan|excluding|anti|neither)\\s*.*${keyword}`, 'i').test(text);
-        };
+        const fullContextB = otherWords + " " + otherInterests + " " + otherTraits + " " + otherJob;
 
-        const tracks = [
-            { id: 'teacher', kw: 'teacher|cikgu|guru|lecturer' },
-            { id: 'smoker', kw: 'smoke|merokok|rokok|vape' },
-            { id: 'pets', kw: 'kucing|cat|animal' }
+        // 🎯 High-Value Synergy Keywords
+        const powerKeywords = [
+            { k: 'coffee|kopi|kafe', b: 8 },
+            { k: 'travel|kembara|jalan', b: 7 },
+            { k: 'tech|coding|it|ai', b: 10 },
+            { k: 'masak|cook|food|makan', b: 6 },
+            { k: 'gym|fit|sehat|health', b: 7 },
+            { k: 'buku|read|baca|ilmu', b: 6 },
+            { k: 'kucing|cat|animal', b: 5 },
+            { k: 'islam|deen|agama|tadabbur|zikir', b: 12 }
         ];
 
-        tracks.forEach(t => {
-            if (isNegated(meRequirements, t.kw)) {
-                if (new RegExp(t.kw, 'i').test(otherContext)) {
-                    penalties += 15; // Softened penalty to protect 50% floor
-                }
+        powerKeywords.forEach(pk => {
+            const regex = new RegExp(pk.k, 'i');
+            if (regex.test(meWords) && regex.test(fullContextB)) {
+                bonuses += pk.b;
             }
         });
 
-        // 4. ✨ SYNERGY (+10%)
-        const sharedKeywords = ['coffee', 'travel', 'books', 'hiking', 'tech', 'cooking', 'islam'];
-        sharedKeywords.forEach(kw => {
-            if (meRequirements.includes(kw) && otherContext.includes(kw)) {
-                bonuses += 2;
-            }
-        });
+        // 2. 🧩 INTEREST & TRAIT ALIGNMENT (Direct Array Comparison)
+        const myInterests = me.interests || [];
+        const commonInt = myInterests.filter(i => (other.interests || []).includes(i));
+        bonuses += (commonInt.length * 4); // +4% per shared interest
+
+        const myTraits = me.traits || [];
+        const commonTraits = myTraits.filter(t => (other.traits || []).includes(t));
+        bonuses += (commonTraits.length * 6); // +6% per shared personality trait
+
+        // 3. 🛡️ DEALBREAKER LOGIC
+        if (meWords.includes("smoking") || meWords.includes("merokok")) {
+            if (!fullContextB.includes("smoke") && !fullContextB.includes("rokok")) bonuses += 5;
+        }
+
+        // 4. 📍 LOCATION PROXIMITY (Bonus for convenience)
+        const dist = DB.calculateDistance(me, other);
+        if (dist && dist < 50) bonuses += 5;
 
         score = score + bonuses - penalties;
         
-        // Final Guarantee: Very hard to drop under 50
-        return Math.max(5, Math.min(99, Math.round(score)));
+        // Final Normalization: Ensure smooth, human-like variance
+        const seededRandom = (score * 9301 + 49297) % 233280;
+        const subtleVariance = (seededRandom / 233280.0) * 4; // Add 0-4% tiny variance
+        
+        return Math.max(45, Math.min(99, Math.round(score + subtleVariance)));
     },
 
     getMatchLabel: (score) => {
@@ -679,11 +693,11 @@ export const DB = {
                 data.jodohkuId = `JDK-${year}-${rand}`;
             }
 
-            // SMART MERGE: Ensure serverTimestamp() is included
-            await updateDoc(doc(db, "users", uid), {
+            // SMART MERGE: Ensure serverTimestamp() is included (Create if missing)
+            await setDoc(doc(db, "users", uid), {
                 ...data,
                 updatedAt: serverTimestamp()
-            });
+            }, { merge: true });
             return true;
         } catch (e) { console.error("Update User Error:", e); return false; }
     },
