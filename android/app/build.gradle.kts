@@ -12,6 +12,8 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // Flag to enable support for the new language APIs
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -45,6 +47,10 @@ android {
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
         }
     }
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
 
 configurations.all {
