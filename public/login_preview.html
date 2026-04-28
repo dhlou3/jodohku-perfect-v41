@@ -133,23 +133,24 @@
     <!-- ⚡️ SENTINEL PREFETCH: Zero-Latency Navigation Hints -->
     <link rel="prefetch" href="home_preview.html?v=41.4">
     <link rel="prefetch" href="onboarding_name.html?v=41.4">
+    <script src="i18n.js"></script>
 </head>
 <body>
     <div class="phone-container">
         <div class="hero-section">
             <div class="logo-symbol" id="masterTrigger"></div>
-            <h1>Welcome Back</h1>
-            <p class="tagline">Explore matches and chat securely.</p>
+            <h1 data-t="welcome_back">Welcome Back</h1>
+            <p class="tagline" data-t="login_tagline">Explore matches and chat securely.</p>
         </div>
         <div class="auth-card">
             <button class="btn-google" id="gBtn">
                 <img src="https://img.icons8.com/color/48/000000/google-logo.png" width="22" height="22">
-                <span>Continue with Google</span>
+                <span data-t="continue_google">Continue with Google</span>
             </button>
             <div class="biometric-btn" id="bioBtn">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2s-2-.9-2-2v-2c0-1.1.9-2 2-2z"/><path d="M18 11c0-3.3-2.7-6-6-6s-6 2.7-6 6v10"/><path d="M22 11c0-5.5-4.5-10-10-10S2 5.5 2 11v10"/></svg>
             </div>
-            <div class="footer-note">Don't have an account? <a href="register_preview.html">Register Now</a></div>
+            <div class="footer-note"><span data-t="no_account">Don't have an account?</span> <a href="register_preview.html" data-t="register_now">Register Now</a></div>
         </div>
     </div>
 
@@ -244,6 +245,8 @@
             if (params.get('provider') === 'google') {
                 btn.click();
             }
+
+            if (window.I18N) window.I18N.translatePage();
         };
     </script>
 </body>

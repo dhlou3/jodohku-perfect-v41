@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jodohku - Nombor Telefon</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
     <style>
         :root { --brand-gold: #BD8B52; --text-dark: #1F2937; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
@@ -38,13 +39,13 @@
     <div class="phone">
         <header class="header">
             <a href="settings_preview.html" class="back-btn">←</a>
-            <h1>Nombor Telefon</h1>
+            <h1 data-t="change_phone_title">Nombor Telefon</h1>
         </header>
 
         <div class="content" id="step1">
             <p class="instruction">Nombor telefon digunakan untuk log masuk dan menerima kod pengesahan penting.</p>
 
-            <span class="label">NOMBOR TELEFON BAHARU</span>
+            <span class="label" data-t="new_phone">NOMBOR TELEFON BAHARU</span>
             <div class="input-box">
                 <span class="prefix">+60</span>
                 <input type="text" id="phoneInput" placeholder="12-xxxxxxx" autocomplete="off" spellcheck="false">
@@ -52,7 +53,7 @@
 
             <div id="errorMsg"></div>
 
-            <button class="save-btn" onclick="requestOtp()">Hantar Kod Pengesahan</button>
+            <button class="save-btn" onclick="requestOtp()" data-t="update_phone_btn">Hantar Kod Pengesahan</button>
         </div>
 
         <div class="content" id="step2" style="display:none;">
@@ -126,7 +127,10 @@
             window.location.href = 'settings_preview.html';
         }
 
-        window.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('DOMContentLoaded', () => {
+            init();
+            if (window.I18N) window.I18N.translatePage();
+        });
     </script>
 </body>
 </html>

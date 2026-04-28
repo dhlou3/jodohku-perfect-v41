@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jodohku - E-mel</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
     <style>
         :root { --brand-gold: #BD8B52; --text-dark: #1F2937; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
@@ -38,18 +39,18 @@
     <div class="phone">
         <header class="header">
             <a href="settings_preview.html" class="back-btn">←</a>
-            <h1>E-mel</h1>
+            <h1 data-t="change_email_title">E-mel</h1>
         </header>
 
         <div class="content">
             <p class="instruction">Alamat e-mel digunakan untuk pemulihan akaun dan notifikasi penting.</p>
 
-            <span class="label">ALAMAT E-MEL BAHARU</span>
+            <span class="label" data-t="new_email">ALAMAT E-MEL BAHARU</span>
             <input type="text" id="emailInput" placeholder="name@email.com" autocomplete="off" spellcheck="false">
 
             <div id="errorMsg"></div>
 
-            <button class="save-btn" onclick="updateEmail()">Kemas Kini E-mel</button>
+            <button class="save-btn" onclick="updateEmail()" data-t="update_email_btn">Kemas Kini E-mel</button>
         </div>
     </div>
 
@@ -87,7 +88,10 @@
             window.location.href = 'settings_preview.html';
         }
 
-        window.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('DOMContentLoaded', () => {
+            init();
+            if (window.I18N) window.I18N.translatePage();
+        });
     </script>
 </body>
 </html>

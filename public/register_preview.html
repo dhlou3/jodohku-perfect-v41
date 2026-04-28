@@ -128,21 +128,21 @@
             border: 2px solid #00ff00;
             display: block; /* FORCED VISIBLE */
         }
-    </style>
+    <script src="i18n.js"></script>
 </head>
 <body>
     <div class="phone-container">
         <div class="hero-section">
             <div class="logo-symbol"></div>
-            <h1>Create Account</h1>
-            <p class="tagline">Join the community for a blessed journey.</p>
+            <h1 data-t="create_account_title">Create Account</h1>
+            <p class="tagline" data-t="register_tagline">Join the community for a blessed journey.</p>
         </div>
         <div class="auth-card">
             <button class="btn-google" id="regBtn">
                 <img src="https://img.icons8.com/color/48/000000/google-logo.png" width="20" height="20">
-                <span>Continue with Google</span>
+                <span data-t="continue_google">Continue with Google</span>
             </button>
-            <div class="footer-note">Already have an account? <a href="login_preview.html">Log In</a></div>
+            <div class="footer-note"><span data-t="already_account">Already have an account?</span> <a href="login_preview.html" data-t="login">Log In</a></div>
         </div>
     </div>
 
@@ -224,6 +224,8 @@
             if (params.get('provider') === 'google') {
                 btn.click();
             }
+
+            if (window.I18N) window.I18N.translatePage();
         };
     </script>
 </body>

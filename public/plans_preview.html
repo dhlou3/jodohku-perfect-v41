@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jodohku - Pilih Pelan</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="i18n.js"></script>
     <style>
         :root {
             --rahmah-green: #4ADE80;
@@ -175,20 +176,20 @@
     <div class="phone">
         <header class="header">
             <a href="settings_preview.html" class="back-btn">‹</a>
-            <div class="header-title">Pilih Pelan</div>
+            <div class="header-title" data-t="plan_title">Pilih Pelan</div>
             <div style="width: 24px;"></div>
         </header>
 
         <div class="content">
-            <h1 class="main-title">Naik Taraf Jodohku</h1>
-            <p class="main-subtitle">Buka semua ciri premium untuk pengalaman terbaik mencari jodoh</p>
+            <h1 class="main-title" data-t="upgrade_jodohku">Naik Taraf Jodohku</h1>
+            <p class="main-subtitle" data-t="upgrade_desc">Buka semua ciri premium untuk pengalaman terbaik mencari jodoh</p>
 
             <!-- RAHMAH -->
             <div class="plan-card">
                 <div class="badge badge-rahmah">✨ RAHMAH</div>
                 <div class="plan-name">Rahmah</div>
-                <div class="plan-price">PERCUMA</div>
-                <p class="plan-desc">Sesuai untuk permulaan</p>
+                <div class="plan-price" data-t="free_price">PERCUMA</div>
+                <p class="plan-desc" data-t="plan_rahmah_desc">Sesuai untuk permulaan</p>
                 <div class="feature-list">
                     <div class="feature-item check">✓ 5 cadangan profil sehari</div>
                     <div class="feature-item check">✓ 10 like sehari</div>
@@ -203,8 +204,8 @@
             <div class="plan-card gold-card">
                 <div class="badge badge-gold">✨ GOLD</div>
                 <div class="plan-name">Gold</div>
-                <div class="plan-price">RM 29 <span>/ bulan</span></div>
-                <p class="plan-desc">Sesuai untuk yang serius mencari</p>
+                <div class="plan-price">RM 29 <span data-t="per_month">/ bulan</span></div>
+                <p class="plan-desc" data-t="plan_gold_desc">Sesuai untuk yang serius mencari</p>
                 <div class="feature-list">
                     <div class="feature-item check">✓ 30 cadangan profil sehari</div>
                     <div class="feature-item check">✓ 50 like sehari</div>
@@ -215,16 +216,16 @@
                     <div class="feature-item check">✓ Mod Wali penuh</div>
                     <div class="feature-item check">✓ Lencana Gold</div>
                 </div>
-                <button class="plan-btn btn-gold">PILIH GOLD</button>
+                <button class="plan-btn btn-gold" data-t="btn_choose_gold">PILIH GOLD</button>
             </div>
 
             <!-- PLATINUM -->
             <div class="plan-card platinum-card">
-                <div class="popular-badge">⭐ PALING POPULAR — PLATINUM</div>
+                <div class="popular-badge" data-t="popular_badge_plat">⭐ PALING POPULAR — PLATINUM</div>
                 <div class="badge badge-platinum">💎 PLATINUM</div>
                 <div class="plan-name">Platinum</div>
-                <div class="plan-price">RM 69 <span>/ bulan</span></div>
-                <p class="plan-desc">Pengalaman paling lengkap</p>
+                <div class="plan-price">RM 69 <span data-t="per_month">/ bulan</span></div>
+                <p class="plan-desc" data-t="plan_platinum_desc">Pengalaman paling lengkap</p>
                 <div class="feature-list">
                     <div class="feature-item check">✓ Cadangan tanpa had</div>
                     <div class="feature-item check">✓ Like tanpa had</div>
@@ -236,15 +237,15 @@
                     <div class="feature-item check">✓ Lencana Platinum eksklusif</div>
                     <div class="feature-item check">✓ Priority dalam carian</div>
                 </div>
-                <button class="plan-btn btn-platinum" onclick="startPayment('Platinum')">PILIH PLATINUM</button>
+                <button class="plan-btn btn-platinum" onclick="startPayment('Platinum')" data-t="btn_choose_platinum">PILIH PLATINUM</button>
             </div>
 
             <!-- SOVEREIGN — NEW ELITE TIER -->
             <div class="plan-card sovereign-card">
                 <div class="badge badge-sovereign">👑 SOVEREIGN</div>
                 <div class="plan-name">Sovereign</div>
-                <div class="plan-price">RM 149 <span>/ bulan</span></div>
-                <p class="plan-desc">Untuk yang inginkan yang terbaik</p>
+                <div class="plan-price">RM 149 <span data-t="per_month">/ bulan</span></div>
+                <p class="plan-desc" data-t="plan_sovereign_desc">Untuk yang inginkan yang terbaik</p>
                 <div class="feature-list">
                     <div class="feature-item check">✓ Semua ciri Platinum</div>
                     <div class="feature-item check">✓ Profil dipaparkan #1 dalam carian</div>
@@ -254,7 +255,7 @@
                     <div class="feature-item check">✓ Sesi kaunseling pra-nikah percuma</div>
                     <div class="feature-item check">✓ Pengesahan latar belakang penuh</div>
                 </div>
-                <button class="plan-btn btn-sovereign" onclick="startPayment('Sovereign')">PILIH SOVEREIGN</button>
+                <button class="plan-btn btn-sovereign" onclick="startPayment('Sovereign')" data-t="btn_choose_sovereign">PILIH SOVEREIGN</button>
             </div>
 
             <div class="payment-methods-footer">
@@ -268,13 +269,13 @@
             <div id="loader" class="loader"></div>
             <div id="successContent" style="display:none;">
                 <div class="success-icon">✅</div>
-                <h2 style="font-family:'Playfair Display'; font-size:28px; margin-bottom:10px;">Pembayaran Berjaya!</h2>
-                <p style="color:#6B7280; font-size:14px; margin-bottom:30px;">Selamat datang ke keahlian <span id="chosenPlan" style="color:var(--brand-gold); font-weight:800;"></span>.</p>
-                <button class="plan-btn btn-sovereign" onclick="window.location.href='profile_preview.html'">PULANG KE PROFIL</button>
+                <h2 style="font-family:'Playfair Display'; font-size:28px; margin-bottom:10px;" data-t="payment_success">Pembayaran Berjaya!</h2>
+                <p style="color:#6B7280; font-size:14px; margin-bottom:30px;"><span data-t="payment_welcome">Selamat datang ke keahlian</span> <span id="chosenPlan" style="color:var(--brand-gold); font-weight:800;"></span>.</p>
+                <button class="plan-btn btn-sovereign" onclick="window.location.href='profile_preview.html'" data-t="return_to_profile">PULANG KE PROFIL</button>
             </div>
             <div id="processingText">
-                <h3 style="font-size:18px; margin-bottom:10px;">Memproses Pembayaran...</h3>
-                <p style="color:#6B7280; font-size:12px;">Sila jangan tutup tetingkap ini</p>
+                <h3 style="font-size:18px; margin-bottom:10px;" data-t="processing_payment">Memproses Pembayaran...</h3>
+                <p style="color:#6B7280; font-size:12px;" data-t="do_not_close">Sila jangan tutup tetingkap ini</p>
             </div>
         </div>
     </div>
@@ -294,7 +295,9 @@
                 document.getElementById('processingText').style.display = 'none';
                 document.getElementById('successContent').style.display = 'block';
             }, 2500);
-        }
+        };
+
+        if (window.I18N) window.I18N.translatePage();
     </script>
 </body>
 </html>
