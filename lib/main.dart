@@ -10,6 +10,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -68,6 +71,32 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
   late final WebViewController _controller;
   String? _fcmToken;
   final LocalAuthentication auth = LocalAuthentication();
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _handleImagePick(String slotIndex) async {
+    try {
+      await Permission.photos.request();
+      await Permission.camera.request();
+
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 70, // Native Compression Engine
+      );
+
+      if (image != null) {
+        final bytes = await image.readAsBytes();
+        final base64String = base64Encode(bytes);
+        final dataUrl = 'data:image/jpeg;base64,$base64String';
+        
+        // Push back to Web UI instantly
+        _controller.runJavaScript("if(window.receiveImageFromFlutter) window.receiveImageFromFlutter($slotIndex, '$dataUrl')");
+      }
+    } catch (e) {
+      debugPrint("IMAGE_PICK_ERROR: $e");
+    }
+  }
 
   Future<void> _handleBiometricRequest() async {
     try {
@@ -150,6 +179,9 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
             _syncToken(uid);
           } else if (message.message == 'requestBiometric') {
             _handleBiometricRequest();
+          } else if (message.message.startsWith('pickImage:')) {
+            final slotIndex = message.message.split(':')[1];
+            _handleImagePick(slotIndex);
           }
         },
       )

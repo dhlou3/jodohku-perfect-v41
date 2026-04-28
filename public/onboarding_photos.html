@@ -76,7 +76,27 @@
         // GLOBAL EXPOSURE FOR BUTTONS
         window.triggerPicker = function(idx) { 
             activeIdx = idx; 
-            document.getElementById('filePicker').click(); 
+            if (window.FlutterApp) {
+                // Bridge to Native Android/iOS Gallery
+                window.FlutterApp.postMessage('pickImage:' + idx);
+            } else {
+                // Fallback for Web/Desktop
+                document.getElementById('filePicker').click(); 
+            }
+        }
+
+        // NATIVE BRIDGE RECEIVER
+        window.receiveImageFromFlutter = async function(idx, dataUrl) {
+            document.getElementById('loading').style.display = 'flex';
+            try {
+                // We compress it one more time just to ensure standard grid formatting
+                const compressedUrl = await compressImage(dataUrl);
+                photos[idx] = compressedUrl;
+                updateGrid();
+            } catch (err) {
+                console.error("Flutter Bridge Compress Error", err);
+            }
+            document.getElementById('loading').style.display = 'none';
         }
 
         window.removePhoto = function(idx) { 
