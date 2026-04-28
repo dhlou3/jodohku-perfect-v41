@@ -95,20 +95,35 @@
             margin-bottom: 20px;
         }
 
-        .btn-google {
+        .auth-input {
+            width: 100%;
+            padding: 18px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .auth-input:focus {
+            border-color: var(--gold);
+            background: rgba(189, 139, 82, 0.05);
+        }
+        .btn-primary {
             width: 100%;
             padding: 18px;
-            background: #FFFFFF;
-            color: #000000;
+            background: var(--gold);
+            color: white;
             border: none;
             border-radius: 100px;
             font-size: 16px;
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
             cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 20px rgba(189, 139, 82, 0.2);
         }
         
         .footer-note { margin-top: 24px; font-size: 14px; color: var(--text-dim); }
@@ -139,10 +154,9 @@
             <p class="tagline" data-t="register_tagline">Join the community for a blessed journey.</p>
         </div>
         <div class="auth-card">
-            <button class="btn-google" id="regBtn">
-                <img src="https://img.icons8.com/color/48/000000/google-logo.png" width="20" height="20">
-                <span data-t="continue_google">Continue with Google</span>
-            </button>
+            <input type="email" id="emailInput" class="auth-input" placeholder="Alamat Email">
+            <input type="password" id="passwordInput" class="auth-input" placeholder="Kata Laluan Baru">
+            <button class="btn-primary" id="regSubmitBtn">Daftar Akaun</button>
             <div class="footer-note"><span data-t="already_account">Already have an account?</span> <a href="login_preview.html" data-t="login">Log In</a></div>
         </div>
     </div>
@@ -163,7 +177,10 @@
         };
         firebase.initializeApp(firebaseConfig);
 
-        const btn = document.getElementById('regBtn');
+        const regBtn = document.getElementById('regSubmitBtn');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+
         async function handleAuthSuccess(user) {
             if (!user) return;
             console.log("🗝️ [Registration] Success for UID:", user.uid);
@@ -191,32 +208,32 @@
             }
         }
 
-        btn.onclick = async () => {
-            if (sessionStorage.getItem('oauth_redirect_started')) return;
-            btn.innerText = 'Connecting...';
+        regBtn.onclick = async () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
             
-            if (window.FlutterApp) {
-                window.location.href = 'appbridge://googleLogin';
+            if (!email || !password) {
+                alert('Sila masukkan email dan kata laluan.');
                 return;
             }
-
+            if (password.length < 6) {
+                alert('Kata laluan mestilah sekurang-kurangnya 6 aksara.');
+                return;
+            }
+            
+            regBtn.innerText = 'Menyambung...';
+            regBtn.disabled = true;
+            
             try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                
-                if (isMobile) {
-                    sessionStorage.setItem('oauth_redirect_started', 'true');
-                    await firebase.auth().signInWithRedirect(provider);
-                } else {
-                    const result = await firebase.auth().signInWithPopup(provider);
-                    if (result.user) {
-                        await handleAuthSuccess(result.user);
-                    }
+                const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                if (result.user) {
+                    await handleAuthSuccess(result.user);
                 }
             } catch (e) {
                 console.error('AUTH ERROR:', e);
-                sessionStorage.removeItem('oauth_redirect_started');
-                btn.innerText = 'Continue with Google';
+                alert('Pendaftaran gagal: ' + e.message);
+                regBtn.innerText = 'Daftar Akaun';
+                regBtn.disabled = false;
             }
         };
 
@@ -241,6 +258,7 @@
                 sessionStorage.removeItem('oauth_redirect_started');
             });
 
+            /*
             const params = new URLSearchParams(window.location.search);
             if (params.get('provider') === 'google') {
                 if (!sessionStorage.getItem('oauth_redirect_started')) {
@@ -248,6 +266,8 @@
                 }
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
+            */
+
 
             if (window.I18N) window.I18N.translatePage();
         };

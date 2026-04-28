@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -145,32 +145,7 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
     }
   }
 
-  Future<void> _handleGoogleLogin() async {
-    try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        debugPrint("Google Sign In aborted");
-        _controller.runJavaScript("if (document.getElementById('gBtn')) document.getElementById('gBtn').innerText = 'Continue with Google';");
-        _controller.runJavaScript("if (document.getElementById('regBtn')) document.getElementById('regBtn').innerText = 'Continue with Google';");
-        return;
-      }
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      final String uid = userCredential.user!.uid;
-      
-      // Pass the UID to the WebView
-      _controller.runJavaScript("handleAuthSuccess({uid: '$uid'})");
-    } catch (e) {
-      debugPrint("Native Google Login Error: $e");
-      _controller.runJavaScript("alert('Google Sign-In failed. Please try again.');");
-      _controller.runJavaScript("if (document.getElementById('gBtn')) document.getElementById('gBtn').innerText = 'Continue with Google';");
-      _controller.runJavaScript("if (document.getElementById('regBtn')) document.getElementById('regBtn').innerText = 'Continue with Google';");
-    }
-  }
+
 
   Future<void> _requestPermissions() async {
     await [
@@ -222,9 +197,6 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
         NavigationDelegate(
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.startsWith('appbridge://')) {
-              if (request.url.contains('googleLogin')) {
-                _handleGoogleLogin();
-              }
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;
