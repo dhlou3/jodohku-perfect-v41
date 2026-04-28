@@ -194,6 +194,12 @@
         btn.onclick = async () => {
             if (sessionStorage.getItem('oauth_redirect_started')) return;
             btn.innerText = 'Connecting...';
+            
+            if (window.FlutterApp) {
+                window.location.href = 'appbridge://googleLogin';
+                return;
+            }
+
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);

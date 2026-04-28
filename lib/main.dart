@@ -147,17 +147,28 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
 
   Future<void> _handleGoogleLogin() async {
     try {
-      _controller.runJavaScript("""
-        if (document.getElementById('gBtn')) { 
-          document.getElementById('gBtn').click(); 
-        } else if (document.getElementById('regBtn')) { 
-          document.getElementById('regBtn').click(); 
-        } else { 
-          window.location.href='login_preview.html?provider=google&v=41.4'; 
-        }
-      """);
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        debugPrint("Google Sign In aborted");
+        _controller.runJavaScript("if (document.getElementById('gBtn')) document.getElementById('gBtn').innerText = 'Continue with Google';");
+        _controller.runJavaScript("if (document.getElementById('regBtn')) document.getElementById('regBtn').innerText = 'Continue with Google';");
+        return;
+      }
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final String uid = userCredential.user!.uid;
+      
+      // Pass the UID to the WebView
+      _controller.runJavaScript("handleAuthSuccess({uid: '$uid'})");
     } catch (e) {
-      debugPrint("Shield Failure: $e");
+      debugPrint("Native Google Login Error: $e");
+      _controller.runJavaScript("alert('Google Sign-In failed. Please try again.');");
+      _controller.runJavaScript("if (document.getElementById('gBtn')) document.getElementById('gBtn').innerText = 'Continue with Google';");
+      _controller.runJavaScript("if (document.getElementById('regBtn')) document.getElementById('regBtn').innerText = 'Continue with Google';");
     }
   }
 
