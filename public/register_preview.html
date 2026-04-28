@@ -192,12 +192,14 @@
         }
 
         btn.onclick = async () => {
+            if (sessionStorage.getItem('oauth_redirect_started')) return;
             btn.innerText = 'Connecting...';
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 
                 if (isMobile) {
+                    sessionStorage.setItem('oauth_redirect_started', 'true');
                     await firebase.auth().signInWithRedirect(provider);
                 } else {
                     const result = await firebase.auth().signInWithPopup(provider);
@@ -207,6 +209,7 @@
                 }
             } catch (e) {
                 console.error('AUTH ERROR:', e);
+                sessionStorage.removeItem('oauth_redirect_started');
                 btn.innerText = 'Continue with Google';
             }
         };
@@ -223,16 +226,21 @@
             */
 
             firebase.auth().getRedirectResult().then(async (result) => {
+                sessionStorage.removeItem('oauth_redirect_started');
                 if (result && result.user) {
                     await handleAuthSuccess(result.user);
                 }
             }).catch((error) => {
                 console.error('Redirect Error:', error);
+                sessionStorage.removeItem('oauth_redirect_started');
             });
 
             const params = new URLSearchParams(window.location.search);
             if (params.get('provider') === 'google') {
-                btn.click();
+                if (!sessionStorage.getItem('oauth_redirect_started')) {
+                    btn.click();
+                }
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
 
             if (window.I18N) window.I18N.translatePage();
