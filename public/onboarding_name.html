@@ -189,16 +189,40 @@
 
         window.saveAndNext = async function () {
             const name = document.getElementById('nameInput').value.trim();
+            console.log("📝 [Onboarding] Attempting to save name:", name);
+            
             if (!name) {
                 const msg = window.I18N.getLang() === 'en' ? 'Please enter your name.' : 'Sila masukkan nama anda untuk meneruskan.';
                 alert(msg);
                 return;
             }
+            
+            const btn = document.querySelector('.next-btn');
+            btn.innerText = 'Menyimpan...';
+            btn.disabled = true;
+
             try {
-                const ok = await DB.updateUser({ name: name });
-                if (ok) window.location.href = 'onboarding_ic.html';
-                else alert('Sistem sibuk. Sila cuba lagi.');
-            } catch (e) { console.error(e); }
+                // We save as both 'name' and 'fullName' for maximum compatibility with the rest of the app
+                const ok = await DB.updateUser({ 
+                    name: name,
+                    fullName: name,
+                    onboardingStage: 'name_complete' 
+                });
+                
+                if (ok) {
+                    console.log("✅ [Onboarding] Name saved. Redirecting to IC page...");
+                    window.location.href = 'onboarding_ic.html?v=42.7';
+                } else {
+                    alert('Sistem sibuk (Database Update Failed). Sila cuba lagi.');
+                    btn.innerText = 'Seterusnya ➔';
+                    btn.disabled = false;
+                }
+            } catch (e) { 
+                console.error("🔴 [Onboarding] Critical Error:", e);
+                alert('Ralat Sistem: ' + e.message);
+                btn.innerText = 'Seterusnya ➔';
+                btn.disabled = false;
+            }
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
