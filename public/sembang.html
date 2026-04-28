@@ -308,17 +308,44 @@
             const lock = document.getElementById('biometricLock');
             const btn = document.getElementById('bioVerifyBtn');
             lock.style.display = 'flex';
+
+            // Store the callback globally so the native bridge can call it
+            window.activeBioCallback = callback;
+
             btn.onclick = async () => {
                 btn.disabled = true;
                 btn.innerText = window.I18N.t('biometric_scan') || "Scanning...";
-                await new Promise(r => setTimeout(r, 1500));
-                btn.innerText = window.I18N.t('biometric_success') || "Verified!";
-                await new Promise(r => setTimeout(r, 800));
-                lock.style.display = 'none';
-                btn.disabled = false;
-                btn.innerText = window.I18N.t('biometric_verify_title');
-                callback();
+
+                if (window.FlutterApp) {
+                    // Trigger REAL NATIVE Hardware (FaceID/Fingerprint)
+                    window.FlutterApp.postMessage('verifyActionBiometric');
+                } else {
+                    // Simulation for Browser Testing
+                    await new Promise(r => setTimeout(r, 1500));
+                    window.onBiometricResult(true);
+                }
             };
+        };
+
+        window.onBiometricResult = (success) => {
+            const lock = document.getElementById('biometricLock');
+            const btn = document.getElementById('bioVerifyBtn');
+            
+            if (success) {
+                btn.innerText = window.I18N.t('biometric_success') || "Verified!";
+                setTimeout(() => {
+                    lock.style.display = 'none';
+                    btn.disabled = false;
+                    btn.innerText = window.I18N.t('biometric_verify_title');
+                    if (window.activeBioCallback) window.activeBioCallback();
+                }, 800);
+            } else {
+                btn.innerText = "Verification Failed";
+                btn.disabled = false;
+                setTimeout(() => {
+                    btn.innerText = window.I18N.t('biometric_verify_title');
+                }, 2000);
+            }
         };
 
         window.confirmWaliInvite = async () => { 
@@ -505,7 +532,12 @@
         }
         async function init() {
             setPage(1); for(let i=0; i<10; i++) { if(window.firestore_db) break; await new Promise(r => setTimeout(r, 200)); }
-            const me = await DB.getCurrentUser(); if(!me) { document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed; bottom:110px; width:100%; text-align:center; color:red; font-size:10px; z-index:9999;">Session Error: No User</div>'); return; }
+            const me = await DB.getCurrentUser(); 
+            if(!me || !me.onboardingComplete) { 
+                console.log('Profile incomplete. Redirecting...');
+                window.location.href = 'onboarding_name.html';
+                return; 
+            }
             myUid = me.uid; myPhone = me.phone || ""; myEmail = me.email || "";
             const db = window.firestore_db; const { collection, onSnapshot, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
             const updateUI = async (snapDocs) => {

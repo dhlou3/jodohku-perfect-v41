@@ -197,7 +197,7 @@
 <body>
     <div class="phone">
         <div class="header">
-            <a href="onboarding_photos.html" class="back-btn">←</a>
+            <a href="javascript:void(0)" onclick="handleBack()" class="back-btn">←</a>
             <div class="progress-line">
                 <div class="progress-fill"></div>
             </div>
@@ -271,7 +271,12 @@
                 if (ok) {
                     // 🛡️ ELITE SENTINEL: Trigger official invitation
                     await DB.sendWaliInvitation(user, waliData);
-                    window.location.href = 'onboarding_location.html';
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.get('from') === 'profile') {
+                        window.location.href = 'profile_preview.html';
+                    } else {
+                        window.location.href = 'onboarding_location.html';
+                    }
                 } else {
                     alert(window.I18N.t('tech_error'));
                 }
@@ -279,6 +284,15 @@
                 console.error(e); 
                 btn.disabled = false;
                 btn.innerText = (window.I18N.t('lengkapkan_btn') || 'Lengkapkan Profil ➔');
+            }
+        }
+
+        window.handleBack = () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('from') === 'profile') {
+                window.location.href = 'profile_preview.html';
+            } else {
+                window.location.href = 'onboarding_photos.html';
             }
         }
 

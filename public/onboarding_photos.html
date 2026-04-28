@@ -44,7 +44,7 @@
         </div>
 
         <div class="header">
-            <a href="onboarding_prompts.html" class="back-btn">←</a>
+            <a href="javascript:void(0)" onclick="handleBack()" class="back-btn">←</a>
             <div class="progress-line"><div class="progress-fill"></div></div>
         </div>
         <div class="content">
@@ -108,7 +108,13 @@
             document.getElementById('loading').style.display = 'flex';
             const finalPhotos = photos.filter(p => p !== null);
             await DB.updateUser({ photos: finalPhotos, photoUrl: finalPhotos[0] || null });
-            window.location.href = 'onboarding_wali.html?v=41.4';
+            
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('from') === 'profile') {
+                window.location.href = 'profile_preview.html';
+            } else {
+                window.location.href = 'onboarding_wali.html?v=41.4';
+            }
         }
 
         async function compressImage(dataUrl, maxWidth = 800, maxHeight = 800) {
@@ -163,6 +169,15 @@
             const btn = document.getElementById('nextBtn');
             if (photos.filter(p => p !== null).length >= 2) btn.classList.add('ready');
             else btn.classList.remove('ready');
+        }
+
+        window.handleBack = () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('from') === 'profile') {
+                window.location.href = 'profile_preview.html';
+            } else {
+                window.location.href = 'onboarding_prompts.html';
+            }
         }
 
         window.addEventListener('load', async () => {

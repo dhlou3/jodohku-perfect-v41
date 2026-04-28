@@ -174,7 +174,11 @@
         const bioBtn = document.getElementById('bioBtn');
         
         async function handleAuthSuccess(user) {
+            if (!user) return;
             const uid = user.uid || user.id;
+            console.log("🗝️ [Auth] Success for UID:", uid);
+            
+            // Critical: Lock session before any navigation
             localStorage.setItem('current_user_id', uid);
             if (window.FlutterApp) {
                 window.FlutterApp.postMessage('onLoginSuccess:' + uid);
@@ -185,13 +189,16 @@
                 const snap = await db.collection('users').doc(uid).get();
                 
                 if (snap.exists) {
-                    window.location.href = 'home_preview.html?v=41.4';
+                    console.log("✅ [Auth] Profile found. Entering app...");
+                    window.location.href = 'home_preview.html?v=42.7';
                 } else {
-                    window.location.href = 'onboarding_name.html?v=41.4';
+                    console.log("🆕 [Auth] New user. Starting onboarding...");
+                    window.location.href = 'onboarding_name.html?v=42.7';
                 }
             } catch (err) {
-                console.error('Firestore Error:', err);
-                if (user.isBio) window.location.href = 'home_preview.html?v=41.4';
+                console.error('🔴 [Auth] Firestore Error:', err);
+                // Fail-safe: If firestore fails but we have a user, go to home anyway
+                window.location.href = 'home_preview.html?v=42.7';
             }
         }
         
@@ -211,6 +218,7 @@
             
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                 
                 if (isMobile) {
@@ -228,13 +236,15 @@
         };
 
         window.onload = () => {
-            // SILENT LISTENER: Instantly catches Auth State changes on Mobile WebViews
+            // SILENT LISTENER DISABLED: Force manual choice
+            /*
             firebase.auth().onAuthStateChanged(async (user) => {
                 if (user) {
                     btn.innerText = 'Authenticated. Loading...';
                     await handleAuthSuccess(user);
                 }
             });
+            */
 
             firebase.auth().getRedirectResult().then(async (result) => {
                 if (result && result.user) {

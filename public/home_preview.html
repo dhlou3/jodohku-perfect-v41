@@ -193,11 +193,21 @@
 
                 me = await DB.getCurrentUser();
                 if(!me) {
-                    log('No profile data found for this ID.');
+                    log('No account found. Redirecting to landing...');
                     return;
                 }
                 log('Logged in as: ' + (me.fullName || me.name));
                 log('Gender: ' + me.gender);
+
+                // ⚡️ ELITE PERMISSIONS: Auto-ask for Location & Notifications
+                if(!me.lat || !me.lng) {
+                    log('📍 Requesting Location Access...');
+                    await DB.updateUserLocation();
+                }
+                if(!me.pushActive) {
+                    log('🔔 Requesting Notification Access...');
+                    await DB.enablePushNotifications();
+                }
 
                 renderInterestChips();
                 allProfiles = await DB.getDiscoveryUsers();

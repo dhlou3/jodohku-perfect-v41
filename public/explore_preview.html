@@ -107,7 +107,7 @@
             <h2 class="section-title"><span data-t="peminat_anda">Peminat Anda</span> <span id="fB" class="badge">0</span></h2>
             <div id="fC" class="fans-scroll"></div>
             
-            <h2 class="section-title" data-t="category_taaruf" style="margin-bottom:15px;">Kategori Taaruf</h2>
+
             <div class="filter-bar" id="filterBar">
                 <div class="filter-pill" onclick="openCategory('state')"><span class="filter-icon">📍</span><span data-t="negeri">Negeri</span></div>
                 <div class="filter-pill" onclick="openCategory('prof')"><span class="filter-icon">💼</span><span data-t="profesional">Profesional</span></div>
@@ -163,7 +163,7 @@
     <script type="module">
         import { DB } from './database.js';
         let activeFanId = null; 
-
+        let isFanSource = false; // Track if we are viewing a Fan or a Suggestion
         async function init() {
             const me = await DB.getCurrentUser();
             const myId = me ? me.uid : null;
@@ -183,7 +183,7 @@
                 container.innerHTML = '';
                 fans.forEach(fan => {
                     const card = document.createElement('div'); card.className = 'fan-card';
-                    card.onclick = () => openM(fan.id, fan);
+                    card.onclick = () => { isFanSource = true; openM(fan.id, fan); };
                     const avatar = fan.photoUrl ? `<img src="${fan.photoUrl}" class="fan-img" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(fan.fullName || fan.name || 'P')}&background=BD8B52&color=fff'">` : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#BD8B52; color:white; font-size:40px; font-weight:900;">${(fan.fullName || fan.name || 'P')[0]}</div>`;
                     card.innerHTML = `${avatar}<div class="fan-overlay"><div class="fan-name">${fan.fullName || fan.name || window.I18N.t('peminat')}</div><button class="btn-accept">${window.I18N.t('lihat')}</button></div>`;
                     container.appendChild(card);
@@ -207,7 +207,7 @@
                 users.slice(0, 6).forEach(u => {
                     const card = document.createElement('div');
                     card.className = 'suggest-card';
-                    card.onclick = () => openM(u.uid, u);
+                    card.onclick = () => { isFanSource = false; openM(u.uid, u); };
                     
                     const dist = DB.calculateDistance(me, u);
                     const photo = u.photoUrl ? `<img src="${u.photoUrl}" class="suggest-photo" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.fullName || 'P')}&background=BD8B52&color=fff'">` : `<div style="width:100%; aspect-ratio:3/4; background:var(--gold); display:flex; align-items:center; justify-content:center; color:white; font-size:40px; font-weight:900;">${(u.fullName || 'U')[0]}</div>`;
@@ -332,9 +332,26 @@
                 document.getElementById('waliGuard').style.display = 'flex';
                 return;
             }
-            const ok = await DB.acceptFan(activeFanId);
-            if(ok) window.location.href='sembang.html'; 
-            else alert(window.I18N.t('tech_error'));
+
+            const me = await DB.getCurrentUser();
+            
+            if (isFanSource) {
+                // If it's someone who liked us, accept them and go to chat
+                const ok = await DB.acceptFan(activeFanId);
+                if(ok) window.location.href='sembang.html'; 
+                else alert(window.I18N.t('tech_error'));
+            } else {
+                // If it's a new suggestion, just like them and stay here
+                const res = await DB.recordLike(me.uid, activeFanId);
+                if(res === 'match') {
+                    alert(window.I18N.t('match_success') || "Tahniah! Padanan baru.");
+                    window.location.href='sembang.html';
+                } else {
+                    closeM();
+                    // Optionally refresh suggestions or remove the card
+                    location.reload(); 
+                }
+            }
         }
 
         window.refuse = async () => {

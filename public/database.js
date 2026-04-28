@@ -5,7 +5,7 @@ import {
     getFirestore, enableIndexedDbPersistence, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs,
     addDoc, serverTimestamp, arrayUnion, arrayRemove, orderBy, onSnapshot, limit
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
 const firebaseConfig = {
@@ -450,28 +450,32 @@ export const DB = {
 
     sendMessage: async (chatId, fromUid, text, type = 'text', fromPhone = "", fromEmail = "") => {
         try {
-            // 🛡️ SENTINEL PRE-FLIGHT CHECK (Context-Aware v3.0)
+            // 🛡️ SENTINEL PRE-FLIGHT CHECK (Context-Aware v4.0 - ULTRA-STRONG)
             const raw = text.toLowerCase();
-            const forbidden = ['babi', 'sial', 'bodoh', 'pala hotak', 'fuck', 'shit', 'anjing', 'pukimak'];
-            const meetingKeywords = ['zus', 'coffee', 'kopi', 'kafe', 'kfc', 'mcd', 'jumpa', 'meet', 'lepak', 'dating', 'date', 'starbucks', 'tealive'];
-            const intentKeywords = ['jumpa', 'meet', 'lepak', 'dating', 'date'];
+            const cleanRaw = raw.replace(/[^a-z0-9]/g, ''); // Strip spaces and special chars for detection
+            
+            const forbidden = ['babi', 'sial', 'bodoh', 'pala hotak', 'fuck', 'shit', 'anjing', 'pukimak', 'lanjiao', 'kimak', 'pantat', 'pelacur', 'haramjadah'];
+            const socialMedia = ['whatsapp', 'wasap', 'wasp', 'tele', 'insta', 'ig', 'wechat', 'line', 'fb', 'facebook', 'tiktok', 'snapchat', 'nombor', 'phone', 'ws'];
+            const meetingKeywords = ['zus', 'coffee', 'kopi', 'kafe', 'kfc', 'mcd', 'jumpa', 'meet', 'lepak', 'dating', 'date', 'starbucks', 'tealive', 'mall', 'pavilion', 'klcc'];
+            const intentKeywords = ['jumpa', 'meet', 'lepak', 'dating', 'date', 'dating', 'dinner', 'makan'];
 
             let filteredText = text;
             let violationType = null;
 
-            if (forbidden.some(w => raw.includes(w))) {
+            // 1. Language Check
+            if (forbidden.some(w => cleanRaw.includes(w) || raw.includes(w))) {
                 filteredText = '[MESEJ DIKOSONGKAN KERANA BAHASA TIDAK SOPAN]';
                 violationType = 'bad_language';
-            } else if (/[0-9]{7,}/.test(raw.replace(/[^0-9]/g, '')) || /whatsapp|wasap|wasp|tele|insta|ig|wechat|line|muka buku|fb|nombor|fon/i.test(raw)) {
-                filteredText = '[MAKLUMAT DISELINDUNG OLEH AI SEKURITI]';
+            } 
+            // 2. Privacy Leak (Numbers & Social Media)
+            else if (/[0-9]{7,}/.test(raw.replace(/[^0-9]/g, '')) || socialMedia.some(w => raw.includes(w))) {
+                filteredText = '[MAKLUMAT PERIBADI DISELINDUNG OLEH AI SEKURITI]';
                 violationType = 'privacy_leak';
-            } else if (intentKeywords.some(w => raw.includes(w)) && meetingKeywords.some(w => raw.includes(w))) {
-                const hasIntent = intentKeywords.some(w => raw.includes(w));
-                const hasPlace = meetingKeywords.some(w => raw.includes(w));
-                if (hasIntent && hasPlace) {
-                    filteredText = '[SILA GUNAKAN BUTANG "MEET" UNTUK PERTEMUAN RASMI]';
-                    violationType = 'unofficial_meeting';
-                }
+            } 
+            // 3. Unofficial Meeting Intent
+            else if (intentKeywords.some(w => raw.includes(w)) && meetingKeywords.some(w => raw.includes(w))) {
+                filteredText = '[SILA GUNAKAN BUTANG "MEET" UNTUK PERTEMUAN RASMI]';
+                violationType = 'unofficial_meeting';
             }
 
             await addDoc(collection(db, "chats", chatId, "messages"), {
@@ -627,20 +631,22 @@ export const DB = {
         if (!me || !target) return null;
         const lat1 = me.lat || 3.1390;
         const lon1 = me.lng || 101.6869;
-        const lat2 = target.lat || 3.0738;
-        const lon2 = target.lng || 101.5183;
-
-        const R = 6371; // Earth radius in km
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    // 📍 GEOSPATIAL ENGINE: Haversine Distance Calculation
+    calculateDistance: (userA, userB) => {
+        if (!userA || !userB || !userA.lat || !userA.lng || !userB.lat || !userB.lng) return 0;
+        
+        const R = 6371; // Earth's radius in km
+        const dLat = (userB.lat - userA.lat) * Math.PI / 180;
+        const dLon = (userB.lng - userA.lng) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(userA.lat * Math.PI / 180) * Math.cos(userB.lat * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         return Math.round(R * c);
     },
 
-    calculateMatchScore: (me, other) => {
+    calculateMatchScore: async (me, other) => {
         if (!me || !other) return 0;
 
         // 🏗️ TRUE ELITE ENGINE v6.0: Worldview vs Context model
@@ -993,9 +999,16 @@ export const DB = {
         }
     },
 
-    logout: () => {
-        localStorage.removeItem('current_user_id');
-        window.location.href = 'landing_preview.html';
+    logout: async () => {
+        try {
+            await signOut(auth);
+            localStorage.removeItem('current_user_id');
+            window.location.href = 'landing_preview.html';
+        } catch (e) {
+            console.error("Logout Error:", e);
+            localStorage.removeItem('current_user_id');
+            window.location.href = 'landing_preview.html';
+        }
     }
 };
 

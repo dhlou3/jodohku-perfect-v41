@@ -36,9 +36,9 @@
 <body>
     <div class="phone">
         <div class="header">
-            <a href="onboarding_bio.html" class="back-btn">←</a>
+            <a href="javascript:void(0)" onclick="handleBack()" class="back-btn">←</a>
             <div class="progress-line"><div class="progress-fill"></div></div>
-            <button onclick="window.location.href='onboarding_photos.html'" class="skip-btn-top" data-t="langkau">Langkau</button>
+            <button onclick="handleSkip()" class="skip-btn-top" data-t="langkau">Langkau</button>
         </div>
         <div class="content">
             <h1 data-t="pilih_prompt">Pilih Prompt Suara Hati</h1>
@@ -79,7 +79,32 @@
                 return; 
             }
             const ok = await DB.updateUser({ prompts: prompts });
-            if(ok) window.location.href = 'onboarding_photos.html';
+            if(ok) {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('from') === 'profile') {
+                    window.location.href = 'profile_preview.html';
+                } else {
+                    window.location.href = 'onboarding_photos.html';
+                }
+            }
+        }
+
+        window.handleBack = () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('from') === 'profile') {
+                window.location.href = 'profile_preview.html';
+            } else {
+                window.location.href = 'onboarding_bio.html';
+            }
+        }
+
+        window.handleSkip = () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('from') === 'profile') {
+                window.location.href = 'profile_preview.html';
+            } else {
+                window.location.href = 'onboarding_photos.html';
+            }
         }
 
         window.addEventListener('DOMContentLoaded', async () => {

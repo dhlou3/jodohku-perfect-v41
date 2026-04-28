@@ -43,7 +43,7 @@
 </head>
 <body>
     <div class="phone">
-        <button onclick="skipLoc()" class="skip-btn-top" data-t="langkau">Langkau</button>
+        <button onclick="handleSkip()" class="skip-btn-top" data-t="langkau">Langkau</button>
         <div class="content">
             <div class="loc-icon-container">
                 <div class="pulse"></div>
@@ -58,7 +58,7 @@
         <div class="footer">
             <button onclick="requestLocation()" class="allow-btn" data-t="aktif_loc">Aktifkan Lokasi</button>
             <div style="text-align:center; padding:10px;">
-                <a href="onboarding_wali.html" style="font-size:12px; color:#9CA3AF; text-decoration:none; font-weight:700;">← KEMBALI</a>
+                <a href="javascript:void(0)" onclick="handleBack()" style="font-size:12px; color:#9CA3AF; text-decoration:none; font-weight:700;">← KEMBALI</a>
             </div>
         </div>
     </div>
@@ -110,9 +110,25 @@
             }
         }
 
-        window.skipLoc = async () => {
-            await DB.updateUser({ onboardingComplete: true });
-            window.location.href = 'home_preview.html';
+        }
+        
+        window.handleBack = () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('from') === 'profile') {
+                window.location.href = 'profile_preview.html';
+            } else {
+                window.location.href = 'onboarding_wali.html';
+            }
+        }
+
+        window.handleSkip = async () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('from') === 'profile') {
+                window.location.href = 'profile_preview.html';
+            } else {
+                await DB.updateUser({ onboardingComplete: true });
+                window.location.href = 'home_preview.html';
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {

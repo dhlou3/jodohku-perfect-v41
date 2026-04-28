@@ -128,6 +128,7 @@
             border: 2px solid #00ff00;
             display: block; /* FORCED VISIBLE */
         }
+    </style>
     <script src="i18n.js"></script>
 </head>
 <body>
@@ -164,6 +165,10 @@
 
         const btn = document.getElementById('regBtn');
         async function handleAuthSuccess(user) {
+            if (!user) return;
+            console.log("🗝️ [Registration] Success for UID:", user.uid);
+            
+            // Critical: Lock session before any navigation
             localStorage.setItem('current_user_id', user.uid);
             if (window.FlutterApp) {
                 window.FlutterApp.postMessage('onLoginSuccess:' + user.uid);
@@ -174,12 +179,15 @@
                 const snap = await db.collection('users').doc(user.uid).get();
                 
                 if (snap.exists) {
-                    window.location.href = 'home_preview.html?v=41.2';
+                    console.log("✅ [Auth] Account recognized. Entering app...");
+                    window.location.href = 'home_preview.html?v=42.7';
                 } else {
-                    window.location.href = 'onboarding_name.html?v=41.2';
+                    console.log("🆕 [Auth] New Registration. Starting onboarding...");
+                    window.location.href = 'onboarding_name.html?v=42.7';
                 }
             } catch (err) {
-                console.error('Firestore Error:', err);
+                console.error('🔴 [Auth] Firestore Error:', err);
+                window.location.href = 'onboarding_name.html?v=42.7';
             }
         }
 
@@ -204,13 +212,15 @@
         };
 
         window.onload = () => {
-            // SILENT LISTENER: Instantly catches Auth State changes on Mobile WebViews
+            // SILENT LISTENER DISABLED: Force manual choice
+            /*
             firebase.auth().onAuthStateChanged(async (user) => {
                 if (user) {
                     btn.innerText = 'Authenticated. Loading...';
                     await handleAuthSuccess(user);
                 }
             });
+            */
 
             firebase.auth().getRedirectResult().then(async (result) => {
                 if (result && result.user) {

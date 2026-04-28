@@ -26,9 +26,6 @@
         .arabic { font-family: 'Amiri', serif; font-size: 30px; color: var(--gold); opacity: 0.9; margin-bottom: 10px; }
         .premium-tag { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; }
     </style>
-    <!-- ⚡️ SENTINEL PREFETCH: Zero-Latency Navigation Hints -->
-    <link rel="prefetch" href="login_preview.html?provider=google&v=41.4">
-    <link rel="prefetch" href="login_preview.html?v=41.4">
 </head>
 <body>
     <div class="phone">
@@ -42,8 +39,8 @@
             </div>
             <div class="footer-group">
                 <div class="button-stack">
-                    <button class="btn btn-create" data-t="create_acc" onclick="window.location.href='register_preview.html?v=41.2'">Cipta Akaun Baru</button>
-                    <button class="btn btn-login" data-t="login" onclick="window.location.href='login_preview.html?v=41.2'">Log Masuk</button>
+                    <button class="btn btn-create" data-t="create_acc" onclick="window.location.href='register_preview.html?provider=google&v=42.7'">Cipta Akaun Baru</button>
+                    <button class="btn btn-login" data-t="login" onclick="window.location.href='login_preview.html?provider=google&v=42.7'">Log Masuk</button>
                 </div>
                 <div class="bismillah-footer">
                     <div class="arabic">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
@@ -52,7 +49,7 @@
             </div>
         </div>
     </div>
-    <!-- FIREBASE BASE -->
+    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -74,25 +71,17 @@
             window.I18N.setLang(next);
         }
 
-        // AUTO-LOGIN CHECKER
+        // 🚀 INSTANT ENTRY: Auto-login if session exists
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 localStorage.setItem('current_user_id', user.uid);
-                if (window.FlutterApp) {
-                    window.FlutterApp.postMessage('onLoginSuccess:' + user.uid);
-                }
-                
                 const db = firebase.firestore();
                 db.collection('users').doc(user.uid).get().then((snap) => {
                     if (snap.exists) {
-                        window.location.href = 'home_preview.html?v=41.1';
+                        window.location.href = 'home_preview.html?v=42.7';
                     } else {
-                        // User exists but has no profile data (onboarding not finished)
-                        window.location.href = 'onboarding_name.html?v=41.1';
+                        window.location.href = 'onboarding_name.html?v=42.7';
                     }
-                }).catch((err) => {
-                    console.error("Persistence Check Error:", err);
-                    window.location.href = 'login_preview.html';
                 });
             }
         });
