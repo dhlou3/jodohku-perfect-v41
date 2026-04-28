@@ -627,10 +627,6 @@ export const DB = {
         } catch (e) { return []; }
     },
 
-    calculateDistance: (me, target) => {
-        if (!me || !target) return null;
-        const lat1 = me.lat || 3.1390;
-        const lon1 = me.lng || 101.6869;
     // 📍 GEOSPATIAL ENGINE: Haversine Distance Calculation
     calculateDistance: (userA, userB) => {
         if (!userA || !userB || !userA.lat || !userA.lng || !userB.lat || !userB.lng) return 0;
