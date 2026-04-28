@@ -188,16 +188,22 @@
         import { DB } from './database.js';
 
         window.saveAndNext = async function () {
-            const name = document.getElementById('nameInput').value.trim();
+            // IMMEDIATE FEEDBACK TO CONFIRM TRIGGER
+            const btn = document.querySelector('.next-btn');
+            btn.innerText = 'PROSES...';
+            btn.style.background = '#BD8B52';
+            
+            const nameInput = document.getElementById('nameInput');
+            const name = nameInput ? nameInput.value.trim() : "";
             console.log("📝 [Onboarding] Attempting to save name:", name);
             
             if (!name) {
-                const msg = window.I18N.getLang() === 'en' ? 'Please enter your name.' : 'Sila masukkan nama anda untuk meneruskan.';
-                alert(msg);
+                alert('Sila masukkan nama anda.');
+                btn.innerText = 'Seterusnya ➔';
+                btn.style.background = '#C67C22';
                 return;
             }
             
-            const btn = document.querySelector('.next-btn');
             btn.innerText = 'Menyimpan...';
             btn.disabled = true;
 
