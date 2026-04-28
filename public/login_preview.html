@@ -194,6 +194,9 @@
                 if (user.isBio) window.location.href = 'home_preview.html?v=41.4';
             }
         }
+        
+        // EXPOSE TO NATIVE FLUTTER BRIDGE (Crucial for Biometrics)
+        window.handleAuthSuccess = handleAuthSuccess;
 
         bioBtn.onclick = () => {
             if (window.FlutterApp) {

@@ -469,6 +469,24 @@
                         else pList.appendChild(item);
                     } catch (e) { console.error(e); }
                 }
+
+                // Inject Empty States if lists are empty after processing
+                if (cList.children.length === 0) {
+                    cList.innerHTML = `<div style="text-align:center; padding:60px 20px; color:#9CA3AF;">
+                        <div style="font-size:40px; margin-bottom:15px;">💬</div>
+                        <div style="font-size:14px; font-weight:800; color:#374151; margin-bottom:5px;">Tiada perbualan lagi.</div>
+                        <div style="font-size:12px; font-weight:600;">Mula bertegur sapa dengan padanan anda!</div>
+                    </div>`;
+                }
+
+                if (wList.children.length === 0) {
+                    wList.innerHTML = `<div style="text-align:center; padding:60px 20px; color:#9CA3AF;">
+                        <div style="font-size:40px; margin-bottom:15px;">🛡️</div>
+                        <div style="font-size:14px; font-weight:800; color:#374151; margin-bottom:5px;">Tiada Wali berdaftar.</div>
+                        <div style="font-size:12px; font-weight:600;">Jemput Wali anda untuk keberkatan.</div>
+                        <a href="wali_setup_preview.html" style="display:inline-block; margin-top:15px; padding:10px 20px; background:var(--gold); color:white; border-radius:100px; font-size:12px; font-weight:800; text-decoration:none;">Daftar Wali</a>
+                    </div>`;
+                }
             };
 
             onSnapshot(collection(db, "chats"), (snapshot) => {
