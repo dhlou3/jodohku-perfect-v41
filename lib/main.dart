@@ -108,7 +108,7 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
 
       final bool didAuthenticate = await auth.authenticate(
         localizedReason: 'Sila sahkan identiti untuk masuk Jodohku Malaysia.',
-        options: const AuthenticationOptions(stickyAuth: true, biometricsOnly: true),
+        options: const AuthenticationOptions(stickyAuth: true, biometricOnly: true),
       );
 
       if (didAuthenticate) {
@@ -122,6 +122,26 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
       }
     } catch (e) {
       debugPrint("BIOMETRIC_ERROR: $e");
+    }
+  }
+
+  Future<void> _handleActionVerification() async {
+    try {
+      final bool canAuth = await auth.isDeviceSupported() || await auth.canCheckBiometrics;
+      if (!canAuth) {
+        _controller.runJavaScript("window.onBiometricResult(true)"); // Fallback for unsupported devices
+        return;
+      }
+
+      final bool didAuthenticate = await auth.authenticate(
+        localizedReason: 'Sila sahkan identiti untuk tindakan keselamatan ini.',
+        options: const AuthenticationOptions(stickyAuth: true, biometricOnly: true),
+      );
+
+      _controller.runJavaScript("window.onBiometricResult($didAuthenticate)");
+    } catch (e) {
+      debugPrint("BIO_VERIFY_ERROR: $e");
+      _controller.runJavaScript("window.onBiometricResult(false)");
     }
   }
 
@@ -187,26 +207,6 @@ class _HybridMainScreenState extends State<HybridMainScreen> {
           }
         },
       )
-...
-  Future<void> _handleActionVerification() async {
-    try {
-      final bool canAuth = await auth.isDeviceSupported() || await auth.canCheckBiometrics;
-      if (!canAuth) {
-        _controller.runJavaScript("window.onBiometricResult(true)"); // Fallback for unsupported devices
-        return;
-      }
-
-      final bool didAuthenticate = await auth.authenticate(
-        localizedReason: 'Sila sahkan identiti untuk tindakan keselamatan ini.',
-        options: const AuthenticationOptions(stickyAuth: true, biometricsOnly: true),
-      );
-
-      _controller.runJavaScript("window.onBiometricResult($didAuthenticate)");
-    } catch (e) {
-      debugPrint("BIO_VERIFY_ERROR: $e");
-      _controller.runJavaScript("window.onBiometricResult(false)");
-    }
-  }
       ..setNavigationDelegate(
         NavigationDelegate(
           onNavigationRequest: (NavigationRequest request) {
