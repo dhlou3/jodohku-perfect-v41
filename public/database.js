@@ -177,7 +177,7 @@ export const DB = {
             const q = query(
                 collection(db, "users"),
                 where("gender", "in", targets),
-                limit(200)
+                limit(15) // SPEED PATCH: Reduced payload for faster render
             );
 
             const snapshot = await getDocs(q);
